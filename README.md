@@ -137,3 +137,4 @@ Tests start the dev servers automatically (`playwright.config.ts > webServer`).
 - JSON-LD: WebApplication + Organization on home, FAQPage on home FAQ
 - All tool pages target BD-specific keywords in English + Bangla
 - Files auto-delete from storage after 1 hour
+# pdf-studio-tools
