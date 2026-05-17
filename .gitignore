@@ -1,0 +1,13 @@
+backend/.venv/
+backend/storage/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.egg-info/
+.env
+.env.local
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/playwright-report/
+frontend/test-results/
+.DS_Store

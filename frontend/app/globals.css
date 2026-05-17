@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: 255 255 255;
+  --foreground: 15 23 42;
+  --muted: 241 245 249;
+  --muted-foreground: 100 116 139;
+  --card: 255 255 255;
+  --card-foreground: 15 23 42;
+  --border: 226 232 240;
+  --input: 226 232 240;
+  --ring: 99 102 241;
+  --primary: 79 70 229;
+  --primary-foreground: 255 255 255;
+  --secondary: 241 245 249;
+  --secondary-foreground: 15 23 42;
+  --accent: 238 242 255;
+  --accent-foreground: 49 46 129;
+  --destructive: 239 68 68;
+  --destructive-foreground: 255 255 255;
+  --success: 16 185 129;
+}
+
+.dark {
+  --background: 9 9 11;
+  --foreground: 241 245 249;
+  --muted: 24 24 27;
+  --muted-foreground: 148 163 184;
+  --card: 17 17 20;
+  --card-foreground: 241 245 249;
+  --border: 39 39 42;
+  --input: 39 39 42;
+  --ring: 129 140 248;
+  --primary: 129 140 248;
+  --primary-foreground: 17 24 39;
+  --secondary: 24 24 27;
+  --secondary-foreground: 226 232 240;
+  --accent: 49 46 129;
+  --accent-foreground: 224 231 255;
+  --destructive: 239 68 68;
+  --destructive-foreground: 255 255 255;
+  --success: 34 197 94;
+}
+
+@theme inline {
+  --color-background: rgb(var(--background));
+  --color-foreground: rgb(var(--foreground));
+  --color-muted: rgb(var(--muted));
+  --color-muted-foreground: rgb(var(--muted-foreground));
+  --color-card: rgb(var(--card));
+  --color-card-foreground: rgb(var(--card-foreground));
+  --color-border: rgb(var(--border));
+  --color-input: rgb(var(--input));
+  --color-ring: rgb(var(--ring));
+  --color-primary: rgb(var(--primary));
+  --color-primary-foreground: rgb(var(--primary-foreground));
+  --color-secondary: rgb(var(--secondary));
+  --color-secondary-foreground: rgb(var(--secondary-foreground));
+  --color-accent: rgb(var(--accent));
+  --color-accent-foreground: rgb(var(--accent-foreground));
+  --color-destructive: rgb(var(--destructive));
+  --color-destructive-foreground: rgb(var(--destructive-foreground));
+  --color-success: rgb(var(--success));
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html, body { height: 100%; }
+body {
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+*:focus-visible {
+  outline: 2px solid rgb(var(--ring));
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: rgb(var(--border)); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--muted-foreground) / 0.4); }
+
+/* Always-visible thin scrollbars for result previews so users see the affordance. */
+.preview-scroll { scrollbar-width: thin; scrollbar-gutter: stable; }
+.preview-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.preview-scroll::-webkit-scrollbar-track { background: rgb(var(--muted) / 0.4); }
+.preview-scroll::-webkit-scrollbar-thumb {
+  background: rgb(var(--muted-foreground) / 0.35);
+  border-radius: 999px;
+}
+.preview-scroll::-webkit-scrollbar-thumb:hover { background: rgb(var(--muted-foreground) / 0.6); }
+
+.gradient-text {
+  background: linear-gradient(120deg, #6366f1 0%, #ec4899 60%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glass {
+  background: rgb(var(--card) / 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Blog prose styling */
+.prose h2 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; }
+.prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.25em; margin-bottom: 0.5em; }
+.prose p { margin-bottom: 1em; line-height: 1.65; }
+.prose ul { list-style: disc; padding-left: 1.5em; margin-bottom: 1em; }
+.prose ol { list-style: decimal; padding-left: 1.5em; margin-bottom: 1em; }
+.prose li { margin-bottom: 0.25em; }
+.prose a { color: rgb(var(--primary)); text-decoration: underline; }
+.prose code { background: rgb(var(--muted)); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+.prose strong { font-weight: 700; }

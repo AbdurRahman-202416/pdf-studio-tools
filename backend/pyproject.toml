@@ -1,0 +1,13 @@
+[tool.pyrefly]
+project-includes = ["app"]
+project-excludes = [".venv", "storage", "**/__pycache__"]
+python-interpreter = ".venv/bin/python"
+python-version = "3.9"
+search-path = ["."]
+
+[tool.pyright]
+include = ["app"]
+exclude = [".venv", "storage", "**/__pycache__"]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.9"

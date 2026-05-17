@@ -1,0 +1,7 @@
+project-includes = ["app"]
+project-excludes = [".venv", "storage", "**/__pycache__"]
+
+python-interpreter = ".venv/bin/python"
+python-version = "3.9"
+
+search-path = ["."]
