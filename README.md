@@ -31,7 +31,6 @@ Built for Bangladesh, free for everyone.
 - Per-page selection (individual / all / clear)
 - Drag-and-drop reorder across files
 - 3-level compression (Light / Balanced / Maximum)
-- Rotate and split pages
 - AES-256 password lock / unlock
 - PDF to high-quality JPG / PNG (ZIP for multi-page)
 - Bangla & English OCR with smart text-layer fallback

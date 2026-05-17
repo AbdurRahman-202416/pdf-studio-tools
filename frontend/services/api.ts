@@ -100,30 +100,3 @@ export async function compressPDF(
   return res.json();
 }
 
-export async function rotatePDF(
-  file_id: string,
-  rotations: Record<number, number>,
-  filename?: string,
-): Promise<ProcessedFile> {
-  const res = await fetch(`${API_BASE}/rotate`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ file_id, rotations, filename }),
-  });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
-}
-
-export async function splitPDF(
-  file_id: string,
-  ranges: Array<[number, number]>,
-  filename?: string,
-): Promise<ProcessedFile> {
-  const res = await fetch(`${API_BASE}/split`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ file_id, ranges, filename }),
-  });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
-}
