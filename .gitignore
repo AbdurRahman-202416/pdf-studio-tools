@@ -11,3 +11,10 @@ frontend/out/
 frontend/playwright-report/
 frontend/test-results/
 .DS_Store
+
+# Editor / tooling
+.vscode/
+.claude/
+.playwright-mcp/
+CLAUDE.md
+docs/superpowers/
