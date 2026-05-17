@@ -3,7 +3,7 @@ export const siteConfig = {
   shortName: "PDFStudio",
   description:
     "Free online PDF tools, merge, compress, split, lock, OCR, NID combine, bank statement to Excel. Built for Bangladesh.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/+$/, ""),
   locale: "en_US",
   alternateLocale: "bn_BD",
   twitter: "@pdfstudio",
