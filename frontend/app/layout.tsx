@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next";
 
 import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
@@ -56,6 +57,12 @@ export const metadata: Metadata = {
     },
   },
   alternates: { canonical: "/" },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
+    other: {
+      "msvalidate.01": process.env.NEXT_PUBLIC_BING_VERIFICATION ?? "",
+    },
+  },
 };
 
 export const viewport: Viewport = { themeColor: siteConfig.themeColor };
@@ -95,6 +102,7 @@ export default function RootLayout({
             toastOptions={{ duration: 3500 }}
           />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
