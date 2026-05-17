@@ -10,6 +10,7 @@ const STATIC_ROUTES = [
   "settings",
   "blog",
   "roadmap",
+  "about",
   "tools/nid-combine",
   "tools/bangla-ocr",
   "tools/bank-to-excel",

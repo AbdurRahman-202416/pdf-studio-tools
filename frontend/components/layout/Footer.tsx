@@ -70,8 +70,17 @@ export function Footer() {
           </p>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 pb-6 text-xs text-muted-foreground">
-        © {year} PDF Studio. All rights reserved.
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 pb-6 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+        <p>© {year} PDF Studio. All rights reserved.</p>
+        <p>
+          Built by{" "}
+          <Link
+            href="/about"
+            className="font-medium text-foreground hover:text-primary transition"
+          >
+            Abdur Rahman
+          </Link>
+        </p>
       </div>
     </footer>
   );
