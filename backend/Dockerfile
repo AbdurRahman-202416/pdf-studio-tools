@@ -13,6 +13,20 @@ RUN apt-get update \
         tesseract-ocr \
         tesseract-ocr-eng \
         tesseract-ocr-ben \
+        tesseract-ocr-spa \
+        tesseract-ocr-fra \
+        tesseract-ocr-deu \
+        tesseract-ocr-hin \
+        tesseract-ocr-ara \
+        tesseract-ocr-chi-sim \
+        tesseract-ocr-chi-tra \
+        tesseract-ocr-jpn \
+        tesseract-ocr-kor \
+        tesseract-ocr-por \
+        tesseract-ocr-rus \
+        tesseract-ocr-ita \
+        tesseract-ocr-nld \
+        tesseract-ocr-tur \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
