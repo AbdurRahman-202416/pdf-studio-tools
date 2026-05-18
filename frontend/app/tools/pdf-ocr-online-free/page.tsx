@@ -12,16 +12,20 @@ import { ApiError } from "@/services/api";
 import { downloadBlob } from "@/lib/utils";
 import { extractOCR, getOcrStatus, type OcrResult, type OcrStatus } from "@/services/tools-api";
 import { cn } from "@/lib/utils";
+import { getTool } from "@/lib/seo/tool-registry";
 
-const langs: Array<{ value: "ben+eng" | "ben" | "eng"; label: string; bn: string }> = [
-  { value: "ben+eng", label: "Bangla + English", bn: "বাংলা + ইংরেজি" },
-  { value: "ben", label: "Bangla only", bn: "শুধু বাংলা" },
-  { value: "eng", label: "English only", bn: "শুধু ইংরেজি" },
+const tool = getTool("pdf-ocr-online-free")!;
+
+// TODO: expand to full Tesseract language list — Phase 3
+const langs: Array<{ value: string; label: string; sub: string }> = [
+  { value: "eng+ben", label: "English + multi-language", sub: "Best for mixed documents" },
+  { value: "eng", label: "English only", sub: "Fastest for English text" },
+  { value: "ben", label: "Bengali", sub: "Bengali script" },
 ];
 
-export default function BanglaOCRPage() {
+export default function PdfOcrPage() {
   const [file, setFile] = useState<File | null>(null);
-  const [lang, setLang] = useState<"ben+eng" | "ben" | "eng">("ben+eng");
+  const [lang, setLang] = useState<string>("eng+ben");
   const [forceOcr, setForceOcr] = useState(false);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<OcrResult | null>(null);
@@ -68,13 +72,10 @@ export default function BanglaOCRPage() {
     downloadBlob(new Blob([result.text], { type: "text/plain;charset=utf-8" }), "extracted-text.txt");
   };
 
-  const hasBangla = status?.languages.includes("ben");
-
   return (
     <ToolShell
-      title="Bangla OCR"
-      subtitle="Pull Bangla and English text out of scanned or image-based PDFs, no manual retyping."
-      badge="বাংলা"
+      title={tool.primaryKeyword}
+      subtitle={`Extract text from scanned or image-based PDFs in 100+ languages. ${tool.relatedKeywords[0]}.`}
       icon={Languages}
       gradient="from-emerald-500 via-teal-500 to-cyan-500"
       sideCard={
@@ -90,9 +91,6 @@ export default function BanglaOCRPage() {
                 <div className="flex items-center gap-2 text-success">
                   <span className="h-2 w-2 rounded-full bg-success" /> Tesseract ready
                 </div>
-                <p className="text-muted-foreground">
-                  Bangla pack: {hasBangla ? "✅ installed" : "❌ missing"}
-                </p>
                 <p className="text-xs text-muted-foreground">
                   {status.languages.length} languages available
                 </p>
@@ -136,7 +134,7 @@ export default function BanglaOCRPage() {
                   )}
                 >
                   <p className="font-semibold">{l.label}</p>
-                  <p className="text-xs text-muted-foreground">{l.bn}</p>
+                  <p className="text-xs text-muted-foreground">{l.sub}</p>
                 </button>
               ))}
             </div>

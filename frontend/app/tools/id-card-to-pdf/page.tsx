@@ -12,13 +12,16 @@ import { ToolShell } from "@/features/tools/components/ToolShell";
 import { combineNID, toolDownloadUrl, type ToolDownloadable } from "@/services/tools-api";
 import { ApiError } from "@/services/api";
 import { cn } from "@/lib/utils";
+import { getTool } from "@/lib/seo/tool-registry";
+
+const tool = getTool("id-card-to-pdf")!;
 
 const layouts = [
   { value: "a4_portrait", label: "A4 portrait", description: "Most common, vertical sheet" },
   { value: "a4_horizontal", label: "A4 horizontal", description: "Wider, side-by-side" },
 ] as const;
 
-export default function NIDCombinePage() {
+export default function IdCardToPdfPage() {
   const [front, setFront] = useState<File | null>(null);
   const [back, setBack] = useState<File | null>(null);
   const [layout, setLayout] = useState<(typeof layouts)[number]["value"]>("a4_portrait");
@@ -42,14 +45,14 @@ export default function NIDCombinePage() {
 
   const handleSubmit = async () => {
     if (!front || !back) {
-      toast.error("Upload both front and back of the NID");
+      toast.error("Upload both front and back of the ID card");
       return;
     }
     setBusy(true);
     try {
       const res = await combineNID(front, back, { layout, add_labels: labels });
       setResult(res);
-      toast.success("NID combined successfully");
+      toast.success("ID card combined successfully");
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Failed to combine");
     } finally {
@@ -59,9 +62,8 @@ export default function NIDCombinePage() {
 
   return (
     <ToolShell
-      title="NID Combiner"
-      subtitle="Combine your NID front and back onto a single A4 page in real ID-card dimensions, print-ready for any office submission."
-      badge="🇧🇩 Bangladesh"
+      title={tool.primaryKeyword}
+      subtitle={`Combine two-sided ID cards onto a single print-ready A4 PDF. ${tool.relatedKeywords[0]}.`}
       icon={IdCard}
       gradient="from-indigo-500 via-violet-500 to-fuchsia-500"
       sideCard={
@@ -73,7 +75,7 @@ export default function NIDCombinePage() {
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p>1. Upload the front side image (or PDF).</p>
               <p>2. Upload the back side.</p>
-              <p>3. Choose layout, click <strong className="text-foreground">Combine NID</strong>.</p>
+              <p>3. Choose layout, click <strong className="text-foreground">Combine ID card</strong>.</p>
               <p>4. Download the print-ready A4 PDF.</p>
             </CardContent>
           </Card>
@@ -95,7 +97,7 @@ export default function NIDCombinePage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <FileDrop
             label="Front side"
-            hint="Upload front of NID (image or PDF)"
+            hint="Upload front of ID card (image or PDF)"
             accept={{ "image/*": [], "application/pdf": [".pdf"] }}
             file={front}
             preview={frontPreview}
@@ -104,7 +106,7 @@ export default function NIDCombinePage() {
           />
           <FileDrop
             label="Back side"
-            hint="Upload back of NID (image or PDF)"
+            hint="Upload back of ID card (image or PDF)"
             accept={{ "image/*": [], "application/pdf": [".pdf"] }}
             file={back}
             preview={backPreview}
@@ -160,7 +162,7 @@ export default function NIDCombinePage() {
           data-testid="nid-combine-button"
           className="w-full sm:w-auto"
         >
-          <Wand2 className="h-4 w-4" /> Combine NID
+          <Wand2 className="h-4 w-4" /> Combine ID card
         </Button>
 
         {result && (

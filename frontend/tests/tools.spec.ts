@@ -106,4 +106,16 @@ test.describe("Tools hub", () => {
     await page.getByRole("link", { name: "Tools" }).first().click();
     await expect(page).toHaveURL(/\/tools$/);
   });
+
+  test("renamed BD tool slugs resolve (Task 7 scope)", async ({ page }) => {
+    const slugs = [
+      "/tools/pdf-ocr-online-free",
+      "/tools/id-card-to-pdf",
+      "/tools/pdf-to-excel-converter",
+    ];
+    for (const slug of slugs) {
+      const resp = await page.goto(slug);
+      expect(resp?.status(), `${slug} should be 200`).toBe(200);
+    }
+  });
 });

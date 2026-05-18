@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Banknote, FileSpreadsheet, Wand2 } from "lucide-react";
+import { FileSpreadsheet, Table, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -11,15 +11,18 @@ import { ToolResult } from "@/features/tools/components/ToolResult";
 import { ToolShell } from "@/features/tools/components/ToolShell";
 import { convertBankStatement, toolDownloadUrl, type BankResult } from "@/services/tools-api";
 import { ApiError } from "@/services/api";
+import { getTool } from "@/lib/seo/tool-registry";
 
-export default function BankToExcelPage() {
+const tool = getTool("pdf-to-excel-converter")!;
+
+export default function PdfToExcelPage() {
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<BankResult | null>(null);
 
   const handleConvert = async () => {
     if (!file) {
-      toast.error("Upload a bank statement PDF");
+      toast.error("Upload a PDF file");
       return;
     }
     setBusy(true);
@@ -36,10 +39,9 @@ export default function BankToExcelPage() {
 
   return (
     <ToolShell
-      title="Bank Statement → Excel"
-      subtitle="Convert Bangladeshi bank statement PDFs (DBBL, BRAC, Islami, Sonali and more) into clean Excel files."
-      badge="Pro"
-      icon={Banknote}
+      title={tool.primaryKeyword}
+      subtitle={`Extract tables from PDF files into editable Excel spreadsheets. ${tool.relatedKeywords[0]}.`}
+      icon={Table}
       gradient="from-amber-500 via-orange-500 to-rose-500"
       sideCard={
         <>
@@ -48,14 +50,14 @@ export default function BankToExcelPage() {
               <CardTitle>Best results</CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground space-y-2">
-              <p>✓ PDFs with selectable text (most e-statements)</p>
+              <p>✓ PDFs with selectable text (most digital PDFs)</p>
               <p>✓ Standard tabular layouts</p>
               <p>✗ Pure image-only scans, run OCR first</p>
             </CardContent>
           </Card>
           <Card className="border-amber-300/40 bg-amber-50/50 dark:bg-amber-950/20">
             <CardContent className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Privacy:</strong> Your statement is processed in
+              <strong className="text-foreground">Privacy:</strong> Your file is processed in
               memory and auto-deleted within an hour. We never log content.
             </CardContent>
           </Card>
@@ -64,8 +66,8 @@ export default function BankToExcelPage() {
     >
       <div className="space-y-6">
         <FileDrop
-          label="Drop your statement PDF"
-          hint="Most e-statements work great. Image-only scans may need OCR first."
+          label="Drop your PDF with tables"
+          hint="Most digital PDFs work great. Image-only scans may need OCR first."
           accept={{ "application/pdf": [".pdf"] }}
           file={file}
           onChange={setFile}

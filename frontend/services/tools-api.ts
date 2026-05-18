@@ -6,10 +6,13 @@ export interface ToolDownloadable {
   size_bytes: number;
 }
 
-export interface NidCombineOptions {
+export interface IdCardCombineOptions {
   layout?: "a4_portrait" | "a4_horizontal" | "compact";
   add_labels?: boolean;
 }
+
+/** @deprecated Use IdCardCombineOptions */
+export type NidCombineOptions = IdCardCombineOptions;
 
 export interface OcrPage {
   index: number;
@@ -89,20 +92,23 @@ export function toolDownloadUrl(output_id: string, name: string): string {
   return `${API_BASE}/tools/download/${output_id}?name=${encodeURIComponent(name)}`;
 }
 
-export async function combineNID(
+export async function idCardCombine(
   front: File,
   back: File,
-  options: NidCombineOptions = {},
+  options: IdCardCombineOptions = {},
 ): Promise<ToolDownloadable> {
   const fd = new FormData();
   fd.append("front", front);
   fd.append("back", back);
   fd.append("layout", options.layout ?? "a4_portrait");
   fd.append("add_labels", String(options.add_labels ?? true));
-  const res = await fetch(`${API_BASE}/tools/nid/combine`, { method: "POST", body: fd });
+  const res = await fetch(`${API_BASE}/tools/id-card/combine`, { method: "POST", body: fd });
   if (!res.ok) throw new ApiError(await parseError(res), res.status);
   return res.json();
 }
+
+/** @deprecated Use idCardCombine */
+export const combineNID = idCardCombine;
 
 export async function getOcrStatus(): Promise<OcrStatus> {
   const res = await fetch(`${API_BASE}/tools/ocr/status`);
@@ -112,7 +118,7 @@ export async function getOcrStatus(): Promise<OcrStatus> {
 
 export async function extractOCR(
   file: File,
-  lang: "ben" | "eng" | "ben+eng" = "ben+eng",
+  lang: string = "eng+ben",
   forceOcr = false,
 ): Promise<OcrResult> {
   const fd = new FormData();
@@ -124,13 +130,16 @@ export async function extractOCR(
   return res.json();
 }
 
-export async function convertBankStatement(file: File): Promise<BankResult> {
+export async function pdfTableToExcel(file: File): Promise<BankResult> {
   const fd = new FormData();
   fd.append("file", file);
-  const res = await fetch(`${API_BASE}/tools/bank/to-excel`, { method: "POST", body: fd });
+  const res = await fetch(`${API_BASE}/tools/pdf-table/to-excel`, { method: "POST", body: fd });
   if (!res.ok) throw new ApiError(await parseError(res), res.status);
   return res.json();
 }
+
+/** @deprecated Use pdfTableToExcel */
+export const convertBankStatement = pdfTableToExcel;
 
 export interface PhotoOptions {
   size?: "passport" | "stamp" | "visa_us" | "custom";
