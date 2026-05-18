@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { FileDrop } from "@/features/tools/components/FileDrop";
 import { ToolResult } from "@/features/tools/components/ToolResult";
 import { ToolShell } from "@/features/tools/components/ToolShell";
-import { combineNID, toolDownloadUrl, type ToolDownloadable } from "@/services/tools-api";
+import { idCardCombine, toolDownloadUrl, type ToolDownloadable } from "@/services/tools-api";
 import { ApiError } from "@/services/api";
 import { cn } from "@/lib/utils";
 import { getTool } from "@/lib/seo/tool-registry";
@@ -50,7 +50,7 @@ export default function IdCardToPdfPage() {
     }
     setBusy(true);
     try {
-      const res = await combineNID(front, back, { layout, add_labels: labels });
+      const res = await idCardCombine(front, back, { layout, add_labels: labels });
       setResult(res);
       toast.success("ID card combined successfully");
     } catch (err) {

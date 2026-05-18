@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { FileDrop } from "@/features/tools/components/FileDrop";
 import { ToolResult } from "@/features/tools/components/ToolResult";
 import { ToolShell } from "@/features/tools/components/ToolShell";
-import { convertBankStatement, toolDownloadUrl, type BankResult } from "@/services/tools-api";
+import { pdfTableToExcel, toolDownloadUrl, type BankResult } from "@/services/tools-api";
 import { ApiError } from "@/services/api";
 import { getTool } from "@/lib/seo/tool-registry";
 
@@ -27,7 +27,7 @@ export default function PdfToExcelPage() {
     }
     setBusy(true);
     try {
-      const r = await convertBankStatement(file);
+      const r = await pdfTableToExcel(file);
       setResult(r);
       toast.success(`Extracted ${r.rows} rows × ${r.columns} columns`);
     } catch (err) {

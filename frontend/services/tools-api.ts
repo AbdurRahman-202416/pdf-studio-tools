@@ -11,8 +11,6 @@ export interface IdCardCombineOptions {
   add_labels?: boolean;
 }
 
-/** @deprecated Use IdCardCombineOptions */
-export type NidCombineOptions = IdCardCombineOptions;
 
 export interface OcrPage {
   index: number;
@@ -107,8 +105,6 @@ export async function idCardCombine(
   return res.json();
 }
 
-/** @deprecated Use idCardCombine */
-export const combineNID = idCardCombine;
 
 export async function getOcrStatus(): Promise<OcrStatus> {
   const res = await fetch(`${API_BASE}/tools/ocr/status`);
@@ -138,8 +134,6 @@ export async function pdfTableToExcel(file: File): Promise<BankResult> {
   return res.json();
 }
 
-/** @deprecated Use pdfTableToExcel */
-export const convertBankStatement = pdfTableToExcel;
 
 export interface PhotoOptions {
   size?: "passport" | "stamp" | "visa_us" | "custom";
