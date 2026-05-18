@@ -11,13 +11,15 @@ from app.utils.storage import new_file_id, output_path
 
 LayoutMode = Literal["a4_portrait", "a4_horizontal", "compact"]
 
+VALID_LAYOUTS = ("a4_portrait", "a4_horizontal", "compact")
+
 A4_W, A4_H = 595.0, 842.0  # PDF points
 
-# Real Bangladesh NID card dimensions: 85.6 x 53.98 mm → at 72 DPI: 242.5 x 153 pts
+# Standard ID card dimensions: 85.6 x 53.98 mm → at 72 DPI: 242.5 x 153 pts
 CARD_W, CARD_H = 242.5, 153.0
 
 
-class NIDError(Exception):
+class IDCardError(Exception):
     pass
 
 
@@ -32,7 +34,7 @@ def _load_image_from_bytes(data: bytes) -> Image.Image:
 def _load_first_page_as_image(pdf_bytes: bytes, dpi: int = 220) -> Image.Image:
     with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
         if doc.page_count == 0:
-            raise NIDError("PDF has no pages")
+            raise IDCardError("PDF has no pages")
         zoom = dpi / 72
         pix = doc.load_page(0).get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
         return Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
@@ -45,7 +47,7 @@ def _to_image(file_bytes: bytes, content_type: str | None) -> Image.Image:
     return _load_image_from_bytes(file_bytes).convert("RGB")
 
 
-def combine_nid(
+def combine_id_card(
     front_bytes: bytes,
     back_bytes: bytes,
     front_ct: str | None,
@@ -53,7 +55,7 @@ def combine_nid(
     layout: LayoutMode = "a4_portrait",
     add_labels: bool = True,
 ) -> tuple[str, Path]:
-    """Combine NID front + back into a clean ID-card layout PDF."""
+    """Combine ID card front + back into a clean layout PDF."""
     front_img = _to_image(front_bytes, front_ct)
     back_img = _to_image(back_bytes, back_ct)
 

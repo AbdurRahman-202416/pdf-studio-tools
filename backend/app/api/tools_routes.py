@@ -11,9 +11,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 from app.services import (
-    bank_service,
+    bank_service,     # Task 5 will rename to pdf_table_service
     forms_service,
-    nid_service,
+    id_card_service,  # Task 4 renamed from nid_service
     ocr_service,
     pdf_image_service,
     pdf_lock_service,
@@ -24,17 +24,17 @@ from app.utils.storage import find_output, find_upload, new_file_id, upload_path
 router = APIRouter(prefix="/tools", tags=["tools"])
 
 
-# ---------- NID Combiner ---------- #
+# ---------- ID Card Combiner ---------- #
 
 
-@router.post("/nid/combine")
-async def nid_combine(
+@router.post("/id-card/combine")
+async def id_card_combine(
     front: UploadFile = File(...),
     back: UploadFile = File(...),
     layout: str = Form("a4_portrait"),
     add_labels: bool = Form(True),
 ):
-    if layout not in ("a4_portrait", "a4_horizontal", "compact"):
+    if layout not in id_card_service.VALID_LAYOUTS:
         raise HTTPException(400, "Invalid layout")
     front_bytes = await front.read()
     back_bytes = await back.read()
@@ -43,7 +43,7 @@ async def nid_combine(
 
     try:
         output_id, out = await asyncio.to_thread(
-            nid_service.combine_nid,
+            id_card_service.combine_id_card,
             front_bytes,
             back_bytes,
             front.content_type,
@@ -51,12 +51,12 @@ async def nid_combine(
             layout,
             add_labels,
         )
-    except nid_service.NIDError as exc:
+    except id_card_service.IDCardError as exc:
         raise HTTPException(400, str(exc))
 
     return {
         "output_id": output_id,
-        "filename": "nid-combined.pdf",
+        "filename": "id-card.pdf",
         "size_bytes": out.stat().st_size,
     }
 
