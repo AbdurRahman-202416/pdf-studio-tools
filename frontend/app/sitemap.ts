@@ -15,8 +15,7 @@ const STATIC_ROUTES = [
   "tools/bangla-ocr",
   "tools/bank-to-excel",
   "tools/photo-to-pdf",
-  "tools/govt-forms",
-  "tools/pdf-to-jpg",
+"tools/pdf-to-jpg",
   "tools/pdf-lock",
 ];
 

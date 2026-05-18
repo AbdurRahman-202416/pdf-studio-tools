@@ -4,7 +4,6 @@ import {
   Banknote,
   Camera,
   CheckCircle2,
-  FileSignature,
   IdCard,
   Image as ImageIcon,
   Languages,
@@ -106,13 +105,6 @@ const specializedTools = [
       "Multiple copies of a passport photo on A4, perfect for print shops.",
     icon: Camera,
     gradient: "from-sky-500 via-blue-500 to-indigo-500",
-  },
-  {
-    href: "/tools/govt-forms",
-    title: "Govt Forms",
-    description: "Pre-loaded e-TIN, NID correction, birth certificate forms.",
-    icon: FileSignature,
-    gradient: "from-rose-500 via-pink-500 to-purple-500",
   },
   {
     href: "/workspace",

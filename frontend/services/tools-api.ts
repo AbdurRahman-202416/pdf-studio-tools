@@ -50,33 +50,6 @@ export interface PhotoResult extends ToolDownloadable {
   info: PhotoInfo;
 }
 
-export interface FormFieldDef {
-  key: string;
-  label: string;
-  type: "text" | "textarea" | "date" | "number";
-  required: boolean;
-  placeholder: string;
-  width: number;
-}
-
-export interface FormSummary {
-  id: string;
-  title: string;
-  title_bn: string;
-  description: string;
-  icon: string;
-  field_count: number;
-}
-
-export interface FormDetail {
-  id: string;
-  title: string;
-  title_bn: string;
-  description: string;
-  icon: string;
-  fields: FormFieldDef[];
-}
-
 async function parseError(res: Response): Promise<string> {
   try {
     const data = await res.json();
@@ -158,18 +131,6 @@ export async function photoToPdf(file: File, opts: PhotoOptions = {}): Promise<P
   return res.json();
 }
 
-export async function listForms(): Promise<FormSummary[]> {
-  const res = await fetch(`${API_BASE}/tools/forms`);
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  const data = await res.json();
-  return data.forms;
-}
-
-export async function getForm(formId: string): Promise<FormDetail> {
-  const res = await fetch(`${API_BASE}/tools/forms/${formId}`);
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
-}
 
 export interface PdfToImagesResult extends ToolDownloadable {
   count: number;
@@ -208,12 +169,4 @@ export async function unlockPdf(file: File, password: string): Promise<ToolDownl
   return res.json();
 }
 
-export async function renderForm(formId: string, values: Record<string, string>): Promise<ToolDownloadable> {
-  const res = await fetch(`${API_BASE}/tools/forms/render`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ form_id: formId, values }),
-  });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
-}
+

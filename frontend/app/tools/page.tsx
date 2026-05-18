@@ -4,7 +4,6 @@ import {
   ArrowRight,
   Banknote,
   Camera,
-  FileSignature,
   IdCard,
   Image as ImageIcon,
   Languages,
@@ -81,14 +80,6 @@ const tools = [
     icon: Lock,
     gradient: "from-slate-700 via-slate-600 to-slate-500",
     badge: "New",
-  },
-  {
-    href: "/tools/govt-forms",
-    title: "Govt Forms",
-    title_bn: "সরকারি ফর্ম",
-    description: "Pre-loaded templates: e-TIN, NID correction, birth certificate, police clearance.",
-    icon: FileSignature,
-    gradient: "from-rose-500 via-pink-500 to-purple-500",
   },
   {
     href: "/workspace",
