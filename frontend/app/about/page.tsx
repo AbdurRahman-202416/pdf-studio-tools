@@ -14,7 +14,7 @@ const developer = {
   name: "Abdur Rahman",
   title: "Front-End Engineer",
   email: "abdurrahman19011@gmail.com",
-  location: "Dhaka, Bangladesh",
+  location: "Dhaka",
   portfolio: "https://my-portfolio-lovat-zeta-22.vercel.app/",
   linkedin: "https://www.linkedin.com/in/abdur-rahman-cse2024/",
 };
@@ -77,9 +77,7 @@ export default function AboutPage() {
 
       {/* Short intro */}
       <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
-        Front-end engineer based in Dhaka, Bangladesh. PDF Studio is built to
-        make everyday PDF tasks fast, free, and friendly, with extra care for
-        Bangla and BD-specific workflows.
+        We built PDF Studio because the best free PDF tools all have catches — watermarks, daily limits, signup walls. We removed every one.
       </p>
 
       {/* Contact tiles, labels only (URLs hidden, links still work) */}

@@ -68,7 +68,7 @@ export async function GET(req: Request) {
           </div>
         </div>
         <div style={{ fontSize: 22, opacity: 0.85, display: "flex" }}>
-          pdfstudio.app · Built for Bangladesh
+          pdfstudio.app · Free for everyone, everywhere
         </div>
       </div>
     ),

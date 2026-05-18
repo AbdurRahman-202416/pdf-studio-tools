@@ -1,12 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Banknote,
-  Camera,
   CheckCircle2,
-  IdCard,
-  Image as ImageIcon,
-  Languages,
   Layers,
   Lock,
   Merge,
@@ -14,6 +9,8 @@ import {
   Wand2,
   Zap,
 } from "lucide-react";
+import * as Icons from "lucide-react";
+import type React from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -21,6 +18,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/components/seo/SiteConfig";
 import { TrustStrip } from "@/features/home/TrustStrip";
 import { FaqSection } from "@/features/home/FaqSection";
+import { toolRegistry } from "@/lib/seo/tool-registry";
 
 const features = [
   {
@@ -60,61 +58,26 @@ const features = [
   },
 ];
 
-const specializedTools = [
-  {
-    href: "/tools/nid-combine",
-    title: "NID Combiner",
-    description: "Front + back of NID on a single, print-ready A4 page.",
-    icon: IdCard,
-    gradient: "from-indigo-500 via-violet-500 to-fuchsia-500",
-  },
-  {
-    href: "/tools/bangla-ocr",
-    title: "Bangla OCR",
-    description: "Pull Bangla text out of scanned PDFs with Tesseract.",
-    icon: Languages,
-    gradient: "from-emerald-500 via-teal-500 to-cyan-500",
-  },
-  {
-    href: "/tools/bank-to-excel",
-    title: "Bank → Excel",
-    description: "Convert bank statement PDFs into clean Excel sheets.",
-    icon: Banknote,
-    gradient: "from-amber-500 via-orange-500 to-rose-500",
-  },
-  {
-    href: "/tools/pdf-to-jpg",
-    title: "PDF → JPG",
-    description: "Export each PDF page as high-quality JPG or PNG images.",
-    icon: ImageIcon,
-    gradient: "from-pink-500 via-rose-500 to-orange-500",
-    badge: "NEW",
-  },
-  {
-    href: "/tools/pdf-lock",
-    title: "Lock / Unlock PDF",
-    description: "Add or remove an AES-256 password on any PDF.",
-    icon: Lock,
-    gradient: "from-slate-700 via-slate-600 to-slate-500",
-    badge: "NEW",
-  },
-  {
-    href: "/tools/photo-to-pdf",
-    title: "Passport Photo PDF",
-    description:
-      "Multiple copies of a passport photo on A4, perfect for print shops.",
-    icon: Camera,
-    gradient: "from-sky-500 via-blue-500 to-indigo-500",
-  },
-  {
-    href: "/workspace",
-    title: "Merge & Compress",
-    description:
-      "Classic PDF workspace with drag-drop reorder and 3-level compression.",
-    icon: Layers,
-    gradient: "from-gray-700 via-gray-600 to-gray-500",
-  },
+// Gradient palette cycled over the registry entries
+const GRADIENTS = [
+  "from-indigo-500 via-violet-500 to-fuchsia-500",
+  "from-emerald-500 via-teal-500 to-cyan-500",
+  "from-amber-500 via-orange-500 to-rose-500",
+  "from-pink-500 via-rose-500 to-orange-500",
+  "from-slate-700 via-slate-600 to-slate-500",
+  "from-sky-500 via-blue-500 to-indigo-500",
+  "from-gray-700 via-gray-600 to-gray-500",
+  "from-green-500 via-emerald-500 to-teal-500",
+  "from-purple-500 via-fuchsia-500 to-pink-500",
 ];
+
+const specializedTools = toolRegistry.map((t, i) => ({
+  href: `/tools/${t.slug}`,
+  title: t.displayName,
+  description: t.relatedKeywords[0],
+  iconName: t.iconName,
+  gradient: GRADIENTS[i % GRADIENTS.length],
+}));
 
 export default function Home() {
   return (
@@ -148,12 +111,11 @@ export default function Home() {
             <Sparkles className="h-3.5 w-3.5 text-primary" /> Free PDF tools, no signup
           </span>
           <h1 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-            The <span className="gradient-text">PDF toolkit</span>
-            <br className="hidden sm:block" /> you actually want to use.
+            All-in-one PDF toolkit.<br className="hidden sm:block" />
+            <span className="gradient-text">Free, fast, watermark-free.</span>
           </h1>
           <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Merge, compress, split, lock, convert and OCR PDFs in one polished workspace.
-            Built for Bangladesh, free for everyone.
+            Twelve focused PDF utilities — converters, optimizers, OCR, security, and more. No signup. No daily limit. Files auto-delete in 1 hour.
           </p>
           <div className="mt-8 flex items-center justify-center gap-3 flex-wrap">
             <Link href="/tools" data-testid="cta-tools">
@@ -221,31 +183,25 @@ export default function Home() {
       <section id="tools" className="space-y-8">
         <div className="text-center max-w-2xl mx-auto">
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground">
-            🇧🇩 Built for Bangladesh
+            Files auto-delete in 1 hour. No accounts.
           </span>
           <h2 className="mt-4 text-3xl font-bold tracking-tight">All our tools</h2>
           <p className="mt-2 text-muted-foreground">
-            Eight focused utilities, from classic merge &amp; compress to BD-specific
-            workflows like NID combine and Bangla OCR.
+            Nine focused PDF utilities — converters, optimizers, OCR, security, and more.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {specializedTools.map((tool) => {
-            const Icon = tool.icon;
+            const Icon = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[tool.iconName];
             return (
               <Link key={tool.href} href={tool.href} className="block group">
                 <Card className="relative h-full overflow-hidden transition hover:shadow-md hover:-translate-y-0.5">
                   <div className={`h-1.5 w-full bg-gradient-to-r ${tool.gradient}`} />
-                  {tool.badge && (
-                    <span className="absolute top-3 right-3 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                      {tool.badge}
-                    </span>
-                  )}
                   <CardContent className="space-y-3 pt-5">
                     <div
                       className={`grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br text-white shadow ${tool.gradient}`}
                     >
-                      <Icon className="h-5 w-5" />
+                      {Icon && <Icon className="h-5 w-5" />}
                     </div>
                     <h3 className="font-semibold">{tool.title}</h3>
                     <p className="text-sm text-muted-foreground">{tool.description}</p>

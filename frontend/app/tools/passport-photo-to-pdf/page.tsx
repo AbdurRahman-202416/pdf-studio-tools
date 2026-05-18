@@ -14,7 +14,7 @@ import { ApiError } from "@/services/api";
 import { cn } from "@/lib/utils";
 
 const sizes = [
-  { value: "passport", label: "Passport", description: "45 × 35 mm (Bangladesh)" },
+  { value: "passport", label: "Passport", description: "45 × 35 mm (standard)" },
   { value: "stamp", label: "Stamp", description: "1 × 1 inch (25.4 × 25.4 mm)" },
   { value: "visa_us", label: "US Visa", description: "2 × 2 inch (50.8 × 50.8 mm)" },
 ] as const;
@@ -71,7 +71,7 @@ export default function PhotoToPdfPage() {
           <CardContent className="text-sm text-muted-foreground space-y-2">
             <p>• Use a high-resolution photo (1000px+).</p>
             <p>• Plain background works best (auto-fit centers subject).</p>
-            <p>• Bangladesh passport is 45×35 mm by default.</p>
+            <p>• Standard passport size is 45 × 35 mm.</p>
           </CardContent>
         </Card>
       }

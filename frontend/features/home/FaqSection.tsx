@@ -2,32 +2,24 @@ import { JsonLd } from "@/components/seo/JsonLd";
 
 const FAQ = [
   {
-    q: "Are my PDFs safe?",
-    a: "Yes. Files are uploaded over HTTPS, processed on the server, and automatically deleted one hour later. We never share, sell, or analyze them.",
-  },
-  {
     q: "Is PDF Studio really free?",
-    a: "Yes, every tool listed is free with no signup. We may add a Pro tier later for batch processing and API access, but the core tools stay free.",
+    a: "Yes — every tool is free, with no daily limit, no signup, and no watermark on the output. We're funded by optional donations and don't show ads.",
   },
   {
-    q: "Do I need to create an account?",
-    a: "No. PDF Studio is anonymous-first. Drop files, process, download.",
+    q: "What happens to my uploaded files?",
+    a: "Files are processed on our server, then automatically deleted within one hour. We never store, share, or train any model on your documents.",
   },
   {
-    q: "What's the maximum file size?",
-    a: "100 MB per file. Need bigger? Contact us, we can lift the limit for specific use cases.",
+    q: "How large a PDF can I upload?",
+    a: "Up to 100 MB per file. For larger files, split first with the workspace tool, process each part, then merge.",
   },
   {
-    q: "Does it work on mobile?",
-    a: "Yes, every tool is mobile-responsive with touch-friendly drag-and-drop and large tap targets.",
+    q: "Do I need to install anything?",
+    a: "No. PDF Studio runs entirely in your browser; the heavy lifting happens on our server. Nothing to download.",
   },
   {
-    q: "Can I OCR scanned Bangla documents?",
-    a: "Yes, the Bangla OCR tool runs Tesseract with the Bengali (ben) language pack. It also handles English on the same page.",
-  },
-  {
-    q: "Can I password-protect a PDF?",
-    a: "Yes, the Lock / Unlock PDF tool adds AES-256 password protection, the same algorithm used by Acrobat.",
+    q: "Is it safe to upload sensitive PDFs?",
+    a: "Files are transferred over HTTPS, processed in isolated workers, and deleted within an hour. For maximum privacy, use the Password Protect PDF tool before uploading.",
   },
 ];
 
