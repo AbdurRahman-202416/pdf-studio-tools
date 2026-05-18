@@ -131,4 +131,46 @@ test.describe("Tools hub", () => {
       expect(resp?.status(), `${slug} should be 200`).toBe(200);
     }
   });
+
+  test("legacy slugs 301 to new slugs", async ({ request }) => {
+    const mappings = [
+      ["/tools/bangla-ocr", "/tools/pdf-ocr-online-free"],
+      ["/tools/nid-combine", "/tools/id-card-to-pdf"],
+      ["/tools/bank-to-excel", "/tools/pdf-to-excel-converter"],
+      ["/tools/pdf-to-jpg", "/tools/pdf-to-jpg-high-quality"],
+      ["/tools/pdf-lock", "/tools/password-protect-pdf-online"],
+      ["/tools/photo-to-pdf", "/tools/passport-photo-to-pdf"],
+      ["/tools/govt-forms", "/tools"],
+    ];
+    for (const [from, to] of mappings) {
+      const resp = await request.get(from, { maxRedirects: 0 });
+      // Next.js dev server returns 308 for permanent redirects (production returns 301).
+      // Both 301 and 308 represent permanent redirects; we accept either here.
+      expect([301, 308], `${from} should be a permanent redirect`).toContain(resp.status());
+      expect(resp.headers().location, `${from} should redirect to ${to}`).toBe(to);
+    }
+  });
+
+  test("sitemap contains all 9 tool slugs", async ({ request }) => {
+    const resp = await request.get("/sitemap.xml");
+    const body = await resp.text();
+    const required = [
+      "/tools/compress-pdf-without-losing-quality",
+      "/tools/merge-large-pdf-files-online",
+      "/tools/pdf-to-jpg-high-quality",
+      "/tools/password-protect-pdf-online",
+      "/tools/unlock-pdf-with-password-online",
+      "/tools/pdf-ocr-online-free",
+      "/tools/id-card-to-pdf",
+      "/tools/passport-photo-to-pdf",
+      "/tools/pdf-to-excel-converter",
+    ];
+    for (const slug of required) {
+      expect(body).toContain(slug);
+    }
+    // and no longer contains:
+    for (const old of ["bangla-ocr", "nid-combine", "bank-to-excel", "govt-forms"]) {
+      expect(body).not.toContain(`/tools/${old}`);
+    }
+  });
 });
