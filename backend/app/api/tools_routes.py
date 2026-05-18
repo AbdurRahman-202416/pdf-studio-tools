@@ -61,7 +61,7 @@ async def nid_combine(
     }
 
 
-# ---------- Bangla OCR ---------- #
+# ---------- Multilingual OCR ---------- #
 
 
 @router.get("/ocr/status")
@@ -73,7 +73,10 @@ async def ocr_status():
 
 
 # Validate against actually-installed packs rather than a hardcoded whitelist.
-_OCR_CODE_RE = re.compile(r"^[a-z]{2,4}(\+[a-z]{2,4}){0,3}$")
+# Accepts standard 2-4 letter codes (eng, ben, spa) and underscore-codes
+# used by Tesseract for traditional/vertical variants (chi_sim, chi_tra,
+# chi_sim_vert, etc.). Up to 4 components joined with '+' for multi-lang OCR.
+_OCR_CODE_RE = re.compile(r"^[a-z][a-z0-9_]{1,11}(\+[a-z][a-z0-9_]{1,11}){0,3}$")
 
 
 @router.post("/ocr/extract")
@@ -86,10 +89,15 @@ async def ocr_extract(
         raise HTTPException(415, "Only PDF files are accepted")
     if not _OCR_CODE_RE.match(lang):
         raise HTTPException(400, "Invalid language code format")
-    installed = set(ocr_service.list_languages())
-    for code in lang.split("+"):
-        if installed and code not in installed:
-            raise HTTPException(400, f"Language '{code}' is not installed on the server")
+    installed = set(await asyncio.to_thread(ocr_service.list_languages))
+    if not installed:
+        if ocr_service.is_available():
+            raise HTTPException(503, "OCR engine is installed but no language packs are available")
+        # Tesseract entirely unavailable — extract_text will raise OCRError → 400 below
+    else:
+        for code in lang.split("+"):
+            if code not in installed:
+                raise HTTPException(400, f"Language '{code}' is not installed on the server")
 
     file_id = new_file_id()
     dest = upload_path(file_id)
