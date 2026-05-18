@@ -118,4 +118,17 @@ test.describe("Tools hub", () => {
       expect(resp?.status(), `${slug} should be 200`).toBe(200);
     }
   });
+
+  test("renamed tool slugs resolve (Task 8 scope)", async ({ page }) => {
+    const slugs = [
+      "/tools/pdf-to-jpg-high-quality",
+      "/tools/password-protect-pdf-online",
+      "/tools/unlock-pdf-with-password-online",
+      "/tools/passport-photo-to-pdf",
+    ];
+    for (const slug of slugs) {
+      const resp = await page.goto(slug);
+      expect(resp?.status(), `${slug} should be 200`).toBe(200);
+    }
+  });
 });
