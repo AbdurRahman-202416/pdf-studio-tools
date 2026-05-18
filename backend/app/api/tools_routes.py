@@ -11,12 +11,12 @@ from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 from app.services import (
-    bank_service,     # Task 5 will rename to pdf_table_service
     forms_service,
-    id_card_service,  # Task 4 renamed from nid_service
+    id_card_service,
     ocr_service,
     pdf_image_service,
     pdf_lock_service,
+    pdf_table_service,
     photo_service,
 )
 from app.utils.storage import find_output, find_upload, new_file_id, upload_path
@@ -120,11 +120,11 @@ async def ocr_extract(
     }
 
 
-# ---------- Bank Statement → Excel ---------- #
+# ---------- PDF Table → Excel ---------- #
 
 
-@router.post("/bank/to-excel")
-async def bank_to_excel(file: UploadFile = File(...)):
+@router.post("/pdf-table/to-excel")
+async def pdf_table_to_excel(file: UploadFile = File(...)):
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
     content = await file.read()
@@ -137,16 +137,16 @@ async def bank_to_excel(file: UploadFile = File(...)):
 
     try:
         output_id, out, stats = await asyncio.to_thread(
-            bank_service.convert_bank_statement,
+            pdf_table_service.convert_pdf_table,
             dest,
-            "statement.xlsx",
+            "extracted-tables.xlsx",
         )
-    except bank_service.BankError as exc:
+    except pdf_table_service.PDFTableError as exc:
         raise HTTPException(400, str(exc))
 
     return {
         "output_id": output_id,
-        "filename": "statement.xlsx",
+        "filename": "extracted-tables.xlsx",
         "size_bytes": out.stat().st_size,
         "rows": stats["rows"],
         "columns": stats["columns"],

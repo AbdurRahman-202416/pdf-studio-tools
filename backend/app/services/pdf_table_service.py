@@ -11,7 +11,7 @@ from openpyxl.utils import get_column_letter
 from app.utils.storage import new_file_id, output_path
 
 
-class BankError(Exception):
+class PDFTableError(Exception):
     pass
 
 
@@ -47,8 +47,8 @@ def _is_summary_row(row: list[str]) -> bool:
     )
 
 
-def convert_bank_statement(file_path: Path, output_name: str = "statement.xlsx") -> tuple[str, Path, dict]:
-    """Extract bank statement tables to a clean XLSX file."""
+def convert_pdf_table(file_path: Path, output_name: str = "extracted-tables.xlsx") -> tuple[str, Path, dict]:
+    """Extract tables from a PDF to a clean XLSX file."""
     try:
         with pdfplumber.open(file_path) as pdf:
             all_rows: list[list[str]] = []
@@ -78,15 +78,15 @@ def convert_bank_statement(file_path: Path, output_name: str = "statement.xlsx")
                             if len(parts) >= 3:
                                 lines.append(parts)
                 if not lines:
-                    raise BankError(
-                        "Could not detect a table in this PDF. Ensure the statement has selectable text, image-only scans need OCR first."
+                    raise PDFTableError(
+                        "Could not detect a table in this PDF. Ensure the PDF has selectable text; image-only scans need OCR first."
                     )
                 header = [f"Column {i+1}" for i in range(max(len(r) for r in lines))]
                 all_rows = lines
-    except BankError:
+    except PDFTableError:
         raise
     except Exception as exc:  # noqa: BLE001
-        raise BankError(f"Failed to read PDF: {exc}") from exc
+        raise PDFTableError(f"Failed to read PDF: {exc}") from exc
 
     # Pad rows to header width and drop summary lines
     max_cols = max((len(r) for r in all_rows), default=0)
@@ -107,7 +107,7 @@ def convert_bank_statement(file_path: Path, output_name: str = "statement.xlsx")
 
     wb = Workbook()
     ws = wb.active
-    ws.title = "Statement"
+    ws.title = "Tables"
 
     header_font = Font(bold=True, color="FFFFFFFF")
     header_fill = PatternFill("solid", fgColor="FF4F46E5")
