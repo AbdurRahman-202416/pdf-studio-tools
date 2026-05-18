@@ -8,10 +8,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, File, Form, HTTPException, Response, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
-from pydantic import BaseModel
-
 from app.services import (
-    forms_service,
     id_card_service,
     ocr_service,
     pdf_image_service,
@@ -197,42 +194,6 @@ async def photo_to_pdf(
         "filename": f"photo-{size}.pdf",
         "size_bytes": out.stat().st_size,
         "info": info,
-    }
-
-
-# ---------- Govt Forms ---------- #
-
-
-class RenderFormRequest(BaseModel):
-    form_id: str
-    values: dict[str, str]
-
-
-@router.get("/forms")
-async def list_forms():
-    return {"forms": forms_service.list_forms()}
-
-
-@router.get("/forms/{form_id}")
-async def get_form(form_id: str):
-    try:
-        return forms_service.get_form(form_id)
-    except forms_service.FormError as exc:
-        raise HTTPException(404, str(exc))
-
-
-@router.post("/forms/render")
-async def render_form(req: RenderFormRequest):
-    try:
-        output_id, out = await asyncio.to_thread(
-            forms_service.render_form, req.form_id, req.values
-        )
-    except forms_service.FormError as exc:
-        raise HTTPException(400, str(exc))
-    return {
-        "output_id": output_id,
-        "filename": f"{req.form_id}.pdf",
-        "size_bytes": out.stat().st_size,
     }
 
 
