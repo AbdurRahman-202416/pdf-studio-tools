@@ -108,7 +108,7 @@ export const toolRegistry: ToolEntry[] = [
     ],
   },
   {
-    slug: "unlock-pdf-without-password",
+    slug: "unlock-pdf-with-password-online",
     displayName: "Unlock PDF",
     primaryKeyword: "unlock pdf with password online",
     relatedKeywords: [
@@ -218,6 +218,4 @@ export const TOOL_CATEGORIES: ToolCategory[] = [
   "convert",
   "security",
   "ocr",
-  "organize",
-  "edit",
 ];

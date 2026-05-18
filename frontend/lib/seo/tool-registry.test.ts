@@ -1,5 +1,8 @@
 import { toolRegistry, getTool, type ToolEntry } from "./tool-registry";
 
+// Compile-time contract: ensures ToolEntry stays assignable from registry entries.
+const _entry: ToolEntry = toolRegistry[0]!;
+
 function assert(cond: boolean, msg: string) {
   if (!cond) {
     console.error("FAIL:", msg);
