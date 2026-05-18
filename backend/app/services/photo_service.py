@@ -14,7 +14,7 @@ Layout = Literal["single", "grid_4", "grid_8"]
 
 # Standard sizes in mm; PIL works in pixels at 300 DPI for print
 SIZES_MM: dict[str, tuple[float, float]] = {
-    "passport": (45.0, 35.0),       # Bangladesh passport: 45 x 35 mm
+    "passport": (45.0, 35.0),       # Standard passport: 45 x 35 mm (ISO/IEC 7810 ID-3)
     "stamp": (25.4, 25.4),          # 1 x 1 inch stamp size
     "visa_us": (50.8, 50.8),        # US visa: 2 x 2 inch
 }

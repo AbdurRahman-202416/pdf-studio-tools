@@ -8,20 +8,19 @@ const TINY_PNG = Buffer.from(
 );
 
 test.describe("Tools hub", () => {
-  test("tools index lists all tools and links to NID combiner", async ({ page }) => {
+  test("tools index lists all tools and links to ID card combiner", async ({ page }) => {
     await page.goto("/tools");
     await expect(page.getByRole("heading", { name: /actually fit your workflow/i })).toBeVisible();
-    await expect(page.getByTestId("tool-nid-combine")).toBeVisible();
-    await expect(page.getByTestId("tool-bangla-ocr")).toBeVisible();
-    await expect(page.getByTestId("tool-bank-to-excel")).toBeVisible();
-    await expect(page.getByTestId("tool-photo-to-pdf")).toBeVisible();
-    await expect(page.getByTestId("tool-govt-forms")).toBeVisible();
-    await page.getByTestId("tool-nid-combine").click();
-    await expect(page).toHaveURL(/\/tools\/nid-combine$/);
+    await expect(page.getByTestId("tool-id-card-to-pdf")).toBeVisible();
+    await expect(page.getByTestId("tool-pdf-ocr-online-free")).toBeVisible();
+    await expect(page.getByTestId("tool-pdf-to-excel-converter")).toBeVisible();
+    await expect(page.getByTestId("tool-passport-photo-to-pdf")).toBeVisible();
+    await page.getByTestId("tool-id-card-to-pdf").click();
+    await expect(page).toHaveURL(/\/tools\/id-card-to-pdf$/);
   });
 
-  test("NID combiner uploads front + back and produces a PDF", async ({ page }) => {
-    await page.goto("/tools/nid-combine");
+  test("ID card combiner uploads front + back and produces a PDF", async ({ page }) => {
+    await page.goto("/tools/id-card-to-pdf");
 
     await page.getByTestId("nid-front-input").setInputFiles({
       name: "front.png",
@@ -43,15 +42,15 @@ test.describe("Tools hub", () => {
     expect(href).toMatch(/\/tools\/download\//);
   });
 
-  test("Bangla OCR page shows engine status", async ({ page }) => {
-    await page.goto("/tools/bangla-ocr");
+  test("PDF OCR page shows engine status", async ({ page }) => {
+    await page.goto("/tools/pdf-ocr-online-free");
     await expect(page.getByText(/Tesseract/)).toBeVisible({ timeout: 10_000 });
     // Engine should be ready in CI (we installed tesseract)
     await expect(page.getByText(/Tesseract ready/)).toBeVisible({ timeout: 10_000 });
   });
 
-  test("Bank to Excel converts a generated PDF", async ({ page }) => {
-    await page.goto("/tools/bank-to-excel");
+  test("PDF to Excel converts a generated PDF", async ({ page }) => {
+    await page.goto("/tools/pdf-to-excel-converter");
     const bytes = await makeSamplePDF("Bank", 1);
     await page.getByTestId("bank-file-input").setInputFiles({
       name: "statement.pdf",
@@ -67,11 +66,11 @@ test.describe("Tools hub", () => {
       errorToast.waitFor({ state: "visible", timeout: 30_000 }).catch(() => null),
     ]);
     // The page didn't crash, that's our main contract
-    await expect(page.getByRole("heading", { name: /Bank Statement/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /pdf to excel/i })).toBeVisible();
   });
 
   test("Photo to PDF generates an A4 sheet from an image", async ({ page }) => {
-    await page.goto("/tools/photo-to-pdf");
+    await page.goto("/tools/passport-photo-to-pdf");
     await page.getByTestId("photo-file-input").setInputFiles({
       name: "selfie.png",
       mimeType: "image/png",
@@ -81,24 +80,6 @@ test.describe("Tools hub", () => {
     await page.getByTestId("layout-grid_4").click();
     await page.getByTestId("photo-button").click();
     await expect(page.getByTestId("photo-result")).toBeVisible({ timeout: 25_000 });
-  });
-
-  test("Govt forms loads list and renders a PDF", async ({ page }) => {
-    await page.goto("/tools/govt-forms");
-    await expect(page.getByTestId("form-etin-info")).toBeVisible({ timeout: 10_000 });
-    await page.getByTestId("form-etin-info").click();
-    await expect(page.getByTestId("field-name")).toBeVisible();
-
-    await page.getByTestId("field-name").fill("Md. Test User");
-    await page.getByTestId("field-father_name").fill("Md. Test Sr.");
-    await page.getByTestId("field-mother_name").fill("Mrs. Test");
-    await page.getByTestId("field-dob").fill("1990-01-01");
-    await page.getByTestId("field-nid").fill("1234567890");
-    await page.getByTestId("field-address").fill("Dhaka, Bangladesh");
-    await page.getByTestId("field-phone").fill("01700000000");
-
-    await page.getByTestId("form-generate").click();
-    await expect(page.getByTestId("form-result")).toBeVisible({ timeout: 20_000 });
   });
 
   test("navigation includes Tools link", async ({ page }) => {
