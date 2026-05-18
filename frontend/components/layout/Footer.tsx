@@ -16,7 +16,7 @@ export function Footer() {
             </p>
           </div>
           <p className="mt-2 text-muted-foreground">
-            Free PDF tools, built for Bangladesh. Merge, compress, OCR, and more.
+            Free, fast, private PDF tools — for everyone, everywhere.
           </p>
         </div>
         <div>
@@ -28,18 +28,18 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/tools/pdf-to-jpg" className="hover:text-foreground">
+              <Link href="/tools/pdf-to-jpg-high-quality" className="hover:text-foreground">
                 PDF to JPG
               </Link>
             </li>
             <li>
-              <Link href="/tools/pdf-lock" className="hover:text-foreground">
+              <Link href="/tools/password-protect-pdf-online" className="hover:text-foreground">
                 Lock / Unlock PDF
               </Link>
             </li>
             <li>
-              <Link href="/tools/bangla-ocr" className="hover:text-foreground">
-                Bangla OCR
+              <Link href="/tools/pdf-ocr-online-free" className="hover:text-foreground">
+                PDF OCR
               </Link>
             </li>
             <li>
