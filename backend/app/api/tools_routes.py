@@ -72,16 +72,24 @@ async def ocr_status():
     }
 
 
+# Validate against actually-installed packs rather than a hardcoded whitelist.
+_OCR_CODE_RE = re.compile(r"^[a-z]{2,4}(\+[a-z]{2,4}){0,3}$")
+
+
 @router.post("/ocr/extract")
 async def ocr_extract(
     file: UploadFile = File(...),
-    lang: str = Form("ben+eng"),
+    lang: str = Form("eng"),
     force_ocr: bool = Form(False),
 ):
     if file.content_type not in ("application/pdf",) and not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
-    if lang not in ("ben", "eng", "ben+eng"):
-        raise HTTPException(400, "Unsupported language")
+    if not _OCR_CODE_RE.match(lang):
+        raise HTTPException(400, "Invalid language code format")
+    installed = set(ocr_service.list_languages())
+    for code in lang.split("+"):
+        if installed and code not in installed:
+            raise HTTPException(400, f"Language '{code}' is not installed on the server")
 
     file_id = new_file_id()
     dest = upload_path(file_id)
