@@ -1,4 +1,5 @@
 import { toolRegistry, getTool, type ToolEntry } from "./tool-registry";
+import { siteConfig } from "../../components/seo/SiteConfig";
 
 // Compile-time contract: ensures ToolEntry stays assignable from registry entries.
 const _entry: ToolEntry = toolRegistry[0]!;
@@ -40,3 +41,13 @@ assert(!toolRegistry.find((t) => t.slug.includes("bangla-ocr")), "old bangla-ocr
 assert(!toolRegistry.find((t) => t.slug.includes("bank-to-excel")), "old bank-to-excel slug still in registry");
 
 console.log(`OK — ${toolRegistry.length} tools validated`);
+
+// SiteConfig depolarization check
+const cfgJson = JSON.stringify(siteConfig).toLowerCase();
+for (const word of ["bangladesh", "bangla", "nid", "e-tin", "bn_bd", "bn-bd", "এনআইডি", "বাংলা", "পিডিএফ"]) {
+  if (cfgJson.includes(word.toLowerCase())) {
+    console.error(`FAIL: SiteConfig still contains "${word}"`);
+    process.exit(1);
+  }
+}
+console.log("OK — SiteConfig depolarized");

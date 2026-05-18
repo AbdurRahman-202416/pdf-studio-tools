@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} – Free PDF tools online`,
+    default: `${siteConfig.name} — ${siteConfig.tagline}`,
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -29,13 +29,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: siteConfig.name,
     locale: siteConfig.locale,
-    alternateLocale: [siteConfig.alternateLocale],
     url: siteConfig.url,
-    title: `${siteConfig.name} – Free PDF tools online`,
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
     images: [
       {
-        url: `/og?title=${encodeURIComponent(siteConfig.name)}&subtitle=${encodeURIComponent("Free PDF tools, merge, compress, OCR, convert. Built for Bangladesh.")}`,
+        url: `/og?title=${encodeURIComponent(siteConfig.name)}&subtitle=${encodeURIComponent(siteConfig.tagline)}`,
         width: 1200,
         height: 630,
       },
