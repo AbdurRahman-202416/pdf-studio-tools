@@ -65,8 +65,9 @@ export function EmailCapture({ source = "footer" }: EmailCaptureProps) {
         isLoading={busy}
         disabled={busy}
         size="sm"
+        aria-label="Subscribe"
       >
-        <Send className="h-3.5 w-3.5" />
+        <Send className="h-3.5 w-3.5" aria-hidden="true" />
       </Button>
     </form>
   );

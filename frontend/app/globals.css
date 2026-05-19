@@ -16,8 +16,8 @@
   --card-foreground: 23 21 19;
   --border: 224 217 203;                /* warm border */
   --input: 224 217 203;
-  --ring: 194 91 12;                    /* amber ring */
-  --primary: 194 91 12;                 /* aged-whisky amber */
+  --ring: 160 70 10;                    /* amber ring (WCAG AA tuned) */
+  --primary: 160 70 10;                 /* aged-whisky amber, 5.7:1 vs cream */
   --primary-foreground: 255 253 248;
   --secondary: 240 235 224;
   --secondary-foreground: 23 21 19;

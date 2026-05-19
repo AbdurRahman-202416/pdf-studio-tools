@@ -55,7 +55,10 @@ export function FileDrop({
       data-testid={testId}
       onClick={open}
     >
-      <input {...getInputProps()} data-testid={`${testId}-input`} />
+      <input
+        {...getInputProps({ "aria-label": label })}
+        data-testid={`${testId}-input`}
+      />
       <div className="relative aspect-[4/3] flex items-center justify-center text-center p-6">
         {preview ? (
           // eslint-disable-next-line @next/next/no-img-element

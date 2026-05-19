@@ -95,7 +95,7 @@ export function UploadZone() {
         data-testid="upload-zone"
         role="button"
         tabIndex={0}
-        aria-label="Upload PDF files. Drag and drop or click to browse."
+        aria-label="Drag & drop PDFs or click to browse"
         onClick={open}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -104,16 +104,20 @@ export function UploadZone() {
           }
         }}
       >
-        <input {...getInputProps()} data-testid="upload-input" />
+        <input
+          {...getInputProps({ "aria-label": "Upload PDF files" })}
+          data-testid="upload-input"
+        />
         <motion.div
           animate={{ y: isDragActive ? -4 : 0, scale: isDragActive ? 1.05 : 1 }}
           className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary"
+          aria-hidden="true"
         >
           <CloudUpload className="h-8 w-8" />
         </motion.div>
-        <h3 className="mt-4 text-lg font-semibold">
+        <h2 className="mt-4 text-lg font-semibold">
           {isDragActive ? "Drop the PDFs here" : "Drag & drop PDFs"}
-        </h3>
+        </h2>
         <p className="mt-1 text-sm text-muted-foreground max-w-md">
           Or click to browse. Multiple files supported · Max {formatBytes(MAX_BYTES)} each.
           We never share or store your files beyond processing.

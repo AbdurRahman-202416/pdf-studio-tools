@@ -86,9 +86,9 @@ export default function ToolsIndexPage() {
                     <ArrowRight className="mt-3 h-4 w-4 text-muted-foreground -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary transition" />
                   </div>
                   <div>
-                    <h3 className="font-display text-xl font-medium tracking-tight">
+                    <h2 className="font-display text-xl font-medium tracking-tight">
                       {tool.title}
-                    </h3>
+                    </h2>
                     <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed line-clamp-2">
                       {tool.primary}
                     </p>

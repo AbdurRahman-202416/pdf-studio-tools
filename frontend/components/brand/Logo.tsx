@@ -42,7 +42,9 @@ export function Logo({ size = 36, className, showWordmark = true }: LogoProps) {
     <Link
       href="/"
       className={`flex items-center gap-2 group min-w-0 ${className ?? ""}`}
-      aria-label="PDF Studio home"
+      // When the wordmark is visible, let the visible text BE the accessible
+      // name so Lighthouse's label-content-name-mismatch passes.
+      aria-label={showWordmark ? undefined : "PDF Studio home"}
     >
       <LogoMark
         size={size}

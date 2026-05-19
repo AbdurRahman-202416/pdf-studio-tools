@@ -65,7 +65,7 @@ export function Footer() {
             One email when we ship a new tool. No spam.
           </p>
           <EmailCapture source="footer" />
-          <p className="mt-4 text-xs text-muted-foreground/80">
+          <p className="mt-4 text-xs text-muted-foreground">
             Files auto-delete one hour after upload. No tracking.
           </p>
         </div>
