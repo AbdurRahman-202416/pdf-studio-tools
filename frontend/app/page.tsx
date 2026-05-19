@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Sparkles, type LucideIcon } from "lucide-react";
-import * as Icons from "lucide-react";
+import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import type React from "react";
+
+import { getToolIcon } from "@/lib/seo/tool-icons";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -11,13 +12,14 @@ import { siteConfig } from "@/components/seo/SiteConfig";
 import { TrustStrip } from "@/features/home/TrustStrip";
 import { FaqSection } from "@/features/home/FaqSection";
 import { FeaturesAccordion } from "@/features/home/FeaturesAccordion";
+import { MadeForBangladesh } from "@/features/home/MadeForBangladesh";
 import { toolRegistry } from "@/lib/seo/tool-registry";
 
 const specializedTools = toolRegistry.map((t) => ({
   slug: t.slug,
-  href: `/tools/${t.slug}`,
+  href: `/${t.slug}`,
   title: t.displayName,
-  description: t.relatedKeywords[0],
+  description: t.primaryKeyword,
   iconName: t.iconName,
 }));
 
@@ -53,15 +55,17 @@ export default function Home() {
             <Sparkles className="h-3 w-3 text-primary" /> Free · no signup · no watermark
           </span>
           <h1 className="font-display mt-7 text-5xl sm:text-6xl lg:text-7xl font-medium leading-[0.95] tracking-tight">
-            An all-in-one
+            Free PDF tools
             <br className="hidden sm:block" />{" "}
-            <em className="italic font-normal gradient-text">PDF&nbsp;atelier</em>
+            <em className="italic font-normal gradient-text">that&nbsp;just&nbsp;work</em>
             <span className="block mt-2 text-2xl sm:text-3xl lg:text-4xl font-normal text-muted-foreground tracking-normal">
-              free, fast, watermark-free.
+              compress, merge, convert, OCR, sign — no signup, no watermark.
             </span>
           </h1>
           <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Nine focused utilities — converters, optimizers, OCR, security, and more. No signup. No daily limit. Files auto-delete in one hour.
+            Fourteen focused utilities for the things you actually need to do with PDFs.
+            Free forever. No daily limits. Files auto-delete in one hour.
+            Works perfectly with English, Bangla, and 100+ other languages.
           </p>
           <div className="mt-8 flex items-center justify-center gap-3 flex-wrap">
             <Link href="/tools" data-testid="cta-tools">
@@ -83,9 +87,9 @@ export default function Home() {
 
         <div className="mt-8 grid sm:grid-cols-3 gap-3 max-w-3xl mx-auto text-sm">
           {[
-            "Drag & drop multiple PDFs",
-            "Reorder pages visually",
-            "Download in seconds",
+            "Drag & drop, reorder, download",
+            "Works with Bangla & 100+ languages",
+            "Files auto-delete in 1 hour",
           ].map((line) => (
             <div
               key={line}
@@ -106,15 +110,15 @@ export default function Home() {
             The collection
           </span>
           <h2 className="font-display mt-3 text-4xl sm:text-5xl font-medium tracking-tight">
-            All our tools
+            Every PDF tool you actually need
           </h2>
           <p className="mt-3 text-muted-foreground leading-relaxed">
-            Nine focused PDF utilities — converters, optimizers, OCR, security, and more.
+            Compress, merge, convert PDF to JPG / PNG / Word / Excel, OCR, lock, unlock, sign — all free.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {specializedTools.map((tool) => {
-            const Icon = (Icons as unknown as Record<string, LucideIcon>)[tool.iconName];
+            const Icon = getToolIcon(tool.iconName);
             return (
               <Link key={tool.href} href={tool.href} className="block group">
                 <Card className="relative h-full overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_-12px_rgb(var(--primary)/0.25)]">
@@ -147,6 +151,8 @@ export default function Home() {
           })}
         </div>
       </section>
+
+      <MadeForBangladesh />
 
       <FaqSection />
 

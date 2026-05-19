@@ -7,6 +7,7 @@ import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Plausible } from "@/components/analytics/Plausible";
+import { InstallPwaPrompt } from "@/components/share/InstallPwaPrompt";
 import { siteConfig } from "@/components/seo/SiteConfig";
 
 const geistSans = Geist({
@@ -106,6 +107,7 @@ export default function RootLayout({
         <Plausible />
         <ThemeProvider>
           <AppShell>{children}</AppShell>
+          <InstallPwaPrompt />
           <Toaster
             position="top-right"
             theme="system"

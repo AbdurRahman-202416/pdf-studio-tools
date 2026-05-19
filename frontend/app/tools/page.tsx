@@ -1,30 +1,41 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, type LucideIcon } from "lucide-react";
-import * as Icons from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/Card";
 import { ToolIcon } from "@/components/brand/ToolIcon";
 import { cn } from "@/lib/utils";
 import { toolRegistry } from "@/lib/seo/tool-registry";
+import { getToolIcon } from "@/lib/seo/tool-icons";
 
 export const metadata: Metadata = {
-  title: "All PDF tools",
+  title: "All PDF tools — free, no signup",
   description:
-    "Browse every PDF Studio tool: merge, compress, PDF to JPG, lock/unlock PDF, OCR, ID card combiner, PDF table to Excel, passport photo PDF.",
+    "Every PDF Studio tool: compress, merge, PDF to JPG, JPG to PDF, lock/unlock, OCR (100+ languages), PDF to Word, PDF to Excel, sign PDF, and more.",
+  keywords: [
+    "free pdf tools",
+    "online pdf editor",
+    "pdf converter free",
+    "compress pdf online",
+    "merge pdf online",
+    "pdf to word",
+    "pdf to excel",
+    "sign pdf online",
+  ],
   alternates: { canonical: "/tools" },
   openGraph: {
     title: "All PDF tools · PDF Studio",
     description:
-      "Nine free PDF utilities: merge, compress, PDF→JPG, lock/unlock, OCR, ID card, table-to-Excel, and more.",
+      "Fourteen free PDF utilities — compress, merge, convert, OCR, lock, unlock, sign, and more. No signup, no watermark.",
   },
 };
 
 const tools = toolRegistry.map((t) => ({
   slug: t.slug,
-  href: `/tools/${t.slug}`,
+  href: `/${t.slug}`,
   title: t.displayName,
-  description: t.relatedKeywords[0],
+  description: t.metaDescription,
+  primary: t.primaryKeyword,
   iconName: t.iconName,
 }));
 
@@ -36,18 +47,19 @@ export default function ToolsIndexPage() {
           No signup · no daily limit · no watermark
         </span>
         <h1 className="font-display mt-3 text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight leading-[1.05]">
-          PDF tools that{" "}
+          Free PDF tools that{" "}
           <em className="italic font-normal gradient-text">actually fit</em>
           <br className="hidden sm:block" /> your workflow
         </h1>
         <p className="mt-4 text-muted-foreground leading-relaxed">
-          Nine focused utilities for compressing, merging, converting, securing, and extracting from PDFs.
+          Fourteen focused utilities: compress, merge, convert, OCR in 100+ languages, lock/unlock, sign, and more.
+          No signup, no watermark, files auto-delete in an hour.
         </p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {tools.map((tool) => {
-          const Icon = (Icons as unknown as Record<string, LucideIcon>)[tool.iconName];
+          const Icon = getToolIcon(tool.iconName);
           return (
             <Link
               key={tool.href}
@@ -77,8 +89,8 @@ export default function ToolsIndexPage() {
                     <h3 className="font-display text-xl font-medium tracking-tight">
                       {tool.title}
                     </h3>
-                    <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-                      {tool.description}
+                    <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                      {tool.primary}
                     </p>
                   </div>
                 </CardContent>

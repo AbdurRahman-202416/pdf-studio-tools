@@ -1,9 +1,14 @@
 type EventName =
+  | "tool_started"
   | "tool_completed"
   | "tool_failed"
+  | "tool_shared"
   | "share_clicked"
   | "email_captured"
-  | "download_clicked";
+  | "download_clicked"
+  | "pwa_installed"
+  | "pwa_install_prompted"
+  | "lang_switched";
 
 type EventProps = Record<string, string | number | boolean>;
 

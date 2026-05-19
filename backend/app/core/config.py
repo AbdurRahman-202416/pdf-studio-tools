@@ -24,6 +24,15 @@ class Settings(BaseSettings):
     FILE_TTL_SECONDS: int = 60 * 60
     CLEANUP_INTERVAL_SECONDS: int = 15 * 60
 
+    # Per-IP sliding-window rate limit. Disabled in dev for tests; turn on
+    # via env in production: RATE_LIMIT_ENABLED=true.
+    RATE_LIMIT_ENABLED: bool = False
+    RATE_LIMIT_DEFAULT_PER_MIN: int = 120
+    RATE_LIMIT_HEAVY_PER_MIN: int = 30
+
+    # Optional Sentry DSN — when set, errors are reported.
+    SENTRY_DSN: str = ""
+
     # Comma-separated production allowlist, e.g.
     #   "https://pdfstudio.app,https://www.pdfstudio.app"
     CORS_ORIGINS_RAW: str = ""

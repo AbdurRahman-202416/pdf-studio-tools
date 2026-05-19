@@ -66,15 +66,36 @@ export default async function BlogPostPage({
         <MDXRemote source={post.body} />
       </div>
       <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          headline: post.title,
-          description: post.description,
-          datePublished: post.date,
-          author: { "@type": "Organization", name: siteConfig.name },
-          publisher: { "@type": "Organization", name: siteConfig.name },
-        }}
+        data={[
+          {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: post.title,
+            description: post.description,
+            datePublished: post.date,
+            dateModified: post.date,
+            mainEntityOfPage: `${siteConfig.url}/blog/${slug}`,
+            author: { "@type": "Organization", name: siteConfig.name },
+            publisher: {
+              "@type": "Organization",
+              name: siteConfig.name,
+              url: siteConfig.url,
+              logo: {
+                "@type": "ImageObject",
+                url: `${siteConfig.url}/icon`,
+              },
+            },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+              { "@type": "ListItem", position: 2, name: "Blog", item: `${siteConfig.url}/blog` },
+              { "@type": "ListItem", position: 3, name: post.title, item: `${siteConfig.url}/blog/${slug}` },
+            ],
+          },
+        ]}
       />
     </article>
   );

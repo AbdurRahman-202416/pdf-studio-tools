@@ -3,11 +3,15 @@ import { JsonLd } from "@/components/seo/JsonLd";
 const FAQ = [
   {
     q: "Is PDF Studio really free?",
-    a: "Yes — every tool is free, with no daily limit, no signup, and no watermark on the output. We're funded by optional donations and don't show ads.",
+    a: "Yes — every tool is free, with no daily limit, no signup required, and no watermark on the output. We're funded by optional donations and don't show ads.",
   },
   {
     q: "What happens to my uploaded files?",
     a: "Files are processed on our server, then automatically deleted within one hour. We never store, share, or train any model on your documents.",
+  },
+  {
+    q: "Do you support Bangla, Hindi, Arabic, and Chinese PDFs?",
+    a: "Yes — every tool preserves non-Latin scripts. Our OCR engine supports 100+ languages including Bangla, English, Hindi, Arabic, Chinese (Simplified/Traditional), Japanese, Korean, Russian, and many more.",
   },
   {
     q: "How large a PDF can I upload?",
@@ -15,11 +19,15 @@ const FAQ = [
   },
   {
     q: "Do I need to install anything?",
-    a: "No. PDF Studio runs entirely in your browser; the heavy lifting happens on our server. Nothing to download.",
+    a: "No. PDF Studio runs entirely in your browser; the heavy lifting happens on our server. Nothing to download or install. You can also add it to your home screen as a PWA for one-tap access.",
+  },
+  {
+    q: "Can I compress PDFs to exactly 100KB for government portals?",
+    a: "Yes — use our Compress PDF to 100KB tool. It's built for Bangladesh govt portals (BPSC, BCS, NID), Indian portals (UPSC, IBPS), and any system with strict file-size limits.",
   },
   {
     q: "Is it safe to upload sensitive PDFs?",
-    a: "Files are transferred over HTTPS, processed in isolated workers, and deleted within an hour. For maximum privacy, use the Password Protect PDF tool before uploading.",
+    a: "Files are transferred over HTTPS, processed in isolated workers, and auto-deleted within an hour. For maximum privacy, use the Password Protect PDF tool before uploading anywhere.",
   },
 ];
 
@@ -31,7 +39,7 @@ export function FaqSection() {
           Frequently asked questions
         </h2>
         <p className="text-muted-foreground">
-          Answers to common questions about privacy, pricing, and supported features.
+          Privacy, supported languages, file size limits, and government-portal compatibility.
         </p>
       </div>
       <ul className="space-y-3">
