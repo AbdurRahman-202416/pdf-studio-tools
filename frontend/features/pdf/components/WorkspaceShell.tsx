@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { RotateCcw, Sparkles } from "lucide-react";
+import { ArrowLeft, RotateCcw, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -13,7 +14,23 @@ import { CompressionPanel } from "./CompressionPanel";
 import { DownloadSection } from "./DownloadSection";
 import { usePDFStore } from "@/store/pdfStore";
 
-export function WorkspaceShell() {
+const DEFAULT_TITLE = "Workspace";
+const DEFAULT_SUBTITLE = "Upload PDFs, pick pages, reorder, then merge or compress.";
+
+interface WorkspaceShellProps {
+  /** Optional H1 override — defaults to "Workspace". Tool pages pass the tool's displayName. */
+  title?: string;
+  /** Optional one-line description under the H1. */
+  subtitle?: string;
+  /** Show the "← All tools" breadcrumb. Set when the shell is rendered under a /tools/* slug. */
+  showBackLink?: boolean;
+}
+
+export function WorkspaceShell({
+  title = DEFAULT_TITLE,
+  subtitle = DEFAULT_SUBTITLE,
+  showBackLink = false,
+}: WorkspaceShellProps) {
   const files = usePDFStore((s) => s.files);
   const clearFiles = usePDFStore((s) => s.clearFiles);
   const [resetOpen, setResetOpen] = useState(false);
@@ -22,12 +39,19 @@ export function WorkspaceShell() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
+          {showBackLink && (
+            <Link
+              href="/tools"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition mb-2"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              All tools
+            </Link>
+          )}
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            <span className="gradient-text">Workspace</span>
+            <span className="gradient-text">{title}</span>
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Upload PDFs, pick pages, reorder, then merge or compress.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
         </div>
         {files.length > 0 && (
           <Button variant="outline" size="sm" onClick={() => setResetOpen(true)} data-testid="reset-project">
