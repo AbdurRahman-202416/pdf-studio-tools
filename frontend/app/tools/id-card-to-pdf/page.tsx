@@ -80,7 +80,7 @@ export default function IdCardToPdfPage() {
               <p>4. Download the print-ready A4 PDF.</p>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-br from-indigo-50 to-fuchsia-50 dark:from-indigo-950/30 dark:to-fuchsia-950/30 border-primary/20">
+          <Card className="bg-accent/40 border-primary/30">
             <CardContent className="space-y-1.5">
               <div className="flex items-center gap-1.5 text-primary">
                 <Sparkles className="h-3.5 w-3.5" />

@@ -2,46 +2,51 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * "Document Atelier" palette — warm cream + ink + amber.
+ * Inspired by editorial print: paper-white background, ink-black type,
+ * one warm amber accent. No rainbow gradients.
+ */
 :root {
-  --background: 255 255 255;
-  --foreground: 15 23 42;
-  --muted: 241 245 249;
-  --muted-foreground: 100 116 139;
-  --card: 255 255 255;
-  --card-foreground: 15 23 42;
-  --border: 226 232 240;
-  --input: 226 232 240;
-  --ring: 99 102 241;
-  --primary: 79 70 229;
-  --primary-foreground: 255 255 255;
-  --secondary: 241 245 249;
-  --secondary-foreground: 15 23 42;
-  --accent: 238 242 255;
-  --accent-foreground: 49 46 129;
-  --destructive: 239 68 68;
-  --destructive-foreground: 255 255 255;
-  --success: 16 185 129;
+  --background: 250 248 242;            /* warm cream */
+  --foreground: 23 21 19;               /* deep ink */
+  --muted: 240 235 224;                 /* aged paper */
+  --muted-foreground: 102 96 88;        /* warm graphite */
+  --card: 255 253 248;                  /* slightly brighter card */
+  --card-foreground: 23 21 19;
+  --border: 224 217 203;                /* warm border */
+  --input: 224 217 203;
+  --ring: 194 91 12;                    /* amber ring */
+  --primary: 194 91 12;                 /* aged-whisky amber */
+  --primary-foreground: 255 253 248;
+  --secondary: 240 235 224;
+  --secondary-foreground: 23 21 19;
+  --accent: 250 232 205;                /* soft amber tint */
+  --accent-foreground: 124 56 5;
+  --destructive: 180 41 27;             /* warm vermillion */
+  --destructive-foreground: 255 253 248;
+  --success: 24 109 73;                 /* deep emerald */
 }
 
 .dark {
-  --background: 9 9 11;
-  --foreground: 241 245 249;
-  --muted: 24 24 27;
-  --muted-foreground: 148 163 184;
-  --card: 17 17 20;
-  --card-foreground: 241 245 249;
-  --border: 39 39 42;
-  --input: 39 39 42;
-  --ring: 129 140 248;
-  --primary: 129 140 248;
-  --primary-foreground: 17 24 39;
-  --secondary: 24 24 27;
-  --secondary-foreground: 226 232 240;
-  --accent: 49 46 129;
-  --accent-foreground: 224 231 255;
-  --destructive: 239 68 68;
-  --destructive-foreground: 255 255 255;
-  --success: 34 197 94;
+  --background: 13 12 11;               /* deep ink */
+  --foreground: 237 232 225;            /* warm bone */
+  --muted: 28 26 23;
+  --muted-foreground: 165 157 145;
+  --card: 22 20 18;
+  --card-foreground: 237 232 225;
+  --border: 46 41 35;
+  --input: 46 41 35;
+  --ring: 235 152 56;                   /* brighter amber for dark */
+  --primary: 235 152 56;
+  --primary-foreground: 18 14 9;
+  --secondary: 28 26 23;
+  --secondary-foreground: 237 232 225;
+  --accent: 58 38 14;
+  --accent-foreground: 250 207 142;
+  --destructive: 220 76 50;
+  --destructive-foreground: 255 253 248;
+  --success: 64 168 122;
 }
 
 @theme inline {
@@ -64,15 +69,24 @@
   --color-destructive-foreground: rgb(var(--destructive-foreground));
   --color-success: rgb(var(--success));
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-fraunces);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
 html, body { height: 100%; }
 body {
   background: rgb(var(--background));
   color: rgb(var(--foreground));
+  font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Editorial serif for display copy — opt-in via .font-display */
+.font-display {
+  font-family: var(--font-fraunces), ui-serif, Georgia, serif;
+  font-feature-settings: "ss01", "ss02", "cv11";
+  letter-spacing: -0.015em;
 }
 
 *:focus-visible {
@@ -85,7 +99,6 @@ body {
 ::-webkit-scrollbar-thumb { background: rgb(var(--border)); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgb(var(--muted-foreground) / 0.4); }
 
-/* Always-visible thin scrollbars for result previews so users see the affordance. */
 .preview-scroll { scrollbar-width: thin; scrollbar-gutter: stable; }
 .preview-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
 .preview-scroll::-webkit-scrollbar-track { background: rgb(var(--muted) / 0.4); }
@@ -95,8 +108,9 @@ body {
 }
 .preview-scroll::-webkit-scrollbar-thumb:hover { background: rgb(var(--muted-foreground) / 0.6); }
 
+/* Refined ink→amber gradient used sparingly on the hero accent word. */
 .gradient-text {
-  background: linear-gradient(120deg, #6366f1 0%, #ec4899 60%, #f59e0b 100%);
+  background: linear-gradient(100deg, rgb(var(--foreground)) 0%, rgb(var(--primary)) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -104,17 +118,46 @@ body {
 
 .glass {
   background: rgb(var(--card) / 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+
+/* Subtle paper-grain overlay for backgrounds that need atmosphere. */
+.bg-paper {
+  background-color: rgb(var(--background));
+  background-image:
+    radial-gradient(circle at 1px 1px, rgb(var(--foreground) / 0.025) 1px, transparent 0);
+  background-size: 14px 14px;
+}
+
+/* A single warm wash used behind the home hero. */
+.bg-wash {
+  background: radial-gradient(80% 60% at 50% 0%, rgb(var(--primary) / 0.10), transparent 70%);
+}
+
+/* Hairline rules used on tool cards in place of rainbow stripes. */
+.rule-ink {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgb(var(--foreground) / 0.18) 12%,
+    rgb(var(--foreground) / 0.18) 88%,
+    transparent 100%);
+}
+.rule-amber {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgb(var(--primary) / 0.9) 12%,
+    rgb(var(--primary) / 0.9) 88%,
+    transparent 100%);
 }
 
 /* Blog prose styling */
-.prose h2 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.5em; }
+.prose h2 { font-family: var(--font-fraunces), ui-serif, Georgia, serif; font-size: 1.65rem; font-weight: 600; margin-top: 1.6em; margin-bottom: 0.5em; letter-spacing: -0.015em; }
 .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.25em; margin-bottom: 0.5em; }
-.prose p { margin-bottom: 1em; line-height: 1.65; }
+.prose p { margin-bottom: 1em; line-height: 1.7; }
 .prose ul { list-style: disc; padding-left: 1.5em; margin-bottom: 1em; }
 .prose ol { list-style: decimal; padding-left: 1.5em; margin-bottom: 1em; }
 .prose li { margin-bottom: 0.25em; }
-.prose a { color: rgb(var(--primary)); text-decoration: underline; }
-.prose code { background: rgb(var(--muted)); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
-.prose strong { font-weight: 700; }
+.prose a { color: rgb(var(--primary)); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.prose code { background: rgb(var(--muted)); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: var(--font-jetbrains-mono), ui-monospace, monospace; }
+.prose strong { font-weight: 600; }

@@ -51,10 +51,10 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="flex flex-wrap items-center gap-5 sm:gap-6">
         <div
-          className="grid h-20 w-20 sm:h-24 sm:w-24 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg"
+          className="grid h-20 w-20 sm:h-24 sm:w-24 shrink-0 place-items-center rounded-2xl bg-foreground text-background"
           aria-hidden="true"
         >
-          <span className="text-3xl sm:text-4xl font-black tracking-tight">
+          <span className="font-display text-3xl sm:text-4xl font-medium tracking-tight">
             AR
           </span>
         </div>
@@ -113,7 +113,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="rounded-2xl border border-border bg-gradient-to-br from-indigo-50/60 via-card to-fuchsia-50/40 dark:from-indigo-950/30 dark:to-fuchsia-950/20 p-6 sm:p-8 text-center">
+      <section className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-8 text-center"><div className="absolute inset-0 bg-wash" aria-hidden /><div className="relative">
         <p className="text-sm text-muted-foreground">
           Have feedback or want to collaborate on{" "}
           <Link href="/" className="text-primary hover:underline">
@@ -138,6 +138,7 @@ export default function AboutPage() {
             <Linkedin className="h-3.5 w-3.5" />
             Connect
           </a>
+        </div>
         </div>
       </section>
     </div>

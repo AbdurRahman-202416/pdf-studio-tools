@@ -20,38 +20,26 @@ export const metadata: Metadata = {
   },
 };
 
-// Gradient palette cycled over the registry entries
-const GRADIENTS = [
-  "from-indigo-500 via-violet-500 to-fuchsia-500",
-  "from-emerald-500 via-teal-500 to-cyan-500",
-  "from-amber-500 via-orange-500 to-rose-500",
-  "from-sky-500 via-blue-500 to-indigo-500",
-  "from-pink-500 via-rose-500 to-orange-500",
-  "from-slate-700 via-slate-600 to-slate-500",
-  "from-gray-700 via-gray-600 to-gray-500",
-  "from-green-500 via-emerald-500 to-teal-500",
-  "from-purple-500 via-fuchsia-500 to-pink-500",
-];
-
-const tools = toolRegistry.map((t, i) => ({
+const tools = toolRegistry.map((t) => ({
   href: `/tools/${t.slug}`,
   title: t.displayName,
   description: t.relatedKeywords[0],
   iconName: t.iconName,
-  gradient: GRADIENTS[i % GRADIENTS.length],
 }));
 
 export default function ToolsIndexPage() {
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       <header className="text-center max-w-2xl mx-auto">
-        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground">
-          No signup. No daily limit. No watermark.
+        <span className="inline-block text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          No signup · no daily limit · no watermark
         </span>
-        <h1 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">
-          PDF tools that <span className="gradient-text">actually fit your workflow</span>
+        <h1 className="font-display mt-3 text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight leading-[1.05]">
+          PDF tools that{" "}
+          <em className="italic font-normal gradient-text">actually fit</em>
+          <br className="hidden sm:block" /> your workflow
         </h1>
-        <p className="mt-2 text-muted-foreground">
+        <p className="mt-4 text-muted-foreground leading-relaxed">
           Nine focused utilities for compressing, merging, converting, securing, and extracting from PDFs.
         </p>
       </header>
@@ -66,28 +54,26 @@ export default function ToolsIndexPage() {
               data-testid={`tool-${tool.href.split("/").pop()}`}
               className="block group"
             >
-              <Card className="h-full transition-all hover:shadow-lg hover:-translate-y-1 hover:border-primary/30 overflow-hidden">
-                <div
-                  className={cn(
-                    "h-1.5 w-full bg-gradient-to-r",
-                    tool.gradient,
-                  )}
-                />
-                <CardContent className="space-y-3 pt-5">
-                  <div
-                    className={cn(
-                      "grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br text-white shadow",
-                      tool.gradient,
-                    )}
-                  >
-                    {Icon && <Icon className="h-5 w-5" />}
+              <Card className={cn(
+                "relative h-full overflow-hidden transition-all duration-300",
+                "hover:-translate-y-0.5 hover:shadow-[0_8px_30px_-12px_rgb(var(--primary)/0.25)] hover:border-primary/30",
+              )}>
+                <span className="absolute inset-x-6 top-0 h-px rule-ink" aria-hidden />
+                <span className="absolute inset-x-6 top-0 h-px rule-amber opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden />
+                <CardContent className="pt-7 space-y-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="grid h-11 w-11 place-items-center rounded-lg border border-border bg-background text-foreground/80 group-hover:text-primary group-hover:border-primary/40 transition">
+                      {Icon && <Icon className="h-5 w-5" />}
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary transition" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">{tool.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{tool.description}</p>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition">
-                    Open <ArrowRight className="h-3.5 w-3.5" />
+                    <h3 className="font-display text-xl font-medium tracking-tight">
+                      {tool.title}
+                    </h3>
+                    <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                      {tool.description}
+                    </p>
                   </div>
                 </CardContent>
               </Card>

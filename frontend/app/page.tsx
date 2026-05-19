@@ -58,25 +58,11 @@ const features = [
   },
 ];
 
-// Gradient palette cycled over the registry entries
-const GRADIENTS = [
-  "from-indigo-500 via-violet-500 to-fuchsia-500",
-  "from-emerald-500 via-teal-500 to-cyan-500",
-  "from-amber-500 via-orange-500 to-rose-500",
-  "from-pink-500 via-rose-500 to-orange-500",
-  "from-slate-700 via-slate-600 to-slate-500",
-  "from-sky-500 via-blue-500 to-indigo-500",
-  "from-gray-700 via-gray-600 to-gray-500",
-  "from-green-500 via-emerald-500 to-teal-500",
-  "from-purple-500 via-fuchsia-500 to-pink-500",
-];
-
-const specializedTools = toolRegistry.map((t, i) => ({
+const specializedTools = toolRegistry.map((t) => ({
   href: `/tools/${t.slug}`,
   title: t.displayName,
   description: t.relatedKeywords[0],
   iconName: t.iconName,
-  gradient: GRADIENTS[i % GRADIENTS.length],
 }));
 
 export default function Home() {
@@ -105,17 +91,21 @@ export default function Home() {
       />
 
       <section className="relative pt-6 sm:pt-12">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_50%_0%,rgb(99_102_241/0.18),transparent_70%)]" />
+        <div className="absolute inset-x-0 top-0 -z-10 h-[420px] bg-wash" />
         <div className="text-center max-w-3xl mx-auto">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5 text-primary" /> Free PDF tools, no signup
+          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            <Sparkles className="h-3 w-3 text-primary" /> Free · no signup · no watermark
           </span>
-          <h1 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-            All-in-one PDF toolkit.<br className="hidden sm:block" />
-            <span className="gradient-text">Free, fast, watermark-free.</span>
+          <h1 className="font-display mt-7 text-5xl sm:text-6xl lg:text-7xl font-medium leading-[0.95] tracking-tight">
+            An all-in-one
+            <br className="hidden sm:block" />{" "}
+            <em className="italic font-normal gradient-text">PDF&nbsp;atelier</em>
+            <span className="block mt-2 text-2xl sm:text-3xl lg:text-4xl font-normal text-muted-foreground tracking-normal">
+              free, fast, watermark-free.
+            </span>
           </h1>
-          <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Nine focused PDF utilities — converters, optimizers, OCR, security, and more. No signup. No daily limit. Files auto-delete in 1 hour.
+          <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Nine focused utilities — converters, optimizers, OCR, security, and more. No signup. No daily limit. Files auto-delete in one hour.
           </p>
           <div className="mt-8 flex items-center justify-center gap-3 flex-wrap">
             <Link href="/tools" data-testid="cta-tools">
@@ -152,41 +142,54 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="features" className="space-y-8">
+      <section id="features" className="space-y-10">
         <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl font-bold tracking-tight">Everything you need</h2>
-          <p className="mt-2 text-muted-foreground">
-            From quick merges to fine-grained page control, all in one workspace.
+          <span className="inline-block text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            What&rsquo;s inside
+          </span>
+          <h2 className="font-display mt-3 text-4xl sm:text-5xl font-medium tracking-tight">
+            Everything you need
+          </h2>
+          <p className="mt-3 text-muted-foreground leading-relaxed">
+            From quick merges to fine-grained page control — all in one workspace.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f) => {
+        <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-3 bg-border rounded-2xl overflow-hidden border border-border">
+          {features.map((f, i) => {
             const Icon = f.icon;
             return (
-              <Card
+              <div
                 key={f.title}
-                className="transition hover:shadow-md hover:-translate-y-0.5"
+                className="group relative bg-card p-6 sm:p-7 transition-colors hover:bg-accent/30"
               >
-                <CardContent className="space-y-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="font-semibold">{f.title}</h3>
-                  <p className="text-sm text-muted-foreground">{f.description}</p>
-                </CardContent>
-              </Card>
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs text-muted-foreground tabular-nums">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="h-px flex-1 bg-border" />
+                  <Icon className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition" />
+                </div>
+                <h3 className="font-display mt-5 text-2xl font-medium tracking-tight">
+                  {f.title}
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                  {f.description}
+                </p>
+              </div>
             );
           })}
         </div>
       </section>
 
-      <section id="tools" className="space-y-8">
+      <section id="tools" className="space-y-10">
         <div className="text-center max-w-2xl mx-auto">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground">
-            Files auto-delete in 1 hour. No accounts.
+          <span className="inline-block text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            The collection
           </span>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight">All our tools</h2>
-          <p className="mt-2 text-muted-foreground">
+          <h2 className="font-display mt-3 text-4xl sm:text-5xl font-medium tracking-tight">
+            All our tools
+          </h2>
+          <p className="mt-3 text-muted-foreground leading-relaxed">
             Nine focused PDF utilities — converters, optimizers, OCR, security, and more.
           </p>
         </div>
@@ -195,16 +198,24 @@ export default function Home() {
             const Icon = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[tool.iconName];
             return (
               <Link key={tool.href} href={tool.href} className="block group">
-                <Card className="relative h-full overflow-hidden transition hover:shadow-md hover:-translate-y-0.5">
-                  <div className={`h-1.5 w-full bg-gradient-to-r ${tool.gradient}`} />
-                  <CardContent className="space-y-3 pt-5">
-                    <div
-                      className={`grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br text-white shadow ${tool.gradient}`}
-                    >
-                      {Icon && <Icon className="h-5 w-5" />}
+                <Card className="relative h-full overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_-12px_rgb(var(--primary)/0.25)]">
+                  <span className="absolute inset-x-6 top-0 h-px rule-ink" aria-hidden />
+                  <span className="absolute inset-x-6 top-0 h-px rule-amber opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden />
+                  <CardContent className="pt-7 space-y-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="grid h-10 w-10 place-items-center rounded-lg border border-border bg-background text-foreground/80 group-hover:text-primary group-hover:border-primary/40 transition">
+                        {Icon && <Icon className="h-[18px] w-[18px]" />}
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary transition" />
                     </div>
-                    <h3 className="font-semibold">{tool.title}</h3>
-                    <p className="text-sm text-muted-foreground">{tool.description}</p>
+                    <div>
+                      <h3 className="font-display text-xl font-medium tracking-tight">
+                        {tool.title}
+                      </h3>
+                      <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                        {tool.description}
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               </Link>
@@ -215,17 +226,22 @@ export default function Home() {
 
       <FaqSection />
 
-      <section className="rounded-3xl border border-border bg-gradient-to-br from-indigo-50 via-card to-fuchsia-50 dark:from-indigo-950/40 dark:via-card dark:to-fuchsia-950/30 p-8 sm:p-12 text-center">
-        <h2 className="text-3xl font-bold tracking-tight">Ready when you are.</h2>
-        <p className="mt-2 text-muted-foreground max-w-xl mx-auto">
-          Open the workspace and drop your first PDF, no signup, no nonsense.
-        </p>
-        <div className="mt-6">
-          <Link href="/workspace">
-            <Button size="lg">
-              Open workspace <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+      <section className="relative overflow-hidden rounded-3xl border border-border bg-card p-10 sm:p-16 text-center">
+        <div className="absolute inset-0 bg-wash" aria-hidden />
+        <div className="relative">
+          <h2 className="font-display text-4xl sm:text-5xl font-medium tracking-tight">
+            Ready when you are.
+          </h2>
+          <p className="mt-3 text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Open the workspace and drop your first PDF — no signup, no nonsense.
+          </p>
+          <div className="mt-8">
+            <Link href="/workspace">
+              <Button size="lg">
+                Open workspace <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
     </div>
