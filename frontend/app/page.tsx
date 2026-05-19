@@ -115,7 +115,7 @@ export default function Home() {
             <span className="gradient-text">Free, fast, watermark-free.</span>
           </h1>
           <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Twelve focused PDF utilities — converters, optimizers, OCR, security, and more. No signup. No daily limit. Files auto-delete in 1 hour.
+            Nine focused PDF utilities — converters, optimizers, OCR, security, and more. No signup. No daily limit. Files auto-delete in 1 hour.
           </p>
           <div className="mt-8 flex items-center justify-center gap-3 flex-wrap">
             <Link href="/tools" data-testid="cta-tools">

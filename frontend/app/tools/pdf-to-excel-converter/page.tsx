@@ -39,7 +39,7 @@ export default function PdfToExcelPage() {
 
   return (
     <ToolShell
-      title={tool.primaryKeyword}
+      title={tool.displayName}
       subtitle={`Extract tables from PDF files into editable Excel spreadsheets. ${tool.relatedKeywords[0]}.`}
       icon={Table}
       gradient="from-amber-500 via-orange-500 to-rose-500"

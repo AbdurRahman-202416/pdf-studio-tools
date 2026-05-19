@@ -19,6 +19,7 @@ const tool = getTool("id-card-to-pdf")!;
 const layouts = [
   { value: "a4_portrait", label: "A4 portrait", description: "Most common, vertical sheet" },
   { value: "a4_horizontal", label: "A4 horizontal", description: "Wider, side-by-side" },
+  { value: "compact", label: "Compact", description: "Smaller cards, more whitespace" },
 ] as const;
 
 export default function IdCardToPdfPage() {
@@ -62,7 +63,7 @@ export default function IdCardToPdfPage() {
 
   return (
     <ToolShell
-      title={tool.primaryKeyword}
+      title={tool.displayName}
       subtitle={`Combine two-sided ID cards onto a single print-ready A4 PDF. ${tool.relatedKeywords[0]}.`}
       icon={IdCard}
       gradient="from-indigo-500 via-violet-500 to-fuchsia-500"

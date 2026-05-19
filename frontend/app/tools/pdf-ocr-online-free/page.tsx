@@ -74,7 +74,7 @@ export default function PdfOcrPage() {
 
   return (
     <ToolShell
-      title={tool.primaryKeyword}
+      title={tool.displayName}
       subtitle={`Extract text from scanned or image-based PDFs in 100+ languages. ${tool.relatedKeywords[0]}.`}
       icon={Languages}
       gradient="from-emerald-500 via-teal-500 to-cyan-500"
