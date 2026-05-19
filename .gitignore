@@ -16,5 +16,6 @@ frontend/test-results/
 .vscode/
 .claude/
 .playwright-mcp/
+.superpowers/
 CLAUDE.md
 docs/superpowers/
