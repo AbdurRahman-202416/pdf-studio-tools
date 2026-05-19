@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, type LucideIcon } from "lucide-react";
 import * as Icons from "lucide-react";
-import type React from "react";
 
 import { Card, CardContent } from "@/components/ui/Card";
+import { ToolIcon } from "@/components/brand/ToolIcon";
 import { cn } from "@/lib/utils";
 import { toolRegistry } from "@/lib/seo/tool-registry";
 
@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 };
 
 const tools = toolRegistry.map((t) => ({
+  slug: t.slug,
   href: `/tools/${t.slug}`,
   title: t.displayName,
   description: t.relatedKeywords[0],
@@ -46,7 +47,7 @@ export default function ToolsIndexPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {tools.map((tool) => {
-          const Icon = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[tool.iconName];
+          const Icon = (Icons as unknown as Record<string, LucideIcon>)[tool.iconName];
           return (
             <Link
               key={tool.href}
@@ -60,12 +61,17 @@ export default function ToolsIndexPage() {
               )}>
                 <span className="absolute inset-x-6 top-0 h-px rule-ink" aria-hidden />
                 <span className="absolute inset-x-6 top-0 h-px rule-amber opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden />
-                <CardContent className="pt-7 space-y-4">
+                <CardContent className="pt-7 space-y-5">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="grid h-11 w-11 place-items-center rounded-lg border border-border bg-background text-foreground/80 group-hover:text-primary group-hover:border-primary/40 transition">
-                      {Icon && <Icon className="h-5 w-5" />}
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary transition" />
+                    {Icon && (
+                      <ToolIcon
+                        slug={tool.slug}
+                        icon={Icon}
+                        size={64}
+                        className="transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105"
+                      />
+                    )}
+                    <ArrowRight className="mt-3 h-4 w-4 text-muted-foreground -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary transition" />
                   </div>
                   <div>
                     <h3 className="font-display text-xl font-medium tracking-tight">

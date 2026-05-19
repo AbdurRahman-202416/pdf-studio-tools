@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, Sparkles, type LucideIcon } from "lucide-react";
 import * as Icons from "lucide-react";
 import type React from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
+import { ToolIcon } from "@/components/brand/ToolIcon";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/components/seo/SiteConfig";
 import { TrustStrip } from "@/features/home/TrustStrip";
@@ -13,6 +14,7 @@ import { FeaturesAccordion } from "@/features/home/FeaturesAccordion";
 import { toolRegistry } from "@/lib/seo/tool-registry";
 
 const specializedTools = toolRegistry.map((t) => ({
+  slug: t.slug,
   href: `/tools/${t.slug}`,
   title: t.displayName,
   description: t.relatedKeywords[0],
@@ -112,18 +114,23 @@ export default function Home() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {specializedTools.map((tool) => {
-            const Icon = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[tool.iconName];
+            const Icon = (Icons as unknown as Record<string, LucideIcon>)[tool.iconName];
             return (
               <Link key={tool.href} href={tool.href} className="block group">
                 <Card className="relative h-full overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_-12px_rgb(var(--primary)/0.25)]">
                   <span className="absolute inset-x-6 top-0 h-px rule-ink" aria-hidden />
                   <span className="absolute inset-x-6 top-0 h-px rule-amber opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden />
-                  <CardContent className="pt-7 space-y-4">
+                  <CardContent className="pt-7 space-y-5">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="grid h-10 w-10 place-items-center rounded-lg border border-border bg-background text-foreground/80 group-hover:text-primary group-hover:border-primary/40 transition">
-                        {Icon && <Icon className="h-[18px] w-[18px]" />}
-                      </div>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary transition" />
+                      {Icon && (
+                        <ToolIcon
+                          slug={tool.slug}
+                          icon={Icon}
+                          size={60}
+                          className="transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105"
+                        />
+                      )}
+                      <ArrowRight className="mt-3 h-4 w-4 text-muted-foreground -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary transition" />
                     </div>
                     <div>
                       <h3 className="font-display text-xl font-medium tracking-tight">
