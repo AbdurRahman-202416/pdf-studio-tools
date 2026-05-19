@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Geist, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -7,15 +7,29 @@ import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Plausible } from "@/components/analytics/Plausible";
+import { InstallPwaPrompt } from "@/components/share/InstallPwaPrompt";
 import { siteConfig } from "@/components/seo/SiteConfig";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+  display: "swap",
+});
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+  display: "swap",
+});
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} – Free PDF tools online`,
+    default: `${siteConfig.name} — ${siteConfig.tagline}`,
     template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -29,13 +43,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: siteConfig.name,
     locale: siteConfig.locale,
-    alternateLocale: [siteConfig.alternateLocale],
     url: siteConfig.url,
-    title: `${siteConfig.name} – Free PDF tools online`,
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
     images: [
       {
-        url: `/og?title=${encodeURIComponent(siteConfig.name)}&subtitle=${encodeURIComponent("Free PDF tools, merge, compress, OCR, convert. Built for Bangladesh.")}`,
+        url: `/og?title=${encodeURIComponent(siteConfig.name)}&subtitle=${encodeURIComponent(siteConfig.tagline)}`,
         width: 1200,
         height: 630,
       },
@@ -74,7 +87,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={`${geistSans.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}
     >
       <head>
         <script
@@ -94,6 +107,7 @@ export default function RootLayout({
         <Plausible />
         <ThemeProvider>
           <AppShell>{children}</AppShell>
+          <InstallPwaPrompt />
           <Toaster
             position="top-right"
             theme="system"

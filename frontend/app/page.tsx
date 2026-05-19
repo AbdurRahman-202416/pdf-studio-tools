@@ -1,128 +1,27 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  Banknote,
-  Camera,
-  CheckCircle2,
-  FileSignature,
-  IdCard,
-  Image as ImageIcon,
-  Languages,
-  Layers,
-  Lock,
-  Merge,
-  Sparkles,
-  Wand2,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import type React from "react";
+
+import { getToolIcon } from "@/lib/seo/tool-icons";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
+import { ToolIcon } from "@/components/brand/ToolIcon";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/components/seo/SiteConfig";
 import { TrustStrip } from "@/features/home/TrustStrip";
 import { FaqSection } from "@/features/home/FaqSection";
+import { FeaturesAccordion } from "@/features/home/FeaturesAccordion";
+import { MadeForBangladesh } from "@/features/home/MadeForBangladesh";
+import { toolRegistry } from "@/lib/seo/tool-registry";
 
-const features = [
-  {
-    icon: Merge,
-    title: "Merge PDFs",
-    description:
-      "Combine multiple PDFs into one, picking exactly the pages you need.",
-  },
-  {
-    icon: Wand2,
-    title: "Smart compression",
-    description:
-      "Three presets, Light, Balanced, and Maximum, to fit any sharing scenario.",
-  },
-  {
-    icon: Layers,
-    title: "Page-level control",
-    description:
-      "Preview, select, reorder, and rotate pages with smooth drag & drop.",
-  },
-  {
-    icon: Zap,
-    title: "Blazing fast",
-    description:
-      "FastAPI + PyMuPDF backend processes documents in seconds.",
-  },
-  {
-    icon: Lock,
-    title: "Private by default",
-    description: "Files auto-expire after one hour. No accounts, no tracking.",
-  },
-  {
-    icon: Sparkles,
-    title: "Beautiful UI",
-    description:
-      "Dark mode, animations, keyboard accessibility, production-grade UX.",
-  },
-];
-
-const specializedTools = [
-  {
-    href: "/tools/nid-combine",
-    title: "NID Combiner",
-    description: "Front + back of NID on a single, print-ready A4 page.",
-    icon: IdCard,
-    gradient: "from-indigo-500 via-violet-500 to-fuchsia-500",
-  },
-  {
-    href: "/tools/bangla-ocr",
-    title: "Bangla OCR",
-    description: "Pull Bangla text out of scanned PDFs with Tesseract.",
-    icon: Languages,
-    gradient: "from-emerald-500 via-teal-500 to-cyan-500",
-  },
-  {
-    href: "/tools/bank-to-excel",
-    title: "Bank → Excel",
-    description: "Convert bank statement PDFs into clean Excel sheets.",
-    icon: Banknote,
-    gradient: "from-amber-500 via-orange-500 to-rose-500",
-  },
-  {
-    href: "/tools/pdf-to-jpg",
-    title: "PDF → JPG",
-    description: "Export each PDF page as high-quality JPG or PNG images.",
-    icon: ImageIcon,
-    gradient: "from-pink-500 via-rose-500 to-orange-500",
-    badge: "NEW",
-  },
-  {
-    href: "/tools/pdf-lock",
-    title: "Lock / Unlock PDF",
-    description: "Add or remove an AES-256 password on any PDF.",
-    icon: Lock,
-    gradient: "from-slate-700 via-slate-600 to-slate-500",
-    badge: "NEW",
-  },
-  {
-    href: "/tools/photo-to-pdf",
-    title: "Passport Photo PDF",
-    description:
-      "Multiple copies of a passport photo on A4, perfect for print shops.",
-    icon: Camera,
-    gradient: "from-sky-500 via-blue-500 to-indigo-500",
-  },
-  {
-    href: "/tools/govt-forms",
-    title: "Govt Forms",
-    description: "Pre-loaded e-TIN, NID correction, birth certificate forms.",
-    icon: FileSignature,
-    gradient: "from-rose-500 via-pink-500 to-purple-500",
-  },
-  {
-    href: "/workspace",
-    title: "Merge & Compress",
-    description:
-      "Classic PDF workspace with drag-drop reorder and 3-level compression.",
-    icon: Layers,
-    gradient: "from-gray-700 via-gray-600 to-gray-500",
-  },
-];
+const specializedTools = toolRegistry.map((t) => ({
+  slug: t.slug,
+  href: `/${t.slug}`,
+  title: t.displayName,
+  description: t.primaryKeyword,
+  iconName: t.iconName,
+}));
 
 export default function Home() {
   return (
@@ -150,18 +49,23 @@ export default function Home() {
       />
 
       <section className="relative pt-6 sm:pt-12">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_50%_0%,rgb(99_102_241/0.18),transparent_70%)]" />
+        <div className="absolute inset-x-0 top-0 -z-10 h-[420px] bg-wash" />
         <div className="text-center max-w-3xl mx-auto">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5 text-primary" /> Free PDF tools, no signup
+          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            <Sparkles className="h-3 w-3 text-primary" /> Free · no signup · no watermark
           </span>
-          <h1 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-            The <span className="gradient-text">PDF toolkit</span>
-            <br className="hidden sm:block" /> you actually want to use.
+          <h1 className="font-display mt-7 text-5xl sm:text-6xl lg:text-7xl font-medium leading-[0.95] tracking-tight">
+            Free PDF tools
+            <br className="hidden sm:block" />{" "}
+            <em className="italic font-normal gradient-text">that&nbsp;just&nbsp;work</em>
+            <span className="block mt-2 text-2xl sm:text-3xl lg:text-4xl font-normal text-muted-foreground tracking-normal">
+              compress, merge, convert, OCR, sign — no signup, no watermark.
+            </span>
           </h1>
-          <p className="mt-5 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Merge, compress, split, lock, convert and OCR PDFs in one polished workspace.
-            Built for Bangladesh, free for everyone.
+          <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Fourteen focused utilities for the things you actually need to do with PDFs.
+            Free forever. No daily limits. Files auto-delete in one hour.
+            Works perfectly with English, Bangla, and 100+ other languages.
           </p>
           <div className="mt-8 flex items-center justify-center gap-3 flex-wrap">
             <Link href="/tools" data-testid="cta-tools">
@@ -183,9 +87,9 @@ export default function Home() {
 
         <div className="mt-8 grid sm:grid-cols-3 gap-3 max-w-3xl mx-auto text-sm">
           {[
-            "Drag & drop multiple PDFs",
-            "Reorder pages visually",
-            "Download in seconds",
+            "Drag & drop, reorder, download",
+            "Works with Bangla & 100+ languages",
+            "Files auto-delete in 1 hour",
           ].map((line) => (
             <div
               key={line}
@@ -198,65 +102,48 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="features" className="space-y-8">
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl font-bold tracking-tight">Everything you need</h2>
-          <p className="mt-2 text-muted-foreground">
-            From quick merges to fine-grained page control, all in one workspace.
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f) => {
-            const Icon = f.icon;
-            return (
-              <Card
-                key={f.title}
-                className="transition hover:shadow-md hover:-translate-y-0.5"
-              >
-                <CardContent className="space-y-3">
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="font-semibold">{f.title}</h3>
-                  <p className="text-sm text-muted-foreground">{f.description}</p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </section>
+      <FeaturesAccordion />
 
-      <section id="tools" className="space-y-8">
+      <section id="tools" className="space-y-10">
         <div className="text-center max-w-2xl mx-auto">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground">
-            🇧🇩 Built for Bangladesh
+          <span className="inline-block text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            The collection
           </span>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight">All our tools</h2>
-          <p className="mt-2 text-muted-foreground">
-            Eight focused utilities, from classic merge &amp; compress to BD-specific
-            workflows like NID combine and Bangla OCR.
+          <h2 className="font-display mt-3 text-4xl sm:text-5xl font-medium tracking-tight">
+            Every PDF tool you actually need
+          </h2>
+          <p className="mt-3 text-muted-foreground leading-relaxed">
+            Compress, merge, convert PDF to JPG / PNG / Word / Excel, OCR, lock, unlock, sign — all free.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {specializedTools.map((tool) => {
-            const Icon = tool.icon;
+            const Icon = getToolIcon(tool.iconName);
             return (
               <Link key={tool.href} href={tool.href} className="block group">
-                <Card className="relative h-full overflow-hidden transition hover:shadow-md hover:-translate-y-0.5">
-                  <div className={`h-1.5 w-full bg-gradient-to-r ${tool.gradient}`} />
-                  {tool.badge && (
-                    <span className="absolute top-3 right-3 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                      {tool.badge}
-                    </span>
-                  )}
-                  <CardContent className="space-y-3 pt-5">
-                    <div
-                      className={`grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br text-white shadow ${tool.gradient}`}
-                    >
-                      <Icon className="h-5 w-5" />
+                <Card className="relative h-full overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_-12px_rgb(var(--primary)/0.25)]">
+                  <span className="absolute inset-x-6 top-0 h-px rule-ink" aria-hidden />
+                  <span className="absolute inset-x-6 top-0 h-px rule-amber opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden />
+                  <CardContent className="pt-7 space-y-5">
+                    <div className="flex items-start justify-between gap-3">
+                      {Icon && (
+                        <ToolIcon
+                          slug={tool.slug}
+                          icon={Icon}
+                          size={60}
+                          className="transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105"
+                        />
+                      )}
+                      <ArrowRight className="mt-3 h-4 w-4 text-muted-foreground -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary transition" />
                     </div>
-                    <h3 className="font-semibold">{tool.title}</h3>
-                    <p className="text-sm text-muted-foreground">{tool.description}</p>
+                    <div>
+                      <h3 className="font-display text-xl font-medium tracking-tight">
+                        {tool.title}
+                      </h3>
+                      <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                        {tool.description}
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
               </Link>
@@ -265,19 +152,26 @@ export default function Home() {
         </div>
       </section>
 
+      <MadeForBangladesh />
+
       <FaqSection />
 
-      <section className="rounded-3xl border border-border bg-gradient-to-br from-indigo-50 via-card to-fuchsia-50 dark:from-indigo-950/40 dark:via-card dark:to-fuchsia-950/30 p-8 sm:p-12 text-center">
-        <h2 className="text-3xl font-bold tracking-tight">Ready when you are.</h2>
-        <p className="mt-2 text-muted-foreground max-w-xl mx-auto">
-          Open the workspace and drop your first PDF, no signup, no nonsense.
-        </p>
-        <div className="mt-6">
-          <Link href="/workspace">
-            <Button size="lg">
-              Open workspace <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+      <section className="relative overflow-hidden rounded-3xl border border-border bg-card p-10 sm:p-16 text-center">
+        <div className="absolute inset-0 bg-wash" aria-hidden />
+        <div className="relative">
+          <h2 className="font-display text-4xl sm:text-5xl font-medium tracking-tight">
+            Ready when you are.
+          </h2>
+          <p className="mt-3 text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Open the workspace and drop your first PDF — no signup, no nonsense.
+          </p>
+          <div className="mt-8">
+            <Link href="/workspace">
+              <Button size="lg">
+                Open workspace <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
     </div>

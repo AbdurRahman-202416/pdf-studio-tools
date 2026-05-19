@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, Facebook, MessageCircle, Twitter } from "lucide-react";
+import { Check, Copy, Facebook, MessageCircle, Share2, Twitter } from "lucide-react";
 import { toast } from "sonner";
+
+import { trackEvent } from "@/lib/track";
 
 interface ShareButtonsProps {
   text: string;
@@ -19,11 +21,24 @@ export function ShareButtons({ text, url }: ShareButtonsProps) {
   const facebook = `https://www.facebook.com/sharer/sharer.php?u=${enc(shareUrl)}`;
   const whatsapp = `https://wa.me/?text=${enc(text + " " + shareUrl)}`;
 
+  const hasNativeShare =
+    typeof navigator !== "undefined" && typeof navigator.share === "function";
+
+  const nativeShare = async () => {
+    try {
+      await navigator.share({ title: "PDF Studio", text, url: shareUrl });
+      trackEvent("tool_shared", { channel: "native" });
+    } catch {
+      // user cancelled
+    }
+  };
+
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       toast.success("Link copied");
+      trackEvent("tool_shared", { channel: "copy" });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error("Couldn't copy");
@@ -36,6 +51,11 @@ export function ShareButtons({ text, url }: ShareButtonsProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-xs text-muted-foreground">Share:</span>
+      {hasNativeShare && (
+        <button onClick={nativeShare} className={btnClass} aria-label="Share">
+          <Share2 className="h-3.5 w-3.5" /> Share
+        </button>
+      )}
       <button onClick={copy} className={btnClass} aria-label="Copy link">
         {copied ? (
           <Check className="h-3.5 w-3.5 text-success" />
@@ -50,6 +70,7 @@ export function ShareButtons({ text, url }: ShareButtonsProps) {
         rel="noopener noreferrer"
         className={btnClass}
         aria-label="Share on Twitter"
+        onClick={() => trackEvent("tool_shared", { channel: "twitter" })}
       >
         <Twitter className="h-3.5 w-3.5" /> Twitter
       </a>
@@ -59,6 +80,7 @@ export function ShareButtons({ text, url }: ShareButtonsProps) {
         rel="noopener noreferrer"
         className={btnClass}
         aria-label="Share on WhatsApp"
+        onClick={() => trackEvent("tool_shared", { channel: "whatsapp" })}
       >
         <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
       </a>
@@ -68,6 +90,7 @@ export function ShareButtons({ text, url }: ShareButtonsProps) {
         rel="noopener noreferrer"
         className={btnClass}
         aria-label="Share on Facebook"
+        onClick={() => trackEvent("tool_shared", { channel: "facebook" })}
       >
         <Facebook className="h-3.5 w-3.5" /> Facebook
       </a>

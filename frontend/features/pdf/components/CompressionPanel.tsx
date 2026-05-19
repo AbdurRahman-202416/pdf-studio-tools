@@ -79,7 +79,7 @@ export function CompressionPanel() {
     <Card data-testid="compression-panel">
       <CardHeader className="flex flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-amber-400 to-rose-500 text-white">
+          <div className="grid h-9 w-9 place-items-center rounded-xl border border-primary/30 bg-accent text-primary">
             <Sparkles className="h-4 w-4" />
           </div>
           <div>

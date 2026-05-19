@@ -186,4 +186,4 @@ The only persistent state is `backend-storage` (or your Fly volume). Snapshot it
 - [ ] Run [Google Rich Results test](https://search.google.com/test/rich-results) on the home page — confirm FAQ schema is detected
 - [ ] Run [PageSpeed Insights](https://pagespeed.web.dev/) — target ≥90 on mobile
 - [ ] Add a Plausible / GA snippet in `app/layout.tsx` if you want analytics
-- [ ] Share each tool page individually on Reddit / Facebook BD groups (rank long-tail BD queries first)
+- [ ] Share each tool page on Reddit / social media to seed initial backlinks and traffic

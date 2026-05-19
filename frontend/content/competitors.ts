@@ -22,14 +22,14 @@ export const competitors: Competitor[] = [
       { feature: "Free actions per day", pdfStudio: "Unlimited", competitor: "2 per day on the free tier" },
       { feature: "Signup required", pdfStudio: "No", competitor: "No (but encouraged)" },
       { feature: "Max file size (free)", pdfStudio: "100 MB", competitor: "5 GB on Pro, lower free" },
-      { feature: "Bangla OCR", pdfStudio: "Built-in (Tesseract)", competitor: "Limited Bangla support" },
-      { feature: "NID Combiner (BD)", pdfStudio: "Yes, print-ready A4", competitor: "No BD-specific tool" },
-      { feature: "Bank statement → Excel (BD)", pdfStudio: "Yes, formatted XLSX", competitor: "Generic PDF→Excel only" },
       { feature: "Watermark on output", pdfStudio: "No", competitor: "No (free), no (Pro)" },
+      { feature: "OCR support", pdfStudio: "Yes, 100+ languages", competitor: "Limited language support" },
+      { feature: "ID card to A4 PDF", pdfStudio: "Yes, print-ready A4", competitor: "No dedicated tool" },
+      { feature: "PDF table to Excel", pdfStudio: "Yes, formatted XLSX", competitor: "Generic PDF→Excel only" },
       { feature: "Price", pdfStudio: "Free", competitor: "$9/mo Pro" },
     ],
     takeaway:
-      "If you're in Bangladesh and want unlimited daily use, native Bangla OCR, and BD-specific tools (NID, bank statements, govt forms) without a paywall, PDF Studio is the better fit.",
+      "If you want unlimited daily use, multi-language OCR, and no-watermark output without a paywall, PDF Studio is the better fit.",
   },
   {
     slug: "ilovepdf",
@@ -40,13 +40,13 @@ export const competitors: Competitor[] = [
       { feature: "Ads on free tier", pdfStudio: "None", competitor: "Yes, prominent" },
       { feature: "Signup required", pdfStudio: "No", competitor: "Required for many tools" },
       { feature: "Max file size (free)", pdfStudio: "100 MB", competitor: "Varies per tool" },
-      { feature: "Bangla OCR", pdfStudio: "Built-in (Tesseract)", competitor: "Limited" },
-      { feature: "NID Combiner (BD)", pdfStudio: "Yes", competitor: "No" },
-      { feature: "Bank statement → Excel (BD)", pdfStudio: "Yes, formatted XLSX", competitor: "Generic only" },
+      { feature: "OCR support", pdfStudio: "Yes, 100+ languages", competitor: "Limited" },
+      { feature: "ID card to A4 PDF", pdfStudio: "Yes", competitor: "No" },
+      { feature: "PDF table to Excel", pdfStudio: "Yes, formatted XLSX", competitor: "Generic only" },
       { feature: "Price", pdfStudio: "Free", competitor: "$7/mo Pro" },
     ],
     takeaway:
-      "iLovePDF is a fine generalist if you want a one-stop site with mobile apps. PDF Studio is leaner, ad-free, and specialized for BD workflows.",
+      "iLovePDF is a fine generalist if you want a one-stop site with mobile apps. PDF Studio is leaner, ad-free, and no signup required.",
   },
   {
     slug: "adobe-acrobat",
@@ -57,13 +57,13 @@ export const competitors: Competitor[] = [
       { feature: "Install required", pdfStudio: "None, web only", competitor: "Desktop install" },
       { feature: "Signup required", pdfStudio: "No", competitor: "Adobe ID required" },
       { feature: "Free tier", pdfStudio: "Unlimited", competitor: "Limited Reader features only" },
-      { feature: "Bangla OCR", pdfStudio: "Built-in (Tesseract)", competitor: "Yes (paid)" },
-      { feature: "NID Combiner (BD)", pdfStudio: "Yes", competitor: "No (manual layout)" },
+      { feature: "OCR support", pdfStudio: "Yes, 100+ languages", competitor: "Yes (paid)" },
+      { feature: "ID card to A4 PDF", pdfStudio: "Yes", competitor: "No (manual layout)" },
       { feature: "Mobile-friendly web", pdfStudio: "Yes, responsive", competitor: "App download" },
       { feature: "Price", pdfStudio: "Free", competitor: "$19.99/mo Acrobat Pro" },
     ],
     takeaway:
-      "Adobe is the right answer for heavy enterprise PDF work. For everyday merges, compressions, OCR, and BD workflows, PDF Studio is faster and free.",
+      "Adobe is the right answer for heavy enterprise PDF work. For everyday merges, compressions, OCR, and document conversions, PDF Studio is faster and free.",
   },
 ];
 

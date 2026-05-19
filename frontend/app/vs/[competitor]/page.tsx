@@ -24,8 +24,8 @@ export async function generateMetadata({
   const { competitor } = await params;
   const c = findCompetitor(competitor);
   if (!c) return {};
-  const title = `PDF Studio vs ${c.name}, Free, BD-specific PDF tools`;
-  const description = `Comparing PDF Studio with ${c.name}: features, pricing, Bangla support, Bangladesh-specific tools.`;
+  const title = `PDF Studio vs ${c.name} — Free, no-watermark PDF tools`;
+  const description = `Comparing PDF Studio with ${c.name}: features, pricing, OCR support, no-signup policy, and daily limits.`;
   return {
     title,
     description,
@@ -36,7 +36,7 @@ export async function generateMetadata({
       url: `/vs/${competitor}`,
       images: [
         {
-          url: `/og?title=${encodeURIComponent(`PDF Studio vs ${c.name}`)}&subtitle=${encodeURIComponent("Free PDF tools, built for Bangladesh")}`,
+          url: `/og?title=${encodeURIComponent(`PDF Studio vs ${c.name}`)}&subtitle=${encodeURIComponent("Free PDF tools. No signup, no watermark, no daily limit.")}`,
           width: 1200,
           height: 630,
         },

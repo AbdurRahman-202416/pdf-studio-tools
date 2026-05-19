@@ -10,6 +10,7 @@ interface ToolShellProps {
   subtitle?: React.ReactNode;
   badge?: string;
   icon: LucideIcon;
+  /** @deprecated retained for prop-compatibility; the new design renders a neutral chip. */
   gradient?: string;
   children: React.ReactNode;
   sideCard?: React.ReactNode;
@@ -20,7 +21,6 @@ export function ToolShell({
   subtitle,
   badge,
   icon: Icon,
-  gradient = "from-indigo-500 via-fuchsia-500 to-amber-400",
   children,
   sideCard,
 }: ToolShellProps) {
@@ -35,28 +35,23 @@ export function ToolShell({
           All tools
         </Link>
 
-        <div className="mt-4 flex flex-wrap items-start gap-3 sm:gap-4">
-          <div
-            className={cn(
-              "grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br text-white shadow-md",
-              gradient,
-            )}
-          >
+        <div className="mt-5 flex flex-wrap items-start gap-3 sm:gap-4">
+          <div className="grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-xl border border-border bg-background text-foreground/80">
             <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight leading-tight break-words">
+              <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-medium tracking-tight leading-[1.05] break-words">
                 {title}
               </h1>
               {badge && (
-                <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">
+                <span className="shrink-0 rounded-full border border-primary/30 bg-accent px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-primary">
                   {badge}
                 </span>
               )}
             </div>
             {subtitle && (
-              <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground max-w-2xl">
+              <p className="mt-2 text-sm text-muted-foreground max-w-2xl leading-relaxed">
                 {subtitle}
               </p>
             )}

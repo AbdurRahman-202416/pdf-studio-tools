@@ -9,7 +9,7 @@ FastAPI service that powers every PDF Studio tool.
 - **PyMuPDF** (`fitz`) for rendering, page extraction, thumbnails, compression
 - **pypdf** 5.x for AES-256 lock / unlock
 - **Pillow** for image handling
-- **pytesseract** + Tesseract for Bangla + English OCR
+- **pytesseract** + Tesseract for 100+ language OCR
 - **openpyxl** + **pdfplumber** for bank statement extraction
 - **uvicorn** for serving
 
@@ -26,17 +26,17 @@ OpenAPI explorer at <http://localhost:8000/docs>.
 
 ## System deps
 
-Tesseract + the Bengali language pack must be installed at the OS level:
+Tesseract + language data must be installed at the OS level:
 
 ```bash
-# macOS
+# macOS (includes all language packs)
 brew install tesseract tesseract-lang
 
-# Debian/Ubuntu / Docker base image
-apt-get install -y tesseract-ocr tesseract-ocr-ben
+# Debian/Ubuntu / Docker base image (add packs as needed, e.g. eng spa fra deu)
+apt-get install -y tesseract-ocr tesseract-ocr-eng tesseract-ocr-spa tesseract-ocr-fra
 ```
 
-The bundled `Dockerfile` already installs both.
+The bundled `Dockerfile` installs 15 common language packs.
 
 ## Environment variables
 
@@ -68,10 +68,9 @@ app/
     pdf_service.py            merge, compress, rotate, split, thumbnails
     pdf_image_service.py      pdf -> jpg / png / zip
     pdf_lock_service.py       AES-256 lock / unlock
-    nid_service.py            NID front+back -> A4
-    bank_service.py           bank statement -> xlsx
-    ocr_service.py            Bangla + English OCR
-    forms_service.py          BD govt form templates
+    id_card_service.py        ID card front+back -> A4
+    pdf_table_service.py      PDF table -> xlsx
+    ocr_service.py            100+ language OCR
     photo_service.py          passport / stamp photo -> A4
     filename_registry.py      file_id -> original filename map (thread-safe)
   utils/storage.py            id generation, upload/output paths, find_*()

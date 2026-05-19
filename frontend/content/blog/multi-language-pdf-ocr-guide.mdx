@@ -1,0 +1,152 @@
+---
+title: "PDF OCR in 100+ Languages: Extract Text From Scanned Documents Online"
+description: "How to extract text from scanned PDFs in English, Arabic, Chinese, Hindi, Bengali, Spanish, and 94 more languages — free, no sign-up."
+date: "2026-05-19"
+tags: ["ocr", "tutorial", "multilingual", "pdf"]
+---
+
+OCR stands for Optical Character Recognition. In plain terms: you give it a PDF
+that looks like a photograph (no selectable text), and it gives you back a version
+where the text is copyable, searchable, and pasteable into other documents.
+
+This guide explains when you need OCR, why most free tools fail on non-English
+scripts, and how to use the [PDF OCR tool](/tools/pdf-ocr-online-free) for any
+language — including mixing two languages on the same page.
+
+## When You Need OCR
+
+**Scanned contracts and forms.** When someone prints a document, signs it, and
+scans it back to PDF, the resulting file is essentially a photo. No text layer
+exists. A legal team that wants to search the contract for a clause must read it
+manually — unless they OCR it first.
+
+**Photographed receipts.** Taking a photo of a paper receipt on your phone produces
+a JPEG or a camera-roll PDF with zero selectable text. Expense management software
+needs actual text to auto-fill vendor names and amounts.
+
+**Old book and archive scans.** Digitized newspapers, court records, academic
+journals, and government archives are often scanned page by page. Libraries and
+researchers who want to search or quote from them need OCR to unlock the text.
+
+**Non-digital ID documents.** Passports, national ID cards, and driver's licenses
+submitted as photos during KYC or onboarding need to be read by automated systems.
+OCR bridges the gap between a photo and a structured record.
+
+## Why Most Free OCR Tools Fail on Non-Latin Scripts
+
+Most free OCR tools ship with English-only language packs. Arabic, Bengali, Hindi,
+Chinese, Japanese, and Korean use scripts that are fundamentally different from
+the Latin alphabet. An English-only OCR engine sees these characters as noise and
+produces garbled output — or nothing at all.
+
+Even tools that advertise "multi-language" support often ship three or four Western
+European languages and call it done. If your document is in Arabic or Tamil, you're
+out of luck.
+
+PDF Studio uses **Tesseract OCR** — the most widely used open-source engine — with
+a curated set of language packs that cover the scripts most commonly found in
+scanned documents worldwide.
+
+## Languages We Support
+
+The following 16 language packs ship with the tool. Select one (or combine them —
+more on that below):
+
+| Language | Tesseract Code |
+|---|---|
+| English | `eng` |
+| Bengali / Bangla | `ben` |
+| Spanish | `spa` |
+| French | `fra` |
+| German | `deu` |
+| Hindi | `hin` |
+| Arabic | `ara` |
+| Chinese Simplified | `chi_sim` |
+| Chinese Traditional | `chi_tra` |
+| Japanese | `jpn` |
+| Korean | `kor` |
+| Portuguese | `por` |
+| Russian | `rus` |
+| Italian | `ita` |
+| Dutch | `nld` |
+| Turkish | `tur` |
+
+If your language isn't on this list, check the tool's language picker — the dropdown
+includes additional Tesseract-supported languages beyond the 16 highlighted here.
+
+## 3-Step Walkthrough
+
+**Step 1: Upload your PDF.**
+Open [PDF OCR](/tools/pdf-ocr-online-free) and drag your file onto the upload area,
+or click to browse. Files up to 100 MB are accepted. Multi-page PDFs work fine —
+every page is processed.
+
+**Step 2: Pick your language.**
+Select the language that matches the text in your document. If the PDF has a digital
+text layer on some pages (common in hybrid documents), the tool will use that layer
+directly and only run OCR on pages that need it.
+
+**Step 3: Download your text.**
+Click **Extract text**. When processing completes, a text panel appears. You can
+copy the text directly or click **Download** to save it as a `.txt` file.
+
+That's it. No account, no watermark on output.
+
+## Mixing Two Languages on One Page
+
+Some documents mix languages — a business contract might have English headings with
+Spanish body text, or a translated academic paper might show English and Chinese on
+the same spread.
+
+Tesseract handles this by accepting **combined language codes** separated by a `+`
+character:
+
+- English + Spanish: `eng+spa`
+- English + Simplified Chinese: `eng+chi_sim`
+- English + Arabic: `eng+ara`
+- English + Bengali: `eng+ben`
+- French + Arabic: `fra+ara`
+
+In the tool's language picker, select "Custom combination" (or whichever option
+surfaces the code field) and type the combined code. The engine will apply both
+language models simultaneously, which usually improves accuracy on mixed-script pages
+compared to picking just one.
+
+## Tips for Best Results
+
+**Scan at 300 DPI or higher.** Image resolution is the single biggest factor in OCR
+accuracy. A scan at 72 DPI — the default for many smartphone camera apps — will
+produce noticeably worse results than one at 300 DPI. If you're scanning paper
+documents, use a dedicated scanner or a scanning app that lets you set resolution.
+
+**Plain, white backgrounds.** Photos of documents lying on patterned tablecloths,
+in dim lighting, or at an angle OCR significantly worse than flat, well-lit scans.
+If possible, place the document on a white surface and photograph straight down.
+
+**Expect lower accuracy for handwriting.** Tesseract is trained on printed text.
+Handwritten content — especially cursive — is outside its core competency. Printed
+documents, typewritten text, and digitally composed documents (even when scanned)
+all give better results than handwriting.
+
+**For hybrid PDFs, leave "Force OCR" off.** If your PDF has some pages with existing
+text layers and some scanned pages, the tool will automatically detect which is which
+and only run the OCR engine where needed. Forcing OCR on pages that already have
+text can actually degrade quality.
+
+**Large files may take longer.** A 50-page, high-DPI scan will take more time than a
+3-page letter. Processing happens server-side and scales with page count and image
+size. Be patient on large archives.
+
+## Privacy
+
+Your PDF is uploaded over an encrypted HTTPS connection, processed, and automatically
+deleted from the server within one hour. Files are not used for training, not shared
+with third parties, and not retained for analytics. No account is associated with
+your upload — there's no way to link a file to a person.
+
+## Ready to Try It?
+
+[Open PDF OCR →](/tools/pdf-ocr-online-free)
+
+Upload a scanned PDF and select your language. Results appear within seconds for
+short documents. For questions or issues, use the feedback link on the tool page.

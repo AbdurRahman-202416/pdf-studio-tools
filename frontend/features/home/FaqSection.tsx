@@ -2,32 +2,32 @@ import { JsonLd } from "@/components/seo/JsonLd";
 
 const FAQ = [
   {
-    q: "Are my PDFs safe?",
-    a: "Yes. Files are uploaded over HTTPS, processed on the server, and automatically deleted one hour later. We never share, sell, or analyze them.",
-  },
-  {
     q: "Is PDF Studio really free?",
-    a: "Yes, every tool listed is free with no signup. We may add a Pro tier later for batch processing and API access, but the core tools stay free.",
+    a: "Yes — every tool is free, with no daily limit, no signup required, and no watermark on the output. We're funded by optional donations and don't show ads.",
   },
   {
-    q: "Do I need to create an account?",
-    a: "No. PDF Studio is anonymous-first. Drop files, process, download.",
+    q: "What happens to my uploaded files?",
+    a: "Files are processed on our server, then automatically deleted within one hour. We never store, share, or train any model on your documents.",
   },
   {
-    q: "What's the maximum file size?",
-    a: "100 MB per file. Need bigger? Contact us, we can lift the limit for specific use cases.",
+    q: "Do you support Bangla, Hindi, Arabic, and Chinese PDFs?",
+    a: "Yes — every tool preserves non-Latin scripts. Our OCR engine supports 100+ languages including Bangla, English, Hindi, Arabic, Chinese (Simplified/Traditional), Japanese, Korean, Russian, and many more.",
   },
   {
-    q: "Does it work on mobile?",
-    a: "Yes, every tool is mobile-responsive with touch-friendly drag-and-drop and large tap targets.",
+    q: "How large a PDF can I upload?",
+    a: "Up to 100 MB per file. For larger files, split first with the workspace tool, process each part, then merge.",
   },
   {
-    q: "Can I OCR scanned Bangla documents?",
-    a: "Yes, the Bangla OCR tool runs Tesseract with the Bengali (ben) language pack. It also handles English on the same page.",
+    q: "Do I need to install anything?",
+    a: "No. PDF Studio runs entirely in your browser; the heavy lifting happens on our server. Nothing to download or install. You can also add it to your home screen as a PWA for one-tap access.",
   },
   {
-    q: "Can I password-protect a PDF?",
-    a: "Yes, the Lock / Unlock PDF tool adds AES-256 password protection, the same algorithm used by Acrobat.",
+    q: "Can I compress PDFs to exactly 100KB for government portals?",
+    a: "Yes — use our Compress PDF to 100KB tool. It's built for Bangladesh govt portals (BPSC, BCS, NID), Indian portals (UPSC, IBPS), and any system with strict file-size limits.",
+  },
+  {
+    q: "Is it safe to upload sensitive PDFs?",
+    a: "Files are transferred over HTTPS, processed in isolated workers, and auto-deleted within an hour. For maximum privacy, use the Password Protect PDF tool before uploading anywhere.",
   },
 ];
 
@@ -39,7 +39,7 @@ export function FaqSection() {
           Frequently asked questions
         </h2>
         <p className="text-muted-foreground">
-          Answers to common questions about privacy, pricing, and supported features.
+          Privacy, supported languages, file size limits, and government-portal compatibility.
         </p>
       </div>
       <ul className="space-y-3">

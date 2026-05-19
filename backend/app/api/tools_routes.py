@@ -8,33 +8,31 @@ from pathlib import Path
 
 from fastapi import APIRouter, File, Form, HTTPException, Response, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
-from pydantic import BaseModel
-
 from app.services import (
-    bank_service,
-    forms_service,
-    nid_service,
+    id_card_service,
     ocr_service,
     pdf_image_service,
     pdf_lock_service,
+    pdf_table_service,
     photo_service,
 )
+from app.services import image_to_pdf_service, pdf_compress_target, pdf_to_word_service, sign_pdf_service, word_to_pdf_service
 from app.utils.storage import find_output, find_upload, new_file_id, upload_path
 
 router = APIRouter(prefix="/tools", tags=["tools"])
 
 
-# ---------- NID Combiner ---------- #
+# ---------- ID Card Combiner ---------- #
 
 
-@router.post("/nid/combine")
-async def nid_combine(
+@router.post("/id-card/combine")
+async def id_card_combine(
     front: UploadFile = File(...),
     back: UploadFile = File(...),
     layout: str = Form("a4_portrait"),
     add_labels: bool = Form(True),
 ):
-    if layout not in ("a4_portrait", "a4_horizontal", "compact"):
+    if layout not in id_card_service.VALID_LAYOUTS:
         raise HTTPException(400, "Invalid layout")
     front_bytes = await front.read()
     back_bytes = await back.read()
@@ -43,7 +41,7 @@ async def nid_combine(
 
     try:
         output_id, out = await asyncio.to_thread(
-            nid_service.combine_nid,
+            id_card_service.combine_id_card,
             front_bytes,
             back_bytes,
             front.content_type,
@@ -51,17 +49,17 @@ async def nid_combine(
             layout,
             add_labels,
         )
-    except nid_service.NIDError as exc:
+    except id_card_service.IDCardError as exc:
         raise HTTPException(400, str(exc))
 
     return {
         "output_id": output_id,
-        "filename": "nid-combined.pdf",
+        "filename": "id-card.pdf",
         "size_bytes": out.stat().st_size,
     }
 
 
-# ---------- Bangla OCR ---------- #
+# ---------- Multilingual OCR ---------- #
 
 
 @router.get("/ocr/status")
@@ -72,16 +70,32 @@ async def ocr_status():
     }
 
 
+# Validate against actually-installed packs rather than a hardcoded whitelist.
+# Accepts standard 2-4 letter codes (eng, ben, spa) and underscore-codes
+# used by Tesseract for traditional/vertical variants (chi_sim, chi_tra,
+# chi_sim_vert, etc.). Up to 4 components joined with '+' for multi-lang OCR.
+_OCR_CODE_RE = re.compile(r"^[a-z][a-z0-9_]{1,11}(\+[a-z][a-z0-9_]{1,11}){0,3}$")
+
+
 @router.post("/ocr/extract")
 async def ocr_extract(
     file: UploadFile = File(...),
-    lang: str = Form("ben+eng"),
+    lang: str = Form("eng"),
     force_ocr: bool = Form(False),
 ):
     if file.content_type not in ("application/pdf",) and not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
-    if lang not in ("ben", "eng", "ben+eng"):
-        raise HTTPException(400, "Unsupported language")
+    if not _OCR_CODE_RE.match(lang):
+        raise HTTPException(400, "Invalid language code format")
+    installed = set(await asyncio.to_thread(ocr_service.list_languages))
+    if not installed:
+        if ocr_service.is_available():
+            raise HTTPException(503, "OCR engine is installed but no language packs are available")
+        # Tesseract entirely unavailable — extract_text will raise OCRError → 400 below
+    else:
+        for code in lang.split("+"):
+            if code not in installed:
+                raise HTTPException(400, f"Language '{code}' is not installed on the server")
 
     file_id = new_file_id()
     dest = upload_path(file_id)
@@ -104,11 +118,11 @@ async def ocr_extract(
     }
 
 
-# ---------- Bank Statement → Excel ---------- #
+# ---------- PDF Table → Excel ---------- #
 
 
-@router.post("/bank/to-excel")
-async def bank_to_excel(file: UploadFile = File(...)):
+@router.post("/pdf-table/to-excel")
+async def pdf_table_to_excel(file: UploadFile = File(...)):
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
     content = await file.read()
@@ -121,16 +135,16 @@ async def bank_to_excel(file: UploadFile = File(...)):
 
     try:
         output_id, out, stats = await asyncio.to_thread(
-            bank_service.convert_bank_statement,
+            pdf_table_service.convert_pdf_table,
             dest,
-            "statement.xlsx",
+            "extracted-tables.xlsx",
         )
-    except bank_service.BankError as exc:
+    except pdf_table_service.PDFTableError as exc:
         raise HTTPException(400, str(exc))
 
     return {
         "output_id": output_id,
-        "filename": "statement.xlsx",
+        "filename": "extracted-tables.xlsx",
         "size_bytes": out.stat().st_size,
         "rows": stats["rows"],
         "columns": stats["columns"],
@@ -181,42 +195,6 @@ async def photo_to_pdf(
         "filename": f"photo-{size}.pdf",
         "size_bytes": out.stat().st_size,
         "info": info,
-    }
-
-
-# ---------- Govt Forms ---------- #
-
-
-class RenderFormRequest(BaseModel):
-    form_id: str
-    values: dict[str, str]
-
-
-@router.get("/forms")
-async def list_forms():
-    return {"forms": forms_service.list_forms()}
-
-
-@router.get("/forms/{form_id}")
-async def get_form(form_id: str):
-    try:
-        return forms_service.get_form(form_id)
-    except forms_service.FormError as exc:
-        raise HTTPException(404, str(exc))
-
-
-@router.post("/forms/render")
-async def render_form(req: RenderFormRequest):
-    try:
-        output_id, out = await asyncio.to_thread(
-            forms_service.render_form, req.form_id, req.values
-        )
-    except forms_service.FormError as exc:
-        raise HTTPException(400, str(exc))
-    return {
-        "output_id": output_id,
-        "filename": f"{req.form_id}.pdf",
-        "size_bytes": out.stat().st_size,
     }
 
 
@@ -311,11 +289,201 @@ async def pdf_unlock(file: UploadFile = File(...), password: str = Form(...)):
     }
 
 
+# ---------- Compress PDF to target size (e.g. 100KB) ---------- #
+
+
+_TARGET_SIZES_BYTES = {
+    "50kb": 50 * 1024,
+    "100kb": 100 * 1024,
+    "200kb": 200 * 1024,
+    "500kb": 500 * 1024,
+    "1mb": 1024 * 1024,
+    "2mb": 2 * 1024 * 1024,
+}
+
+
+@router.post("/compress/target-size")
+async def compress_target_size(
+    file: UploadFile = File(...),
+    target: str = Form("100kb"),
+):
+    if target not in _TARGET_SIZES_BYTES:
+        raise HTTPException(400, f"target must be one of: {', '.join(_TARGET_SIZES_BYTES)}")
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(415, "Only PDF files are accepted")
+    content = await file.read()
+    if content[:4] != b"%PDF":
+        raise HTTPException(400, "Invalid PDF")
+
+    file_id = new_file_id()
+    dest = upload_path(file_id)
+    dest.write_bytes(content)
+
+    target_bytes = _TARGET_SIZES_BYTES[target]
+    try:
+        output_id, out, stats = await asyncio.to_thread(
+            pdf_compress_target.compress_to_target, dest, target_bytes,
+        )
+    except pdf_compress_target.CompressTargetError as exc:
+        raise HTTPException(400, str(exc))
+
+    return {
+        "output_id": output_id,
+        "filename": f"compressed-{target}.pdf",
+        "size_bytes": out.stat().st_size,
+        "original_size_bytes": len(content),
+        "target": target,
+        **stats,
+    }
+
+
+# ---------- Image (JPG/PNG/WebP) → PDF ---------- #
+
+
+@router.post("/jpg-to-pdf")
+async def jpg_to_pdf(
+    files: list[UploadFile] = File(...),
+    page_size: str = Form("a4_portrait"),
+    margin_mm: float = Form(10.0),
+):
+    if not files:
+        raise HTTPException(400, "No images provided")
+    if len(files) > 50:
+        raise HTTPException(400, "Max 50 images per conversion")
+
+    images_bytes: list[bytes] = []
+    for f in files:
+        data = await f.read()
+        if not data:
+            continue
+        images_bytes.append(data)
+    if not images_bytes:
+        raise HTTPException(400, "All uploads were empty")
+
+    try:
+        output_id, out, info = await asyncio.to_thread(
+            image_to_pdf_service.images_to_pdf, images_bytes, page_size, margin_mm,
+        )
+    except image_to_pdf_service.ImageToPdfError as exc:
+        raise HTTPException(400, str(exc))
+
+    return {
+        "output_id": output_id,
+        "filename": "images.pdf",
+        "size_bytes": out.stat().st_size,
+        **info,
+    }
+
+
+# ---------- PDF → Word (.docx) ---------- #
+
+
+@router.post("/pdf-to-word")
+async def pdf_to_word(file: UploadFile = File(...)):
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(415, "Only PDF files are accepted")
+    content = await file.read()
+    if content[:4] != b"%PDF":
+        raise HTTPException(400, "Invalid PDF")
+    file_id = new_file_id()
+    dest = upload_path(file_id)
+    dest.write_bytes(content)
+
+    try:
+        output_id, out, stats = await asyncio.to_thread(
+            pdf_to_word_service.pdf_to_docx, dest,
+        )
+    except pdf_to_word_service.PdfToWordError as exc:
+        raise HTTPException(400, str(exc))
+
+    return {
+        "output_id": output_id,
+        "filename": "converted.docx",
+        "size_bytes": out.stat().st_size,
+        **stats,
+    }
+
+
+# ---------- Word (.docx) → PDF ---------- #
+
+
+@router.post("/word-to-pdf")
+async def word_to_pdf(file: UploadFile = File(...)):
+    name = (file.filename or "").lower()
+    if not name.endswith(".docx"):
+        raise HTTPException(415, "Only .docx files are accepted")
+    content = await file.read()
+    if not content:
+        raise HTTPException(400, "Empty file")
+    # docx is a zip — must start with PK
+    if content[:2] != b"PK":
+        raise HTTPException(400, "Invalid .docx file")
+    file_id = new_file_id()
+    dest = upload_path(file_id).with_suffix(".docx")
+    dest.write_bytes(content)
+
+    try:
+        output_id, out, stats = await asyncio.to_thread(
+            word_to_pdf_service.docx_to_pdf, dest,
+        )
+    except word_to_pdf_service.WordToPdfError as exc:
+        raise HTTPException(400, str(exc))
+
+    return {
+        "output_id": output_id,
+        "filename": "converted.pdf",
+        "size_bytes": out.stat().st_size,
+        **stats,
+    }
+
+
+# ---------- Sign PDF ---------- #
+
+
+@router.post("/sign-pdf")
+async def sign_pdf(
+    file: UploadFile = File(...),
+    signature: UploadFile = File(...),
+    page_index: int = Form(0),
+    x_pt: float = Form(...),
+    y_pt: float = Form(...),
+    width_pt: float = Form(...),
+    height_pt: float = Form(...),
+):
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(415, "Only PDF files are accepted")
+    pdf_bytes = await file.read()
+    if pdf_bytes[:4] != b"%PDF":
+        raise HTTPException(400, "Invalid PDF")
+    sig_bytes = await signature.read()
+    if not sig_bytes:
+        raise HTTPException(400, "Empty signature image")
+
+    file_id = new_file_id()
+    dest = upload_path(file_id)
+    dest.write_bytes(pdf_bytes)
+
+    try:
+        output_id, out = await asyncio.to_thread(
+            sign_pdf_service.sign_pdf,
+            dest, sig_bytes, page_index, x_pt, y_pt, width_pt, height_pt,
+        )
+    except sign_pdf_service.SignPdfError as exc:
+        raise HTTPException(400, str(exc))
+
+    return {
+        "output_id": output_id,
+        "filename": "signed.pdf",
+        "size_bytes": out.stat().st_size,
+    }
+
+
 # ---------- Generic download alias for outputs ---------- #
 
 _SUFFIX_TO_MIME = {
     ".pdf": "application/pdf",
     ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ".zip": "application/zip",
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",

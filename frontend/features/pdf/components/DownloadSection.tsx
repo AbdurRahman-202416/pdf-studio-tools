@@ -37,7 +37,7 @@ export function DownloadSection() {
         >
           <Card
             data-testid="download-section"
-            className="overflow-hidden border-success/40 bg-gradient-to-br from-emerald-50 to-card dark:from-emerald-950/30"
+            className="overflow-hidden border-success/40 bg-success/[0.06]"
           >
             <CardContent className="flex min-w-0 flex-col gap-4">
               <div className="flex flex-wrap items-center gap-3 sm:gap-4">

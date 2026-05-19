@@ -1,7 +1,7 @@
 # PDF Studio
 
-A production-ready PDF toolkit web app: merge, compress, convert, lock, OCR.
-Built for Bangladesh, free for everyone.
+The all-in-one PDF toolkit. Free, fast, watermark-free.
+Compress, merge, convert, sign, lock, OCR — 9 tools, no signup, no daily limit, files auto-delete in 1 hour.
 
 - **Frontend**, Next.js 16 (App Router), TypeScript, Tailwind v4, Zustand, Framer Motion, React Dropzone, @dnd-kit, sonner, lucide-react
 - **Backend**, Python 3, FastAPI, PyMuPDF (`fitz`), pypdf, Pillow, pytesseract, openpyxl, pdfplumber
@@ -15,31 +15,29 @@ Built for Bangladesh, free for everyone.
 
 | Tool | Route | What it does |
 |---|---|---|
-| Merge & Compress | `/workspace` | Drag, drop, reorder, merge selected pages, compress at 3 levels |
-| PDF → JPG / PNG | `/tools/pdf-to-jpg` | Export pages as JPG/PNG (single image or ZIP) at 150 / 220 / 300 dpi |
-| Lock / Unlock PDF | `/tools/pdf-lock` | Add or remove AES-256 password protection |
-| NID Combiner | `/tools/nid-combine` | Front + back of Bangladesh NID on a single A4 print-ready PDF |
-| Bangla OCR | `/tools/bangla-ocr` | Extract Bangla + English text from scanned PDFs (Tesseract) |
-| Bank Statement → Excel | `/tools/bank-to-excel` | Convert BD bank statement PDFs into XLSX |
-| Passport Photo PDF | `/tools/photo-to-pdf` | Auto-arrange passport / visa photos on A4 |
-| Govt Forms | `/tools/govt-forms` | Pre-loaded e-TIN / NID correction / birth-cert / police-clearance templates |
+| Compress PDF | `/tools/compress-pdf-without-losing-quality` | Three compression presets, preserves quality |
+| Merge PDF | `/tools/merge-large-pdf-files-online` | Combine PDFs with drag-reorder across files |
+| PDF → JPG / PNG | `/tools/pdf-to-jpg-high-quality` | Export pages at 150 / 220 / 300 DPI |
+| Password Protect PDF | `/tools/password-protect-pdf-online` | Add AES-256 encryption |
+| Unlock PDF | `/tools/unlock-pdf-with-password-online` | Remove a known password |
+| PDF OCR | `/tools/pdf-ocr-online-free` | Extract text in 100+ languages (Tesseract) |
+| ID Card to PDF | `/tools/id-card-to-pdf` | Combine two-sided IDs onto A4 |
+| Passport Photo to PDF | `/tools/passport-photo-to-pdf` | Auto-arrange passport/visa photos |
+| PDF Table to Excel | `/tools/pdf-to-excel-converter` | Extract tables to XLSX |
 
 ## Features
 
-- Drag & drop multi-file PDF upload with progress
-- Page thumbnails with lazy loading
-- Per-page selection (individual / all / clear)
-- Drag-and-drop reorder across files
+- Drag & drop multi-file PDF upload
+- Per-page selection + drag-reorder across files
 - 3-level compression (Light / Balanced / Maximum)
-- AES-256 password lock / unlock
-- PDF to high-quality JPG / PNG (ZIP for multi-page)
-- Bangla & English OCR with smart text-layer fallback
-- Bank statement → Excel
-- Light / Dark / System theme with no flash
-- Mobile-responsive with drawer nav
+- AES-256 lock / unlock
+- 100+ language OCR with text-layer fallback
+- Result previews (PDF / JPG / PNG / ZIP / XLSX)
+- Files auto-expire in 1 hour
+- No watermark, no signup, no daily limit
+- Dark mode, mobile-responsive
 - SEO-ready: per-page meta, sitemap, robots, manifest, FAQ schema, JSON-LD
 - Recent output history (localStorage)
-- Files auto-expire after 1 hour (periodic background cleanup)
 - **Result preview** for every tool: PDFs render as paginated images, JPG/PNG show inline, ZIPs preview their first image, XLSX previews show a scrollable table with the first 10 rows
 - **Dynamic favicon** + Apple touch icon (`/icon`, `/apple-icon`) generated server-side
 - WhatsApp / Twitter / Facebook share buttons on every result
@@ -99,14 +97,11 @@ For production, see [DEPLOY.md](./DEPLOY.md).
 | POST | `/api/tools/pdf-to-jpg` | Convert PDF pages to JPG / PNG |
 | POST | `/api/tools/pdf/lock` | Lock with AES-256 password |
 | POST | `/api/tools/pdf/unlock` | Remove password |
-| POST | `/api/tools/nid/combine` | NID front + back → A4 |
+| POST | `/api/tools/id-card/combine` | ID card front + back → A4 |
 | GET | `/api/tools/ocr/status` | OCR engine readiness |
 | POST | `/api/tools/ocr/extract` | OCR extract text |
-| POST | `/api/tools/bank/to-excel` | Bank PDF → XLSX |
+| POST | `/api/tools/pdf-table/to-excel` | PDF table → XLSX |
 | POST | `/api/tools/photo/to-pdf` | Photo → A4 PDF |
-| GET | `/api/tools/forms` | List form templates |
-| GET | `/api/tools/forms/{id}` | Form fields detail |
-| POST | `/api/tools/forms/render` | Fill and render a form |
 | GET | `/api/tools/download/{output_id}` | Download any tool output (pdf/xlsx/zip/jpg/png) |
 | GET | `/api/tools/preview/{output_id}` | Preview a generated result: PNG for PDF/JPG/PNG/ZIP, JSON for XLSX. Supports `?page=N&w=900`; returns `X-Page-Count` header for PDFs |
 
@@ -135,6 +130,6 @@ Tests start the dev servers automatically (`playwright.config.ts > webServer`).
 - Per-page meta + canonical + OG + Twitter cards
 - `sitemap.xml`, `robots.txt`, `manifest.webmanifest` auto-generated
 - JSON-LD: WebApplication + Organization on home, FAQPage on home FAQ
-- All tool pages target BD-specific keywords in English + Bangla
+- All tool pages target long-tail keywords with per-page meta + canonical
 - Files auto-delete from storage after 1 hour
 # pdf-studio-tools

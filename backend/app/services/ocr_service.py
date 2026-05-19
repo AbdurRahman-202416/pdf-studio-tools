@@ -3,12 +3,12 @@ from __future__ import annotations
 import io
 import shutil
 from pathlib import Path
-from typing import Literal
 
 import fitz
 from PIL import Image, ImageFilter, ImageOps
 
-OCRLang = Literal["ben", "eng", "ben+eng"]
+# Any Tesseract language code accepted (e.g. "eng", "spa", "ben+eng", "hin+eng").
+# Validation happens against the actually-installed packs in list_languages().
 
 
 class OCRError(Exception):
@@ -55,7 +55,7 @@ def _preprocess_for_ocr(img: Image.Image) -> Image.Image:
     return img
 
 
-def _ocr_image(img: Image.Image, lang: OCRLang) -> str:
+def _ocr_image(img: Image.Image, lang: str) -> str:
     import pytesseract  # type: ignore
 
     # PSM 3 = automatic page segmentation (best general-purpose); OEM 3 = default LSTM
@@ -74,7 +74,7 @@ def _ocr_image(img: Image.Image, lang: OCRLang) -> str:
 
 def extract_text(
     file_path: Path,
-    lang: OCRLang = "ben+eng",
+    lang: str = "eng",
     dpi: int = 320,
     max_pages: int = 30,
     force_ocr: bool = False,
@@ -136,7 +136,7 @@ def extract_text(
     }
 
 
-def extract_text_from_image(img_bytes: bytes, lang: OCRLang = "ben+eng") -> str:
+def extract_text_from_image(img_bytes: bytes, lang: str = "eng") -> str:
     if not is_available():
         raise OCRError("Tesseract not installed on the server")
     try:
