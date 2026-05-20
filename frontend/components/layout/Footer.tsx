@@ -16,7 +16,7 @@ export function Footer() {
             </p>
           </div>
           <p className="mt-2 text-muted-foreground">
-            Free, fast, private PDF tools — for everyone, everywhere.
+            Free, fast, private PDF tools - for everyone, everywhere.
           </p>
         </div>
         <div>

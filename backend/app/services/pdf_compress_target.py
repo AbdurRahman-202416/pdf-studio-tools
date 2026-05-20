@@ -67,8 +67,8 @@ def compress_to_target(
     """
     if target_bytes < 50 * 1024:
         raise CompressTargetError("Target must be at least 50 KB")
-    if target_bytes > 10 * 1024 * 1024:
-        raise CompressTargetError("Target must be at most 10 MB")
+    if target_bytes > 20 * 1024 * 1024:
+        raise CompressTargetError("Target must be at most 20 MB")
 
     output_id = new_file_id()
     out = output_path(output_id)

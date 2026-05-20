@@ -6,7 +6,7 @@ const tool = getTool("merge-large-pdf-files-online")!;
 export const metadata: Metadata = {
   title: tool.primaryKeyword,
   description:
-    "Merge large PDF files online for free. Drag pages across files, reorder, and export — no watermark, no signup.",
+    "Merge large PDF files online for free. Drag pages across files, reorder, and export - no watermark, no signup.",
   keywords: [tool.primaryKeyword, ...tool.relatedKeywords],
   alternates: { canonical: `/tools/${tool.slug}` },
 };

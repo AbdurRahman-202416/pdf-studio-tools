@@ -58,11 +58,11 @@ export default function Home() {
             Free PDF tools
             <br className="hidden sm:block" />{" "}
             <em className="italic font-normal gradient-text">that&nbsp;just&nbsp;work</em>
-            <span className="block mt-2 text-2xl sm:text-3xl lg:text-4xl font-normal text-muted-foreground tracking-normal">
-              compress, merge, convert, OCR, sign — no signup, no watermark.
+            <span className="block mt-2 text-base sm:text-lg lg:text-xl font-normal text-muted-foreground tracking-normal">
+              compress, merge, convert, OCR, sign - no signup, no watermark.
             </span>
           </h1>
-          <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-6 text-base sm:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Fourteen focused utilities for the things you actually need to do with PDFs.
             Free forever. No daily limits. Files auto-delete in one hour.
             Works perfectly with English, Bangla, and 100+ other languages.
@@ -113,7 +113,7 @@ export default function Home() {
             Every PDF tool you actually need
           </h2>
           <p className="mt-3 text-muted-foreground leading-relaxed">
-            Compress, merge, convert PDF to JPG / PNG / Word / Excel, OCR, lock, unlock, sign — all free.
+            Compress, merge, convert PDF to JPG / PNG / Word / Excel, OCR, lock, unlock, sign - all free.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -163,7 +163,7 @@ export default function Home() {
             Ready when you are.
           </h2>
           <p className="mt-3 text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Open the workspace and drop your first PDF — no signup, no nonsense.
+            Open the workspace and drop your first PDF - no signup, no nonsense.
           </p>
           <div className="mt-8">
             <Link href="/workspace">

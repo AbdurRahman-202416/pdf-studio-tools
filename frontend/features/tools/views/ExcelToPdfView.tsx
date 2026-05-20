@@ -2,36 +2,37 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { FileSpreadsheet, Table, Wand2 } from "lucide-react";
+import { FileText, Sheet, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { FileDrop } from "@/features/tools/components/FileDrop";
 import { ToolResult } from "@/features/tools/components/ToolResult";
 import { ToolShell } from "@/features/tools/components/ToolShell";
-import { pdfTableToExcel, toolDownloadUrl, type PdfTableResult } from "@/services/tools-api";
+import { excelToPdf, toolDownloadUrl, type ExcelToPdfResult } from "@/services/tools-api";
 import { ApiError } from "@/services/api";
-import { getTool } from "@/lib/seo/tool-registry";
+import { trackEvent } from "@/lib/track";
 
-const tool = getTool("pdf-to-excel-converter")!;
-
-export default function PdfToExcelPage() {
+export function ExcelToPdfView() {
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<PdfTableResult | null>(null);
+  const [result, setResult] = useState<ExcelToPdfResult | null>(null);
 
   const handleConvert = async () => {
     if (!file) {
-      toast.error("Upload a PDF file");
+      toast.error("Upload an Excel file");
       return;
     }
     setBusy(true);
+    trackEvent("tool_started", { tool: "excel-to-pdf" });
     try {
-      const r = await pdfTableToExcel(file);
+      const r = await excelToPdf(file);
       setResult(r);
-      const sheetLabel = r.sheets > 1 ? `${r.sheets} tabs` : `${r.tables} table${r.tables === 1 ? "" : "s"}`;
-      toast.success(`Extracted ${r.rows} rows across ${sheetLabel}`);
+      toast.success(
+        `Rendered ${r.sheets} sheet${r.sheets === 1 ? "" : "s"} to PDF (${r.orientation})`,
+      );
     } catch (err) {
+      trackEvent("tool_failed", { tool: "excel-to-pdf" });
       toast.error(err instanceof ApiError ? err.message : "Conversion failed");
     } finally {
       setBusy(false);
@@ -40,20 +41,20 @@ export default function PdfToExcelPage() {
 
   return (
     <ToolShell
-      title={tool.displayName}
-      subtitle={`Extract tables from PDF files into editable Excel spreadsheets. ${tool.relatedKeywords[0]}.`}
-      icon={Table}
-      gradient="from-amber-500 via-orange-500 to-rose-500"
+      title="Excel to PDF"
+      subtitle="Render every sheet in an .xlsx workbook as a clean PDF table. One sheet per PDF page."
+      icon={Sheet}
       sideCard={
         <>
           <Card>
             <CardHeader>
-              <CardTitle>Best results</CardTitle>
+              <CardTitle>How it works</CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground space-y-2">
-              <p>✓ PDFs with selectable text (most digital PDFs)</p>
-              <p>✓ Standard tabular layouts</p>
-              <p>✗ Pure image-only scans, run OCR first</p>
+              <p>✓ Every sheet becomes one PDF page</p>
+              <p>✓ First row treated as header (bold + colored band)</p>
+              <p>✓ Zebra rows and borders for readability</p>
+              <p>✓ Wide sheets auto-flip to landscape</p>
             </CardContent>
           </Card>
           <Card className="border-amber-300/40 bg-amber-50/50 dark:bg-amber-950/20">
@@ -67,12 +68,15 @@ export default function PdfToExcelPage() {
     >
       <div className="space-y-6">
         <FileDrop
-          label="Drop your PDF with tables"
-          hint="Most digital PDFs work great. Image-only scans may need OCR first."
-          accept={{ "application/pdf": [".pdf"] }}
+          label="Drop your .xlsx file"
+          hint="Multi-sheet workbooks fully supported. Formulas are evaluated to their last cached value."
+          accept={{
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+            "application/vnd.ms-excel.sheet.macroenabled.12": [".xlsm"],
+          }}
           file={file}
           onChange={setFile}
-          testId="bank-file"
+          testId="xlsx-file"
           className="max-w-xl"
         />
 
@@ -81,9 +85,9 @@ export default function PdfToExcelPage() {
           onClick={handleConvert}
           isLoading={busy}
           disabled={!file}
-          data-testid="bank-convert-button"
+          data-testid="xlsx-convert-button"
         >
-          <Wand2 className="h-4 w-4" /> Convert to Excel
+          <Wand2 className="h-4 w-4" /> Convert to PDF
         </Button>
 
         {result && (
@@ -92,17 +96,16 @@ export default function PdfToExcelPage() {
             size_bytes={result.size_bytes}
             description={
               <span className="inline-flex items-center gap-1">
-                <FileSpreadsheet className="h-3.5 w-3.5" />
-                {result.rows} rows · {result.columns} columns ·{" "}
-                {result.sheets > 1
-                  ? `${result.sheets} tabs (1 per page)`
-                  : `${result.tables} table${result.tables === 1 ? "" : "s"}`}
+                <FileText className="h-3.5 w-3.5" />
+                {result.sheets} sheet{result.sheets === 1 ? "" : "s"} · {result.rows} data
+                row{result.rows === 1 ? "" : "s"} · {result.orientation}
               </span>
             }
             downloadHref={toolDownloadUrl(result.output_id, result.filename)}
             output_id={result.output_id}
             onDismiss={() => setResult(null)}
-            testId="bank-result"
+            tool="excel-to-pdf"
+            testId="xlsx-result"
           />
         )}
       </div>

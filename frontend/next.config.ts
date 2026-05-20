@@ -20,6 +20,7 @@ const REDIRECTS: Array<{ from: string; to: string }> = [
   { from: "/tools/id-card-to-pdf", to: "/nid-combine" },
   { from: "/tools/passport-photo-to-pdf", to: "/passport-photo-pdf" },
   { from: "/tools/pdf-to-excel-converter", to: "/pdf-to-excel" },
+  { from: "/tools/excel-to-pdf-converter", to: "/excel-to-pdf" },
 
   // ---- earlier short aliases also redirected (defensive) ----
   { from: "/tools/bangla-ocr", to: "/pdf-ocr" },

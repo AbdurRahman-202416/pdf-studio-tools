@@ -7,7 +7,7 @@ export default function MergePdfPage() {
   return (
     <WorkspaceShell
       title={tool.displayName}
-      subtitle="Drop multiple PDFs, drag pages across files, and export one merged PDF — free, no watermark."
+      subtitle="Drop multiple PDFs, drag pages across files, and export one merged PDF - free, no watermark."
       showBackLink
     />
   );

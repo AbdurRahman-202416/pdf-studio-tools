@@ -18,7 +18,7 @@ const DEFAULT_TITLE = "Workspace";
 const DEFAULT_SUBTITLE = "Upload PDFs, pick pages, reorder, then merge or compress.";
 
 interface WorkspaceShellProps {
-  /** Optional H1 override — defaults to "Workspace". Tool pages pass the tool's displayName. */
+  /** Optional H1 override - defaults to "Workspace". Tool pages pass the tool's displayName. */
   title?: string;
   /** Optional one-line description under the H1. */
   subtitle?: string;

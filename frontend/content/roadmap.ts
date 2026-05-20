@@ -8,7 +8,7 @@ export interface RoadmapItem {
 
 export const roadmap: RoadmapItem[] = [
   { title: "Merge & Compress", description: "Drag, drop, reorder, merge selected pages, compress at 3 levels.", status: "shipped" },
-  { title: "PDF OCR", description: "Extract text from scanned PDFs with Tesseract — 100+ languages.", status: "shipped" },
+  { title: "PDF OCR", description: "Extract text from scanned PDFs with Tesseract - 100+ languages.", status: "shipped" },
   { title: "ID Card to PDF", description: "Combine any two-sided ID card (front + back) into a single print-ready A4 PDF.", status: "shipped" },
   { title: "PDF Table to Excel", description: "Convert tabular PDF data into clean, formatted XLSX spreadsheets.", status: "shipped" },
   { title: "Passport Photo to PDF", description: "Auto-arrange passport / visa / stamp photos on A4.", status: "shipped" },

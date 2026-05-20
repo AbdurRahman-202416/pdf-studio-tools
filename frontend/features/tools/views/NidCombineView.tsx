@@ -60,7 +60,7 @@ export function NidCombineView() {
   return (
     <ToolShell
       title="ID Combine"
-      subtitle="Combine the front and back of any ID — NID, student ID, employee ID, driver's license, passport — into a print-ready A4 PDF."
+      subtitle="Combine the front and back of any ID - NID, student ID, employee ID, driver's license, passport - into a print-ready A4 PDF."
       badge="Any ID"
       icon={IdCard}
       sideCard={
@@ -83,7 +83,7 @@ export function NidCombineView() {
                 <span className="text-xs font-semibold uppercase tracking-wide">Works for</span>
               </div>
               <p className="text-sm text-muted-foreground">
-                NID, student ID, employee badge, driver&apos;s license, passport, smart card, gym/library cards, business cards — any two-sided ID.
+                NID, student ID, employee badge, driver&apos;s license, passport, smart card, gym/library cards, business cards - any two-sided ID.
               </p>
             </CardContent>
           </Card>
@@ -94,7 +94,7 @@ export function NidCombineView() {
         <div className="grid gap-4 sm:grid-cols-2">
           <FileDrop
             label="Front side"
-            hint="Front of NID, student ID, employee ID, license — image or PDF"
+            hint="Front of NID, student ID, employee ID, license - image or PDF"
             accept={{ "image/*": [], "application/pdf": [".pdf"] }}
             file={front}
             preview={frontPreview}
@@ -103,7 +103,7 @@ export function NidCombineView() {
           />
           <FileDrop
             label="Back side"
-            hint="Back of the same ID card — image or PDF"
+            hint="Back of the same ID card - image or PDF"
             accept={{ "image/*": [], "application/pdf": [".pdf"] }}
             file={back}
             preview={backPreview}

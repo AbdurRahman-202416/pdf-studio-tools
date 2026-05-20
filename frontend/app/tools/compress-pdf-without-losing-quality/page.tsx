@@ -7,7 +7,7 @@ export default function CompressPdfPage() {
   return (
     <WorkspaceShell
       title={tool.displayName}
-      subtitle="Drop a PDF and shrink it with Light, Balanced, or Maximum compression — no signup, no watermark."
+      subtitle="Drop a PDF and shrink it with Light, Balanced, or Maximum compression - no signup, no watermark."
       showBackLink
     />
   );

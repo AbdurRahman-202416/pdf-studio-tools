@@ -9,7 +9,7 @@ const COMPETITORS = ["smallpdf", "ilovepdf", "adobe-acrobat"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  // Clean canonical routes — these are the URLs we want indexed.
+  // Clean canonical routes - these are the URLs we want indexed.
   const tools = toolRegistry.map((t) => t.slug);
   const blog = listBlogSlugs().map((s) => `blog/${s}`);
   const vs = COMPETITORS.map((c) => `vs/${c}`);

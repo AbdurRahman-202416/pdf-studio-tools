@@ -9,7 +9,7 @@ import { toolRegistry } from "@/lib/seo/tool-registry";
 import { getToolIcon } from "@/lib/seo/tool-icons";
 
 export const metadata: Metadata = {
-  title: "All PDF tools — free, no signup",
+  title: "All PDF tools - free, no signup",
   description:
     "Every PDF Studio tool: compress, merge, PDF to JPG, JPG to PDF, lock/unlock, OCR (100+ languages), PDF to Word, PDF to Excel, sign PDF, and more.",
   keywords: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "All PDF tools · PDF Studio",
     description:
-      "Fourteen free PDF utilities — compress, merge, convert, OCR, lock, unlock, sign, and more. No signup, no watermark.",
+      "Fourteen free PDF utilities - compress, merge, convert, OCR, lock, unlock, sign, and more. No signup, no watermark.",
   },
 };
 

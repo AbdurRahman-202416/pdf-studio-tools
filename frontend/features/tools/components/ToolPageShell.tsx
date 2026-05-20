@@ -12,7 +12,7 @@ import { getToolIcon } from "@/lib/seo/tool-icons";
 
 interface ToolPageShellProps {
   slug: string;
-  /** Optional one-line subtitle below H1 — falls back to the meta description. */
+  /** Optional one-line subtitle below H1 - falls back to the meta description. */
   subtitle?: string;
   /** Optional override for the interactive surface; defaults to <WorkspaceShell />. */
   children?: React.ReactNode;
@@ -51,7 +51,7 @@ export function ToolPageShell({ slug, subtitle, children }: ToolPageShellProps) 
           {
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            name: `${tool.displayName} — ${siteConfig.name}`,
+            name: `${tool.displayName} - ${siteConfig.name}`,
             applicationCategory: "ProductivityApplication",
             operatingSystem: "Web",
             url: canonical,
@@ -144,7 +144,7 @@ function FaqSection({ tool }: { tool: ToolEntry }) {
           FAQ
         </span>
         <h2 className="font-display mt-2 text-3xl sm:text-4xl font-medium tracking-tight">
-          {tool.displayName} — questions, answered
+          {tool.displayName} - questions, answered
         </h2>
       </div>
       <ul className="space-y-3">

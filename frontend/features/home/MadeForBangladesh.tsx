@@ -7,7 +7,7 @@ import { toolsByRegion } from "@/lib/seo/tool-registry";
 import { getToolIcon } from "@/lib/seo/tool-icons";
 
 const HIGHLIGHTS = [
-  "ID front + back combine — NID, student, employee, license",
+  "ID front + back combine - NID, student, employee, license",
   "Compress to 100KB for govt portals",
   "Bangla OCR (Tesseract 5)",
   "Passport-size photo PDF (35×45mm)",
@@ -33,7 +33,7 @@ export function MadeForBangladesh() {
           <em className="italic font-normal gradient-text">government forms</em>
         </h2>
         <p className="mt-3 text-muted-foreground leading-relaxed">
-          NID, passport, BPSC, BCS, university admissions — every portal with strict file-size limits
+          NID, passport, BPSC, BCS, university admissions - every portal with strict file-size limits
           or specific photo formats. PDF Studio handles them out of the box.
         </p>
       </div>

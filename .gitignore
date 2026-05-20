@@ -15,7 +15,13 @@ frontend/test-results/
 # Editor / tooling
 .vscode/
 .claude/
+.claire/
 .playwright-mcp/
 .superpowers/
 CLAUDE.md
 docs/superpowers/
+
+# Stray screenshots from Playwright MCP runs
+/*.png
+/frontend/*.png
+

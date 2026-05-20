@@ -99,10 +99,31 @@ export async function extractOCR(
   return res.json();
 }
 
-export async function pdfTableToExcel(file: File): Promise<BankResult> {
+export interface PdfTableResult extends ToolDownloadable {
+  rows: number;
+  columns: number;
+  sheets: number;
+  tables: number;
+}
+
+export async function pdfTableToExcel(file: File): Promise<PdfTableResult> {
   const fd = new FormData();
   fd.append("file", file);
   const res = await fetch(`${API_BASE}/tools/pdf-table/to-excel`, { method: "POST", body: fd });
+  if (!res.ok) throw new ApiError(await parseError(res), res.status);
+  return res.json();
+}
+
+export interface ExcelToPdfResult extends ToolDownloadable {
+  sheets: number;
+  rows: number;
+  orientation: "portrait" | "landscape";
+}
+
+export async function excelToPdf(file: File): Promise<ExcelToPdfResult> {
+  const fd = new FormData();
+  fd.append("file", file);
+  const res = await fetch(`${API_BASE}/tools/excel/to-pdf`, { method: "POST", body: fd });
   if (!res.ok) throw new ApiError(await parseError(res), res.status);
   return res.json();
 }
@@ -171,7 +192,16 @@ export async function unlockPdf(file: File, password: string): Promise<ToolDownl
 
 // ---------- Target-size compression (compress to 100KB) ---------- //
 
-export type CompressTargetKey = "50kb" | "100kb" | "200kb" | "500kb" | "1mb" | "2mb";
+export type CompressTargetKey =
+  | "50kb"
+  | "100kb"
+  | "200kb"
+  | "500kb"
+  | "1mb"
+  | "2mb"
+  | "5mb"
+  | "10mb"
+  | "16mb";
 
 export interface CompressTargetResult extends ToolDownloadable {
   original_size_bytes: number;
@@ -192,6 +222,25 @@ export async function compressPdfToTarget(
   fd.append("file", file);
   fd.append("target", target);
   const res = await fetch(`${API_BASE}/tools/compress/target-size`, { method: "POST", body: fd });
+  if (!res.ok) throw new ApiError(await parseError(res), res.status);
+  return res.json();
+}
+
+export type QuickCompressLevel = "low" | "medium" | "high";
+
+export interface QuickCompressResult extends ToolDownloadable {
+  original_size_bytes: number;
+  level: QuickCompressLevel;
+}
+
+export async function compressPdfQuick(
+  file: File,
+  level: QuickCompressLevel = "low",
+): Promise<QuickCompressResult> {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("level", level);
+  const res = await fetch(`${API_BASE}/tools/compress/quick`, { method: "POST", body: fd });
   if (!res.ok) throw new ApiError(await parseError(res), res.status);
   return res.json();
 }

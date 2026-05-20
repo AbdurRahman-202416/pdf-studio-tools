@@ -21,7 +21,7 @@ export function toolMetadata(slug: string): Metadata {
     keywords: [tool.primaryKeyword, ...tool.relatedKeywords],
     alternates: { canonical },
     openGraph: {
-      title: `${tool.displayName} — ${siteConfig.name}`,
+      title: `${tool.displayName} - ${siteConfig.name}`,
       description: tool.metaDescription,
       url: canonical,
       type: "website",
@@ -31,7 +31,7 @@ export function toolMetadata(slug: string): Metadata {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${tool.displayName} — ${siteConfig.name}`,
+      title: `${tool.displayName} - ${siteConfig.name}`,
       description: tool.metaDescription,
       images: [ogImage],
     },

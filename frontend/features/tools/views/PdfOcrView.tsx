@@ -76,7 +76,7 @@ export function PdfOcrView() {
   return (
     <ToolShell
       title="PDF OCR"
-      subtitle="Extract text from scanned PDFs — 100+ languages including English, Bangla, Hindi, Arabic, and Chinese."
+      subtitle="Extract text from scanned PDFs - 100+ languages including English, Bangla, Hindi, Arabic, and Chinese."
       icon={Languages}
       sideCard={
         <Card>
@@ -150,7 +150,7 @@ export function PdfOcrView() {
               <span>
                 <span className="block text-sm font-medium">Force OCR (skip text layer)</span>
                 <span className="block text-xs text-muted-foreground">
-                  By default we read the embedded text layer when available — instant and 100% accurate.
+                  By default we read the embedded text layer when available - instant and 100% accurate.
                   Enable this only for fully-scanned PDFs where the text layer is missing or wrong.
                 </span>
               </span>

@@ -64,14 +64,10 @@ export function FeaturesAccordion() {
           data-testid="features-toggle"
           className="group inline-flex items-center gap-3 rounded-full border border-border bg-card pl-5 pr-2 py-2 text-sm font-medium text-foreground/90 hover:border-primary/40 hover:bg-accent/50 transition"
         >
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            01 / 06
-          </span>
-          <span className="h-3 w-px bg-border" aria-hidden />
           <span>
-            {open ? "Hide" : "Show"}
-            {" "}
-            what&rsquo;s inside
+            {/* {open ? "Hide" : "Show"}
+            {" "} */}
+            why people choose us?
           </span>
           <span
             className={`grid h-8 w-8 place-items-center rounded-full bg-foreground text-background transition-transform duration-300 ${open ? "rotate-180" : ""}`}
@@ -102,7 +98,7 @@ export function FeaturesAccordion() {
                   Everything you need
                 </h2>
                 <p className="mt-3 text-muted-foreground leading-relaxed">
-                  From quick merges to fine-grained page control — all in one workspace.
+                  From quick merges to fine-grained page control - all in one workspace.
                 </p>
               </div>
               <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-3 bg-border rounded-2xl overflow-hidden border border-border">

@@ -16,7 +16,7 @@ import { getTool } from "@/lib/seo/tool-registry";
 
 const tool = getTool("pdf-ocr-online-free")!;
 
-// TODO: expand to full Tesseract language list — Phase 3
+// TODO: expand to full Tesseract language list - Phase 3
 const langs: Array<{ value: string; label: string; sub: string }> = [
   { value: "eng+ben", label: "English + multi-language", sub: "Best for mixed documents" },
   { value: "eng", label: "English only", sub: "Fastest for English text" },

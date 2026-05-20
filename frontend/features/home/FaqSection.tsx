@@ -3,7 +3,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 const FAQ = [
   {
     q: "Is PDF Studio really free?",
-    a: "Yes — every tool is free, with no daily limit, no signup required, and no watermark on the output. We're funded by optional donations and don't show ads.",
+    a: "Yes - every tool is free, with no daily limit, no signup required, and no watermark on the output. We're funded by optional donations and don't show ads.",
   },
   {
     q: "What happens to my uploaded files?",
@@ -11,7 +11,7 @@ const FAQ = [
   },
   {
     q: "Do you support Bangla, Hindi, Arabic, and Chinese PDFs?",
-    a: "Yes — every tool preserves non-Latin scripts. Our OCR engine supports 100+ languages including Bangla, English, Hindi, Arabic, Chinese (Simplified/Traditional), Japanese, Korean, Russian, and many more.",
+    a: "Yes - every tool preserves non-Latin scripts. Our OCR engine supports 100+ languages including Bangla, English, Hindi, Arabic, Chinese (Simplified/Traditional), Japanese, Korean, Russian, and many more.",
   },
   {
     q: "How large a PDF can I upload?",
@@ -23,7 +23,7 @@ const FAQ = [
   },
   {
     q: "Can I compress PDFs to exactly 100KB for government portals?",
-    a: "Yes — use our Compress PDF to 100KB tool. It's built for Bangladesh govt portals (BPSC, BCS, NID), Indian portals (UPSC, IBPS), and any system with strict file-size limits.",
+    a: "Yes - use our Compress PDF to 100KB tool. It's built for Bangladesh govt portals (BPSC, BCS, NID), Indian portals (UPSC, IBPS), and any system with strict file-size limits.",
   },
   {
     q: "Is it safe to upload sensitive PDFs?",

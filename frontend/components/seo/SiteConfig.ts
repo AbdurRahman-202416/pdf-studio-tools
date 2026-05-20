@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "PDF Studio",
   shortName: "PDFStudio",
   description:
-    "Free online PDF tools — compress, merge, convert PDF to Word/Excel/JPG, OCR in 100+ languages, lock, unlock, and sign. No signup, no watermark, files auto-delete in 1 hour.",
+    "Free online PDF tools - compress, merge, convert PDF to Word/Excel/JPG, OCR in 100+ languages, lock, unlock, and sign. No signup, no watermark, files auto-delete in 1 hour.",
   tagline: "All-in-one PDF toolkit. Free, fast, watermark-free.",
   url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/+$/, ""),
   locale: "en_US",

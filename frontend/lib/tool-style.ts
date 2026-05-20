@@ -1,5 +1,5 @@
 /**
- * Per-tool icon palette. Curated (not random rainbow) — each slug gets a
+ * Per-tool icon palette. Curated (not random rainbow) - each slug gets a
  * distinct hue that hints at the tool's purpose. The colorful chips give
  * the otherwise-restrained "Document Atelier" surface a tactile, 3D feel.
  *
@@ -73,6 +73,11 @@ const STYLES: Record<string, ToolStyle> = {
     from: "#22c55e",
     to: "#14532d",
     shadow: "rgba(34, 197, 94, 0.45)",
+  },
+  "excel-to-pdf": {
+    from: "#10b981",
+    to: "#064e3b",
+    shadow: "rgba(16, 185, 129, 0.45)",
   },
   "pdf-to-word": {
     from: "#3b82f6",

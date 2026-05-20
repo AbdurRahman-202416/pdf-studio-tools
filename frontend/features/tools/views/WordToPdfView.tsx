@@ -44,7 +44,7 @@ export function WordToPdfView() {
   return (
     <ToolShell
       title="Word to PDF"
-      subtitle="Convert .docx documents to PDF — preserves headings, lists, tables, and inline images."
+      subtitle="Convert .docx documents to PDF - preserves headings, lists, tables, and inline images."
       icon={FileType}
       sideCard={
         <Card>
@@ -54,7 +54,7 @@ export function WordToPdfView() {
           <CardContent className="text-sm text-muted-foreground space-y-2">
             <p>✓ .docx (Word 2007+)</p>
             <p>✓ Headings, lists, basic tables, images</p>
-            <p>✗ Legacy .doc — re-save as .docx first</p>
+            <p>✗ Legacy .doc - re-save as .docx first</p>
           </CardContent>
         </Card>
       }

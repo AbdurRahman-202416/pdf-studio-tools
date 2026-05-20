@@ -24,7 +24,7 @@ export async function generateMetadata({
   const { competitor } = await params;
   const c = findCompetitor(competitor);
   if (!c) return {};
-  const title = `PDF Studio vs ${c.name} — Free, no-watermark PDF tools`;
+  const title = `PDF Studio vs ${c.name} - Free, no-watermark PDF tools`;
   const description = `Comparing PDF Studio with ${c.name}: features, pricing, OCR support, no-signup policy, and daily limits.`;
   return {
     title,

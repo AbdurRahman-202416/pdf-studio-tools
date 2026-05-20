@@ -77,7 +77,7 @@ export default function AboutPage() {
 
       {/* Short intro */}
       <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
-        We built PDF Studio because the best free PDF tools all have catches — watermarks, daily limits, signup walls. We removed every one.
+        We built PDF Studio because the best free PDF tools all have catches - watermarks, daily limits, signup walls. We removed every one.
       </p>
 
       {/* Contact tiles, labels only (URLs hidden, links still work) */}

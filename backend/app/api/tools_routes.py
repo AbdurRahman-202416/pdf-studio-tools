@@ -5,18 +5,21 @@ import io
 import re
 import zipfile
 from pathlib import Path
+from typing import get_args
 
 from fastapi import APIRouter, File, Form, HTTPException, Response, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
+from app.models.schemas import CompressionLevel
 from app.services import (
     id_card_service,
     ocr_service,
     pdf_image_service,
     pdf_lock_service,
+    pdf_service,
     pdf_table_service,
     photo_service,
 )
-from app.services import image_to_pdf_service, pdf_compress_target, pdf_to_word_service, sign_pdf_service, word_to_pdf_service
+from app.services import excel_to_pdf_service, image_to_pdf_service, pdf_compress_target, pdf_to_word_service, sign_pdf_service, word_to_pdf_service
 from app.utils.storage import find_output, find_upload, new_file_id, upload_path
 
 router = APIRouter(prefix="/tools", tags=["tools"])
@@ -148,6 +151,43 @@ async def pdf_table_to_excel(file: UploadFile = File(...)):
         "size_bytes": out.stat().st_size,
         "rows": stats["rows"],
         "columns": stats["columns"],
+        "sheets": stats["sheets"],
+        "tables": stats["tables"],
+    }
+
+
+# ---------- Excel → PDF (table renderer) ---------- #
+
+
+@router.post("/excel/to-pdf")
+async def excel_to_pdf(file: UploadFile = File(...)):
+    name = (file.filename or "").lower()
+    if not (name.endswith(".xlsx") or name.endswith(".xlsm")):
+        raise HTTPException(415, "Only .xlsx or .xlsm files are accepted")
+    content = await file.read()
+    if content[:2] != b"PK":
+        raise HTTPException(400, "Invalid Excel file")
+
+    file_id = new_file_id()
+    dest = upload_path(file_id).with_suffix(".xlsx")
+    dest.write_bytes(content)
+
+    try:
+        output_id, out, stats = await asyncio.to_thread(
+            excel_to_pdf_service.convert_excel_to_pdf,
+            dest,
+            "spreadsheet.pdf",
+        )
+    except excel_to_pdf_service.ExcelToPDFError as exc:
+        raise HTTPException(400, str(exc))
+
+    return {
+        "output_id": output_id,
+        "filename": "spreadsheet.pdf",
+        "size_bytes": out.stat().st_size,
+        "sheets": stats["sheets"],
+        "rows": stats["rows"],
+        "orientation": stats["orientation"],
     }
 
 
@@ -299,6 +339,9 @@ _TARGET_SIZES_BYTES = {
     "500kb": 500 * 1024,
     "1mb": 1024 * 1024,
     "2mb": 2 * 1024 * 1024,
+    "5mb": 5 * 1024 * 1024,
+    "10mb": 10 * 1024 * 1024,
+    "16mb": 16 * 1024 * 1024,
 }
 
 
@@ -334,6 +377,41 @@ async def compress_target_size(
         "original_size_bytes": len(content),
         "target": target,
         **stats,
+    }
+
+
+# ---------- Quick compression by quality level (one-shot) ---------- #
+
+
+_QUICK_LEVELS = frozenset(get_args(CompressionLevel))
+
+
+@router.post("/compress/quick")
+async def compress_quick(
+    file: UploadFile = File(...),
+    level: str = Form("low"),
+):
+    """One-shot level-based compression: accept a file + level (low/medium/high) and return a compressed PDF."""
+    if level not in _QUICK_LEVELS:
+        raise HTTPException(400, f"level must be one of: {', '.join(sorted(_QUICK_LEVELS))}")
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(415, "Only PDF files are accepted")
+    content = await file.read()
+    if content[:4] != b"%PDF":
+        raise HTTPException(400, "Invalid PDF")
+
+    file_id = new_file_id()
+    dest = upload_path(file_id)
+    dest.write_bytes(content)
+
+    output_id, out = await asyncio.to_thread(pdf_service.compress_pdf, dest, level)
+
+    return {
+        "output_id": output_id,
+        "filename": f"compressed-{level}.pdf",
+        "size_bytes": out.stat().st_size,
+        "original_size_bytes": len(content),
+        "level": level,
     }
 
 

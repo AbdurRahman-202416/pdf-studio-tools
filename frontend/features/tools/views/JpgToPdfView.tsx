@@ -19,7 +19,7 @@ import { cn, formatBytes } from "@/lib/utils";
 import { trackEvent } from "@/lib/track";
 
 const PAGE_SIZES: { value: ImageToPdfPageSize; label: string; sub: string }[] = [
-  { value: "a4_portrait", label: "A4 portrait", sub: "210 × 297 mm — most common" },
+  { value: "a4_portrait", label: "A4 portrait", sub: "210 × 297 mm - most common" },
   { value: "a4_landscape", label: "A4 landscape", sub: "297 × 210 mm" },
   { value: "letter_portrait", label: "US Letter", sub: "216 × 279 mm" },
   { value: "fit_image", label: "Fit image", sub: "Page = image size" },

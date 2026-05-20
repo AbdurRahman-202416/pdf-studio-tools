@@ -22,7 +22,7 @@ import { trackEvent } from "@/lib/track";
 const TARGETS: { value: CompressTargetKey; label: string; sub: string }[] = [
   { value: "50kb", label: "50 KB", sub: "Smallest, may blur images" },
   { value: "100kb", label: "100 KB", sub: "Govt portals (NID, BCS, UPSC)" },
-  { value: "200kb", label: "200 KB", sub: "Balanced — keeps scans legible" },
+  { value: "200kb", label: "200 KB", sub: "Balanced - keeps scans legible" },
   { value: "500kb", label: "500 KB", sub: "High quality, modest size" },
   { value: "1mb", label: "1 MB", sub: "Lossy minimum acceptable" },
   { value: "2mb", label: "2 MB", sub: "Almost-original quality" },
@@ -48,7 +48,7 @@ export function CompressTo100kbView() {
         toast.success(`Compressed to ${formatBytes(r.final_bytes)} (target ${target})`);
       } else {
         toast.warning(
-          `Smallest achievable was ${formatBytes(r.final_bytes)} — try a higher target.`,
+          `Smallest achievable was ${formatBytes(r.final_bytes)} - try a higher target.`,
         );
       }
     } catch (err) {
@@ -73,7 +73,7 @@ export function CompressTo100kbView() {
           <CardContent className="text-sm text-muted-foreground space-y-2">
             <p>1. We rasterize each page at progressively lower DPI.</p>
             <p>2. JPEG quality is dialed down step-by-step.</p>
-            <p>3. We stop the moment your target is met — quality stays as high as possible.</p>
+            <p>3. We stop the moment your target is met - quality stays as high as possible.</p>
           </CardContent>
         </Card>
       }

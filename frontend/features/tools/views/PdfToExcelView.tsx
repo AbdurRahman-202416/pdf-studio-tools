@@ -9,14 +9,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { FileDrop } from "@/features/tools/components/FileDrop";
 import { ToolResult } from "@/features/tools/components/ToolResult";
 import { ToolShell } from "@/features/tools/components/ToolShell";
-import { pdfTableToExcel, toolDownloadUrl, type BankResult } from "@/services/tools-api";
+import { pdfTableToExcel, toolDownloadUrl, type PdfTableResult } from "@/services/tools-api";
 import { ApiError } from "@/services/api";
 import { trackEvent } from "@/lib/track";
 
 export function PdfToExcelView() {
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<BankResult | null>(null);
+  const [result, setResult] = useState<PdfTableResult | null>(null);
 
   const handleConvert = async () => {
     if (!file) {
@@ -28,7 +28,8 @@ export function PdfToExcelView() {
     try {
       const r = await pdfTableToExcel(file);
       setResult(r);
-      toast.success(`Extracted ${r.rows} rows × ${r.columns} columns`);
+      const sheetLabel = r.sheets > 1 ? `${r.sheets} tabs` : `${r.tables} table${r.tables === 1 ? "" : "s"}`;
+      toast.success(`Extracted ${r.rows} rows across ${sheetLabel}`);
     } catch (err) {
       trackEvent("tool_failed", { tool: "pdf-to-excel" });
       toast.error(err instanceof ApiError ? err.message : "Conversion failed");
@@ -51,7 +52,7 @@ export function PdfToExcelView() {
             <CardContent className="text-sm text-muted-foreground space-y-2">
               <p>✓ PDFs with selectable text (most digital PDFs)</p>
               <p>✓ Standard tabular layouts</p>
-              <p>✗ Pure image-only scans — run OCR first</p>
+              <p>✗ Pure image-only scans - run OCR first</p>
             </CardContent>
           </Card>
           <Card className="border-amber-300/40 bg-amber-50/50 dark:bg-amber-950/20">
@@ -91,7 +92,10 @@ export function PdfToExcelView() {
             description={
               <span className="inline-flex items-center gap-1">
                 <FileSpreadsheet className="h-3.5 w-3.5" />
-                {result.rows} rows · {result.columns} columns
+                {result.rows} rows · {result.columns} columns ·{" "}
+                {result.sheets > 1
+                  ? `${result.sheets} tabs (1 per page)`
+                  : `${result.tables} table${result.tables === 1 ? "" : "s"}`}
               </span>
             }
             downloadHref={toolDownloadUrl(result.output_id, result.filename)}

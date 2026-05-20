@@ -18,9 +18,9 @@ export function LogoMark({ size = 36, className }: LogoMarkProps) {
       className={className}
     >
       <rect width="64" height="64" rx="12" className="fill-foreground" />
-      {/* Folded corner — amber accent */}
+      {/* Folded corner - amber accent */}
       <path d="M44 12 L52 20 L44 20 Z" className="fill-primary" fillOpacity="0.95" />
-      {/* Bold P letter — knocked out to background */}
+      {/* Bold P letter - knocked out to background */}
       <path
         fillRule="evenodd"
         clipRule="evenodd"

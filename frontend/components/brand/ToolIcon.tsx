@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import { toolStyle } from "@/lib/tool-style";
 
 interface ToolIconProps {
-  /** Tool slug — drives the per-tool color palette */
+  /** Tool slug - drives the per-tool color palette */
   slug: string;
   icon: LucideIcon;
   /** Pixel size of the chip (square). Defaults to 56. */

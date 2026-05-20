@@ -60,7 +60,7 @@ export function PassportPhotoView() {
   return (
     <ToolShell
       title="Passport Photo PDF"
-      subtitle="Upload one photo and get a perfectly arranged A4 sheet — built for Bangladesh, India, EU, and US visa requirements."
+      subtitle="Upload one photo and get a perfectly arranged A4 sheet - built for Bangladesh, India, EU, and US visa requirements."
       badge="Made for BD"
       icon={Camera}
       sideCard={

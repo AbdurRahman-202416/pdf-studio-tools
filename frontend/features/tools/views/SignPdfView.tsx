@@ -36,7 +36,7 @@ export function SignPdfView() {
   const previewWrapRef = useRef<HTMLDivElement | null>(null);
   const previewImgRef = useRef<HTMLImageElement | null>(null);
   const drawingRef = useRef(false);
-  // Mirror `hasInk` so endDraw can read the current value synchronously —
+  // Mirror `hasInk` so endDraw can read the current value synchronously -
   // pointer events fire too fast for React to commit between move/up.
   const inkRef = useRef(false);
   const dragRef = useRef<{
@@ -233,7 +233,7 @@ export function SignPdfView() {
     }
     const previewW = previewImgRef.current?.clientWidth ?? previewSize.w;
     if (!previewW) {
-      toast.error("Preview not ready — try again in a moment");
+      toast.error("Preview not ready - try again in a moment");
       return;
     }
     const page = pdfMeta.pages[pageIndex];
@@ -330,7 +330,7 @@ export function SignPdfView() {
             <CardTitle>Tips</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-2">
-            <p>• Touch-friendly — works on tablets and phones.</p>
+            <p>• Touch-friendly - works on tablets and phones.</p>
             <p>• Your signature is saved locally for next time.</p>
             <p>• Drag to move, drag the bottom-right corner to resize.</p>
             <p>• For legally-binding eSignatures, use a certificate-based service.</p>
@@ -339,7 +339,7 @@ export function SignPdfView() {
       }
     >
       <div className="space-y-6">
-        {/* Step 1 — upload */}
+        {/* Step 1 - upload */}
         <Card>
           <CardHeader>
             <CardTitle>1. Choose your PDF</CardTitle>
@@ -361,7 +361,7 @@ export function SignPdfView() {
           </CardContent>
         </Card>
 
-        {/* Step 2 — draw signature */}
+        {/* Step 2 - draw signature */}
         <Card>
           <CardHeader>
             <CardTitle>2. Draw your signature</CardTitle>
@@ -399,7 +399,7 @@ export function SignPdfView() {
           </CardContent>
         </Card>
 
-        {/* Step 3 — place on page */}
+        {/* Step 3 - place on page */}
         {pdfMeta && (
           <Card>
             <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">

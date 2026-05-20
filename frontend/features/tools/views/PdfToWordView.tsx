@@ -55,7 +55,7 @@ export function PdfToWordView() {
             <CardContent className="text-sm text-muted-foreground space-y-2">
               <p>✓ Digital PDFs (most resumes, reports)</p>
               <p>✓ Single-column text-heavy layouts</p>
-              <p>✗ Scanned PDFs — run OCR first</p>
+              <p>✗ Scanned PDFs - run OCR first</p>
             </CardContent>
           </Card>
           <Card className="bg-accent/40 border-primary/30">
