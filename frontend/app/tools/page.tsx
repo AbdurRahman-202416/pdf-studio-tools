@@ -35,7 +35,7 @@ const tools = toolRegistry.map((t) => ({
   href: `/${t.slug}`,
   title: t.displayName,
   description: t.metaDescription,
-  primary: t.primaryKeyword,
+  primary: t.cardCopy,
   iconName: t.iconName,
 }));
 

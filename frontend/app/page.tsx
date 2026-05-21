@@ -19,7 +19,7 @@ const specializedTools = toolRegistry.map((t) => ({
   slug: t.slug,
   href: `/${t.slug}`,
   title: t.displayName,
-  description: t.primaryKeyword,
+  description: t.cardCopy,
   iconName: t.iconName,
 }));
 
@@ -62,7 +62,7 @@ export default function Home() {
               compress, merge, convert, OCR, sign - no signup, no watermark.
             </span>
           </h1>
-          <p className="mt-6 text-base sm:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-6 text-base sm:text-md text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Fourteen focused utilities for the things you actually need to do with PDFs.
             Free forever. No daily limits. Files auto-delete in one hour.
             Works perfectly with English, Bangla, and 100+ other languages.

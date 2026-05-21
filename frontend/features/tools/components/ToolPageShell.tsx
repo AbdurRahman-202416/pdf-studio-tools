@@ -217,7 +217,7 @@ function RelatedTools({ tools }: { tools: ToolEntry[] }) {
                       {t.displayName}
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground leading-relaxed line-clamp-2">
-                      {t.relatedKeywords[0]}
+                      {t.cardCopy}
                     </p>
                   </div>
                 </CardContent>

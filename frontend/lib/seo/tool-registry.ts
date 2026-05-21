@@ -27,6 +27,8 @@ export interface ToolEntry {
   displayName: string;
   /** Exact primary keyword - used as H1 and as base for <title>. */
   primaryKeyword: string;
+  /** Short, human-friendly description shown under the tool name on cards (home grid, /tools grid, related-tools section). NOT a keyword string - speak to the user. ~6-10 words. */
+  cardCopy: string;
   /** Concise SEO meta description (<160 chars). */
   metaDescription: string;
   /** 3-6 related long-tail keywords, naturally woven into subtitle/meta. */
@@ -56,6 +58,7 @@ export const toolRegistry: ToolEntry[] = [
     legacySlug: "compress-pdf-without-losing-quality",
     displayName: "Compress PDF",
     primaryKeyword: "compress pdf for email, whatsapp, govt portal",
+    cardCopy: "Shrink PDFs to fit email, chat, or upload limits.",
     metaDescription:
       "Compress PDF to fit Gmail (10 MB), WhatsApp (16 MB), or a government portal (1 MB). Pick where you're sending it, we'll shrink to size. Free, no signup, no watermark.",
     relatedKeywords: [
@@ -90,6 +93,7 @@ export const toolRegistry: ToolEntry[] = [
     slug: "compress-pdf-to-100kb",
     displayName: "Compress PDF to 100KB",
     primaryKeyword: "compress pdf to 100kb",
+    cardCopy: "Hit an exact file size for government forms and portals.",
     metaDescription:
       "Compress PDF to 100KB online free. Target file size compressor for government forms, NID applications, and online portals - works with Bangla PDFs.",
     relatedKeywords: [
@@ -124,6 +128,7 @@ export const toolRegistry: ToolEntry[] = [
     legacySlug: "merge-large-pdf-files-online",
     displayName: "Merge PDF",
     primaryKeyword: "merge pdf online free",
+    cardCopy: "Combine multiple PDFs into one, reorder pages freely.",
     metaDescription:
       "Merge PDF files online free. Combine multiple PDFs into one - drag-reorder pages, no signup, no watermark, files auto-delete after an hour.",
     relatedKeywords: [
@@ -158,6 +163,7 @@ export const toolRegistry: ToolEntry[] = [
     legacySlug: "pdf-to-jpg-high-quality",
     displayName: "PDF to JPG / PNG",
     primaryKeyword: "pdf to jpg converter online free",
+    cardCopy: "Export each PDF page as a JPG or PNG image.",
     metaDescription:
       "Convert PDF to JPG or PNG online free - high quality up to 300 DPI, page ranges, batch ZIP download. No signup, no watermark.",
     relatedKeywords: [
@@ -191,6 +197,7 @@ export const toolRegistry: ToolEntry[] = [
     slug: "jpg-to-pdf",
     displayName: "JPG to PDF",
     primaryKeyword: "jpg to pdf converter online free",
+    cardCopy: "Turn photos and images into a single shareable PDF.",
     metaDescription:
       "Convert JPG, PNG, or WebP images to PDF online free. Combine multiple images into one PDF - no signup, no watermark, auto-delete in 1 hour.",
     relatedKeywords: [
@@ -224,6 +231,7 @@ export const toolRegistry: ToolEntry[] = [
     legacySlug: "password-protect-pdf-online",
     displayName: "Password Protect PDF",
     primaryKeyword: "password protect pdf online free",
+    cardCopy: "Lock a PDF with a password (AES-256 encryption).",
     metaDescription:
       "Lock PDF with a password online free. AES-256 encryption, no signup, no watermark - secure your PDF in seconds.",
     relatedKeywords: [
@@ -258,6 +266,7 @@ export const toolRegistry: ToolEntry[] = [
     legacySlug: "unlock-pdf-with-password-online",
     displayName: "Unlock PDF",
     primaryKeyword: "unlock pdf online free",
+    cardCopy: "Remove a password from a PDF you can already open.",
     metaDescription:
       "Unlock PDF with password online free. Remove PDF password - no signup, no watermark, auto-delete in 1 hour.",
     relatedKeywords: [
@@ -291,6 +300,7 @@ export const toolRegistry: ToolEntry[] = [
     legacySlug: "pdf-ocr-online-free",
     displayName: "PDF OCR",
     primaryKeyword: "pdf ocr online free",
+    cardCopy: "Pull selectable text out of scanned PDFs, 100+ languages.",
     metaDescription:
       "Extract text from scanned PDFs with OCR - 100+ languages including English, Bangla, Hindi, Arabic, and Chinese. Free, no signup.",
     relatedKeywords: [
@@ -327,6 +337,7 @@ export const toolRegistry: ToolEntry[] = [
     // Primary keyword leads with "nid" so the <title> tag and meta-keywords
     // rank for the highest-volume BD query, while the visible label stays "ID Combine".
     primaryKeyword: "nid combine pdf - id card front back",
+    cardCopy: "Front and back of an ID card on a single A4 page.",
     metaDescription:
       "NID combine PDF online free. Combine any 2-sided ID - NID, student ID, employee ID, driver's license, passport - front and back onto one A4 PDF. No signup, no watermark.",
     relatedKeywords: [
@@ -363,6 +374,7 @@ export const toolRegistry: ToolEntry[] = [
     legacySlug: "passport-photo-to-pdf",
     displayName: "Passport Photo PDF",
     primaryKeyword: "passport size photo pdf a4",
+    cardCopy: "Tile passport-size photos onto A4, ready to print.",
     metaDescription:
       "Make passport-size photo PDF online free. Generate A4 sheets with up to 8 photos - built for Bangladesh, India, visa, and govt photo requirements.",
     relatedKeywords: [
@@ -397,6 +409,7 @@ export const toolRegistry: ToolEntry[] = [
     legacySlug: "pdf-to-excel-converter",
     displayName: "PDF to Excel",
     primaryKeyword: "pdf to excel converter free",
+    cardCopy: "Lift tables out of a PDF into editable spreadsheets.",
     metaDescription:
       "Convert PDF tables to Excel online free. Extract tables, bank statements, and reports into .xlsx - no signup, no watermark.",
     relatedKeywords: [
@@ -431,6 +444,7 @@ export const toolRegistry: ToolEntry[] = [
     legacySlug: "excel-to-pdf-converter",
     displayName: "Excel to PDF",
     primaryKeyword: "excel to pdf converter free",
+    cardCopy: "Render every sheet of an .xlsx as a clean PDF.",
     metaDescription:
       "Convert Excel (.xlsx) to PDF online free. Render every sheet as a clean PDF table - one sheet per page, headers, borders, zebra rows. No signup, no watermark.",
     relatedKeywords: [
@@ -464,6 +478,7 @@ export const toolRegistry: ToolEntry[] = [
     slug: "pdf-to-word",
     displayName: "PDF to Word",
     primaryKeyword: "pdf to word converter online free",
+    cardCopy: "Convert a PDF into an editable Word (.docx) document.",
     metaDescription:
       "Convert PDF to editable Word (.docx) online free. Preserve text, paragraphs, and tables. No signup, no watermark, auto-delete in 1 hour.",
     relatedKeywords: [
@@ -497,6 +512,7 @@ export const toolRegistry: ToolEntry[] = [
     slug: "word-to-pdf",
     displayName: "Word to PDF",
     primaryKeyword: "word to pdf converter online free",
+    cardCopy: "Turn a .docx into a shareable PDF, formatting preserved.",
     metaDescription:
       "Convert Word (.docx) to PDF online free. Preserve fonts, layout, headings, and images. No signup, no watermark.",
     relatedKeywords: [
@@ -529,6 +545,7 @@ export const toolRegistry: ToolEntry[] = [
     slug: "sign-pdf",
     displayName: "Sign PDF",
     primaryKeyword: "sign pdf online free",
+    cardCopy: "Draw your signature and drop it on any page.",
     metaDescription:
       "Sign PDF online free. Draw your signature, place it on any page, and download the signed PDF - no signup, no watermark.",
     relatedKeywords: [
