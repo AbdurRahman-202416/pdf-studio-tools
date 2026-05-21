@@ -28,6 +28,67 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.APP_NAME,
         version=settings.APP_VERSION,
+        summary="Stateless PDF toolkit: merge, compress, OCR, sign, convert PDF <-> Word/Excel/Image, lock/unlock, ID cards, passport photos.",
+        description=(
+            "All operations are stateless from the caller's perspective: upload, "
+            "process, download, done. Files auto-delete from the server after "
+            "`FILE_TTL_SECONDS` (default 1 hour) via the cleanup lifespan task; "
+            "no signup, no auth.\n\n"
+            "### Two URL families\n"
+            "- **`/api/*` (workspace)** - upload a PDF once, then operate on its "
+            "`file_id` (metadata, thumbnails, merge, split, rotate, compress).\n"
+            "- **`/api/tools/*` (one-shot tools)** - upload a file *with* the operation "
+            "in a single POST, get back an `output_id` for download.\n\n"
+            "### Downloading results\n"
+            "Workspace results: `GET /api/download/{output_id}` (PDF only).\n"
+            "Tool results (PDF, XLSX, DOCX, ZIP, JPG, PNG): "
+            "`GET /api/tools/download/{output_id}?name=<suggested>`.\n\n"
+            "### Previewing results without downloading\n"
+            "`GET /api/tools/preview/{output_id}` is content-type aware: PDFs render to PNG "
+            "(supports `?page=N&w=900`, exposes `X-Page-Count` header); XLSX returns JSON "
+            "with the first 10 rows; ZIP renders the first image inside.\n\n"
+            "### Limits\n"
+            "Max upload `MAX_UPLOAD_MB` (default 100 MB). Rate limits applied per-IP when "
+            "`RATE_LIMIT_ENABLED=true`."
+        ),
+        openapi_tags=[
+            {
+                "name": "workspace",
+                "description": "Upload-once workflow. Operate on a PDF by `file_id` across multiple calls before downloading.",
+            },
+            {
+                "name": "tools-convert",
+                "description": "One-shot format conversions: PDF <-> JPG / PNG / Word / Excel.",
+            },
+            {
+                "name": "tools-compress",
+                "description": "PDF size reduction: by quality level or to a target file size.",
+            },
+            {
+                "name": "tools-security",
+                "description": "Add or remove a password on a PDF (AES-256).",
+            },
+            {
+                "name": "tools-ocr",
+                "description": "Tesseract-backed OCR for scanned PDFs. 100+ language packs supported.",
+            },
+            {
+                "name": "tools-images",
+                "description": "Image-to-PDF helpers: ID card front+back, passport photos.",
+            },
+            {
+                "name": "tools-sign",
+                "description": "Place a drawn signature image onto a PDF page.",
+            },
+            {
+                "name": "tools-system",
+                "description": "Download and preview endpoints shared by every tool.",
+            },
+            {
+                "name": "system",
+                "description": "Health check and root.",
+            },
+        ],
         lifespan=cleanup_lifespan,
     )
 
@@ -53,7 +114,7 @@ def create_app() -> FastAPI:
     app.include_router(api_router, prefix="/api")
     app.include_router(tools_router, prefix="/api")
 
-    @app.get("/")
+    @app.get("/", tags=["system"], summary="Root", description="Returns the app name and version. Useful for uptime checks.")
     async def root():
         return {"app": settings.APP_NAME, "version": settings.APP_VERSION}
 

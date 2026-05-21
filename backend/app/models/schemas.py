@@ -64,3 +64,102 @@ class SplitRequest(BaseModel):
 
 class ErrorResponse(BaseModel):
     detail: str
+
+
+# ---------- Tool response models (used by /api/tools/* routes) ---------- #
+
+
+class ToolDownloadable(BaseModel):
+    """Base shape returned by every tool that produces a single file the
+    caller should fetch via GET /api/tools/download/{output_id}."""
+
+    output_id: str = Field(..., description="UUID-style id; pass to /api/tools/download/{output_id} to retrieve the file.")
+    filename: str = Field(..., description="Suggested filename for the download (server-sanitized).")
+    size_bytes: int = Field(..., description="Size of the produced file in bytes.")
+
+
+class HealthResponse(BaseModel):
+    status: Literal["ok"] = "ok"
+    version: str
+
+
+class DeleteResponse(BaseModel):
+    deleted: bool
+
+
+class OcrStatusResponse(BaseModel):
+    available: bool = Field(..., description="True if the Tesseract binary is installed.")
+    languages: list[str] = Field(..., description="ISO-639 codes of installed language packs (eng, ben, spa, ...).")
+
+
+class OcrPage(BaseModel):
+    index: int
+    text: str
+    method: Literal["text", "ocr"]
+
+
+class OcrResponse(BaseModel):
+    file_id: str
+    filename: str
+    pages: list[OcrPage]
+    text: str
+    language: str
+    page_count: int
+    method_summary: dict[str, int]
+
+
+class PdfTableExcelResponse(ToolDownloadable):
+    rows: int = Field(..., description="Total data rows extracted across all sheets, excluding headers.")
+    columns: int = Field(..., description="Widest column count seen across all extracted tables.")
+    sheets: int = Field(..., description="Number of sheets in the output workbook (one per PDF page when multi-page).")
+    tables: int = Field(..., description="Number of distinct tables detected across the PDF.")
+
+
+class ExcelToPdfResponse(ToolDownloadable):
+    sheets: int = Field(..., description="Number of source sheets rendered into the PDF.")
+    rows: int = Field(..., description="Total data rows rendered, excluding headers.")
+    orientation: Literal["portrait", "landscape"]
+
+
+class CompressTargetResponse(ToolDownloadable):
+    original_size_bytes: int
+    target: str = Field(..., description="The size preset that was requested, e.g. '100kb', '5mb'.")
+    target_bytes: int
+    final_bytes: int
+    dpi: int = Field(..., description="DPI used by the final iteration of the rasterize ladder.")
+    jpeg_quality: int = Field(..., description="JPEG quality (1-100) used by the final iteration.")
+    iterations: int = Field(..., description="How many ladder steps were tried before reaching the target (or bottoming out).")
+    reached_target: bool = Field(..., description="False if the smallest possible output is still larger than the requested target.")
+
+
+class CompressQuickResponse(ToolDownloadable):
+    original_size_bytes: int
+    level: CompressionLevel
+
+
+class PdfToImagesResponse(ToolDownloadable):
+    count: int = Field(..., description="Number of images produced (one per converted page).")
+    ext: Literal["jpg", "png", "zip"]
+
+
+class PdfLockResponse(ToolDownloadable):
+    pass
+
+
+class PdfToWordResponse(ToolDownloadable):
+    pages: int
+    characters: int
+    images: int
+
+
+class WordToPdfResponse(ToolDownloadable):
+    blocks: int
+    images: int
+
+
+class IdCardCombineResponse(ToolDownloadable):
+    pass
+
+
+class PhotoToPdfResponse(ToolDownloadable):
+    info: dict

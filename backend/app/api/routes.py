@@ -11,6 +11,8 @@ from fastapi.responses import FileResponse
 from app.core.config import settings
 from app.models.schemas import (
     CompressRequest,
+    DeleteResponse,
+    HealthResponse,
     MergeRequest,
     PDFMetadata,
     ProcessedFile,
@@ -26,7 +28,7 @@ from app.utils.storage import (
     upload_path,
 )
 
-router = APIRouter()
+router = APIRouter(tags=["workspace"])
 
 
 def _safe_filename(name: str | None, default: str) -> str:
@@ -38,12 +40,32 @@ def _safe_filename(name: str | None, default: str) -> str:
     return name or default
 
 
-@router.get("/health")
+@router.get(
+    "/health",
+    tags=["system"],
+    summary="Health check",
+    description="Returns `{status: ok, version}`. Use this for uptime probes (UptimeRobot etc).",
+    response_model=HealthResponse,
+)
 async def health():
     return {"status": "ok", "version": settings.APP_VERSION}
 
 
-@router.post("/upload", response_model=UploadResponse)
+@router.post(
+    "/upload",
+    response_model=UploadResponse,
+    summary="Upload a PDF",
+    description=(
+        "Streams the upload to disk in 1 MB chunks, aborting and unlinking if it crosses "
+        "`MAX_UPLOAD_MB`. Validates MIME and `%PDF` magic bytes. Returns the new `file_id` "
+        "plus page metadata you can use for thumbnails, splits, merges, etc."
+    ),
+    responses={
+        413: {"description": "File larger than MAX_UPLOAD_MB"},
+        415: {"description": "Wrong MIME type (not application/pdf)"},
+        400: {"description": "Bytes don't start with %PDF magic"},
+    },
+)
 async def upload(file: UploadFile = File(...)):
     if file.content_type not in settings.ALLOWED_MIME:
         raise HTTPException(415, "Only PDF files are accepted")
@@ -77,28 +99,47 @@ async def upload(file: UploadFile = File(...)):
     return UploadResponse(file=meta)
 
 
-@router.get("/files/{file_id}/metadata", response_model=PDFMetadata)
+@router.get(
+    "/files/{file_id}/metadata",
+    response_model=PDFMetadata,
+    summary="Get metadata for an uploaded PDF",
+    description="Returns the original filename, byte size, page count, and per-page dimensions.",
+)
 async def get_metadata(file_id: str):
     path = find_upload(file_id)
     name = filename_registry.lookup(file_id, path.name)
     return pdf_service.read_metadata(file_id, name, path)
 
 
-@router.get("/files/{file_id}/thumbnail/{page_index}")
+@router.get(
+    "/files/{file_id}/thumbnail/{page_index}",
+    summary="Render a thumbnail of one page",
+    description="Returns a PNG rendered at width `w` (default 220px). 5-minute cache header.",
+    responses={200: {"content": {"image/png": {}}}},
+)
 async def get_thumbnail(file_id: str, page_index: int, w: int = 220):
-    # validate file exists
     find_upload(file_id)
     png = await asyncio.to_thread(pdf_service.render_thumbnail, file_id, page_index, w)
     return Response(content=png, media_type="image/png", headers={"Cache-Control": "public, max-age=300"})
 
 
-@router.get("/files/{file_id}/raw")
+@router.get(
+    "/files/{file_id}/raw",
+    summary="Stream the raw uploaded PDF",
+    description="Returns the original PDF bytes. Used by the frontend for in-browser preview.",
+    responses={200: {"content": {"application/pdf": {}}}},
+)
 async def get_raw(file_id: str):
     path = find_upload(file_id)
     return FileResponse(path, media_type="application/pdf")
 
 
-@router.delete("/files/{file_id}")
+@router.delete(
+    "/files/{file_id}",
+    response_model=DeleteResponse,
+    summary="Delete an uploaded PDF",
+    description="Removes the file immediately instead of waiting for the TTL sweep.",
+)
 async def delete_file(file_id: str):
     path = upload_path(file_id)
     path.unlink(missing_ok=True)
@@ -106,7 +147,15 @@ async def delete_file(file_id: str):
     return {"deleted": True}
 
 
-@router.post("/merge", response_model=ProcessedFile)
+@router.post(
+    "/merge",
+    response_model=ProcessedFile,
+    summary="Merge selected pages from one or more uploaded PDFs",
+    description=(
+        "Each item picks pages from a previously uploaded `file_id`. Pages are concatenated "
+        "in the order given. The output is downloadable via `GET /api/download/{output_id}`."
+    ),
+)
 async def merge(req: MergeRequest):
     if not req.items:
         raise HTTPException(400, "No items to merge")
@@ -124,7 +173,16 @@ async def merge(req: MergeRequest):
     )
 
 
-@router.post("/compress", response_model=ProcessedFile)
+@router.post(
+    "/compress",
+    response_model=ProcessedFile,
+    summary="Compress an uploaded PDF (level-based)",
+    description=(
+        "Takes a `file_id` plus a level (`low` / `medium` / `high`) and returns a smaller PDF. "
+        "For the outcome-first compress UI used by the frontend, see `POST /api/tools/compress/quick` "
+        "(file + level in one POST) or `POST /api/tools/compress/target-size` (compress to fit a size cap)."
+    ),
+)
 async def compress(req: CompressRequest):
     path = find_upload(req.file_id)
     original = path.stat().st_size
@@ -141,7 +199,12 @@ async def compress(req: CompressRequest):
     )
 
 
-@router.post("/rotate", response_model=ProcessedFile)
+@router.post(
+    "/rotate",
+    response_model=ProcessedFile,
+    summary="Rotate selected pages",
+    description="`rotations` maps page index -> degrees (90/180/270). Pages not in the map keep their original orientation.",
+)
 async def rotate(req: RotatePagesRequest):
     path = find_upload(req.file_id)
     output_id, out = await asyncio.to_thread(pdf_service.rotate_pages, path, req.rotations)
@@ -153,7 +216,12 @@ async def rotate(req: RotatePagesRequest):
     )
 
 
-@router.post("/split", response_model=ProcessedFile)
+@router.post(
+    "/split",
+    response_model=ProcessedFile,
+    summary="Extract page ranges into a new PDF",
+    description="`ranges` is a list of `[start, end]` pairs (inclusive, 0-based). All matching pages are concatenated into one output PDF.",
+)
 async def split(req: SplitRequest):
     path = find_upload(req.file_id)
     output_id, out = await asyncio.to_thread(pdf_service.split_pdf, path, req.ranges)
@@ -165,7 +233,16 @@ async def split(req: SplitRequest):
     )
 
 
-@router.get("/download/{output_id}")
+@router.get(
+    "/download/{output_id}",
+    summary="Download a workspace result (PDF)",
+    description=(
+        "Returns the produced PDF as an attachment using the suggested `name`. "
+        "Workspace outputs are always PDFs - for tool outputs (XLSX/DOCX/ZIP/JPG/PNG too) use "
+        "`GET /api/tools/download/{output_id}` instead."
+    ),
+    responses={200: {"content": {"application/pdf": {}}}, 404: {"description": "Output not found or expired"}},
+)
 async def download(output_id: str, name: str = "document.pdf"):
     path = find_output(output_id)
     filename = _safe_filename(name, "document.pdf")

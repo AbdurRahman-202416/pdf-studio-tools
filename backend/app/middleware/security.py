@@ -20,8 +20,16 @@ _HITS: dict[str, deque[float]] = {}
 _LOCK = asyncio.Lock()
 
 
+_DOCS_PATHS = ("/docs", "/redoc", "/openapi.json")
+
+
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    """Append a tight default header set to every response."""
+    """Append a tight default header set to every response.
+
+    The `/docs` and `/redoc` pages are served with a relaxed CSP that allows
+    Swagger UI / ReDoc to load their assets from the CDN; everything else
+    keeps the locked-down `default-src 'none'`.
+    """
 
     async def dispatch(
         self,
@@ -29,8 +37,6 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
         response = await call_next(request)
-        # Defensive defaults — frontend renders API responses, never UIs,
-        # so no inline JS/CSS is required on the API itself.
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
@@ -43,10 +49,27 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "Permissions-Policy",
             "camera=(), microphone=(), geolocation=()",
         )
-        response.headers.setdefault(
-            "Content-Security-Policy",
-            "default-src 'none'; frame-ancestors 'none'; base-uri 'none'",
-        )
+        path = request.url.path
+        if path in _DOCS_PATHS or path.startswith("/docs/") or path.startswith("/redoc/"):
+            response.headers.setdefault(
+                "Content-Security-Policy",
+                # Swagger UI / ReDoc need: their bundled JS+CSS from jsdelivr,
+                # FastAPI's favicon, inline init script, fetched openapi.json,
+                # and a couple of inline styles. Same-origin assets stay allowed.
+                "default-src 'self'; "
+                "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
+                "style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
+                "img-src 'self' data: https://fastapi.tiangolo.com; "
+                "font-src 'self' https://cdn.jsdelivr.net data:; "
+                "connect-src 'self'; "
+                "frame-ancestors 'none'; "
+                "base-uri 'self'",
+            )
+        else:
+            response.headers.setdefault(
+                "Content-Security-Policy",
+                "default-src 'none'; frame-ancestors 'none'; base-uri 'none'",
+            )
         return response
 
 

@@ -9,7 +9,21 @@ from typing import get_args
 
 from fastapi import APIRouter, File, Form, HTTPException, Response, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
-from app.models.schemas import CompressionLevel
+from app.models.schemas import (
+    CompressQuickResponse,
+    CompressTargetResponse,
+    CompressionLevel,
+    ExcelToPdfResponse,
+    IdCardCombineResponse,
+    OcrResponse,
+    OcrStatusResponse,
+    PdfLockResponse,
+    PdfTableExcelResponse,
+    PdfToImagesResponse,
+    PdfToWordResponse,
+    PhotoToPdfResponse,
+    WordToPdfResponse,
+)
 from app.services import (
     id_card_service,
     ocr_service,
@@ -22,13 +36,24 @@ from app.services import (
 from app.services import excel_to_pdf_service, image_to_pdf_service, pdf_compress_target, pdf_to_word_service, sign_pdf_service, word_to_pdf_service
 from app.utils.storage import find_output, find_upload, new_file_id, upload_path
 
-router = APIRouter(prefix="/tools", tags=["tools"])
+router = APIRouter(prefix="/tools")
 
 
 # ---------- ID Card Combiner ---------- #
 
 
-@router.post("/id-card/combine")
+@router.post(
+    "/id-card/combine",
+    response_model=IdCardCombineResponse,
+    tags=["tools-images"],
+    summary="Combine ID card front + back onto A4",
+    description=(
+        "Accepts two image uploads (front, back of an ID card). Produces an A4 PDF "
+        "with both faces placed on one page. `layout` controls placement: "
+        "`a4_portrait` (default) stacks vertically, `a4_horizontal` places them side-by-side, "
+        "`compact` shrinks to a small badge-style layout. `add_labels=true` prints 'FRONT'/'BACK' captions."
+    ),
+)
 async def id_card_combine(
     front: UploadFile = File(...),
     back: UploadFile = File(...),
@@ -65,7 +90,13 @@ async def id_card_combine(
 # ---------- Multilingual OCR ---------- #
 
 
-@router.get("/ocr/status")
+@router.get(
+    "/ocr/status",
+    response_model=OcrStatusResponse,
+    tags=["tools-ocr"],
+    summary="Check Tesseract availability + installed language packs",
+    description="Use this from the frontend before exposing OCR options - lets you greyout languages that aren't installed.",
+)
 async def ocr_status():
     return {
         "available": ocr_service.is_available(),
@@ -80,7 +111,19 @@ async def ocr_status():
 _OCR_CODE_RE = re.compile(r"^[a-z][a-z0-9_]{1,11}(\+[a-z][a-z0-9_]{1,11}){0,3}$")
 
 
-@router.post("/ocr/extract")
+@router.post(
+    "/ocr/extract",
+    response_model=OcrResponse,
+    tags=["tools-ocr"],
+    summary="Extract text from a PDF (OCR fallback for image-only pages)",
+    description=(
+        "If a page already has selectable text, returns it directly. Otherwise rasterizes "
+        "the page and runs Tesseract with the given `lang` (use `+` for multi-language, e.g. `eng+ben`). "
+        "Set `force_ocr=true` to skip the text-layer shortcut and OCR every page. "
+        "Returns per-page text, a concatenated full-document text, and a summary of which "
+        "method (text vs ocr) was used per page."
+    ),
+)
 async def ocr_extract(
     file: UploadFile = File(...),
     lang: str = Form("eng"),
@@ -124,7 +167,20 @@ async def ocr_extract(
 # ---------- PDF Table → Excel ---------- #
 
 
-@router.post("/pdf-table/to-excel")
+@router.post(
+    "/pdf-table/to-excel",
+    response_model=PdfTableExcelResponse,
+    tags=["tools-convert"],
+    summary="Extract tables from a PDF into a styled XLSX",
+    description=(
+        "**Output shape:**\n"
+        "- PDF with tables on **multiple pages** -> one Excel **tab per page** named `Page 1`, `Page 2`, ...\n"
+        "- PDF with tables on **a single page** (or only one page has tables) -> one tab named `Tables` "
+        "with each detected table rendered as a labeled block (`Table 1`, `Table 2`...) with spacer rows between.\n\n"
+        "Headers are detected heuristically (33-keyword vocabulary + structural fallback). Every sheet "
+        "gets a styled header band, zebra rows, borders, autofit columns, and frozen panes."
+    ),
+)
 async def pdf_table_to_excel(file: UploadFile = File(...)):
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
@@ -159,7 +215,17 @@ async def pdf_table_to_excel(file: UploadFile = File(...)):
 # ---------- Excel → PDF (table renderer) ---------- #
 
 
-@router.post("/excel/to-pdf")
+@router.post(
+    "/excel/to-pdf",
+    response_model=ExcelToPdfResponse,
+    tags=["tools-convert"],
+    summary="Render every sheet of an XLSX as a one-page-per-sheet PDF",
+    description=(
+        "Each non-empty sheet becomes a PDF page (or several, if it overflows). The sheet name "
+        "is shown as a heading above the table; the first row is treated as a header (bold + colored band). "
+        "Wide sheets (more than 6 columns or >80 avg-chars/row) auto-flip the whole document to landscape."
+    ),
+)
 async def excel_to_pdf(file: UploadFile = File(...)):
     name = (file.filename or "").lower()
     if not (name.endswith(".xlsx") or name.endswith(".xlsm")):
@@ -194,7 +260,17 @@ async def excel_to_pdf(file: UploadFile = File(...)):
 # ---------- Photo to PDF (passport size) ---------- #
 
 
-@router.post("/photo/to-pdf")
+@router.post(
+    "/photo/to-pdf",
+    response_model=PhotoToPdfResponse,
+    tags=["tools-images"],
+    summary="Tile a portrait photo into an A4 grid (passport / stamp / visa)",
+    description=(
+        "`size` picks the photo dimensions: `passport` (35x45mm), `stamp` (20x25mm), `visa_us` (51x51mm), "
+        "or `custom` (requires `width_mm` + `height_mm`). `layout` controls how many copies fit per A4 sheet: "
+        "`single`, `grid_4`, or `grid_8`. `background` is the wash color around each photo."
+    ),
+)
 async def photo_to_pdf(
     file: UploadFile = File(...),
     size: str = Form("passport"),
@@ -241,7 +317,17 @@ async def photo_to_pdf(
 # ---------- PDF → JPG/PNG ---------- #
 
 
-@router.post("/pdf-to-jpg")
+@router.post(
+    "/pdf-to-jpg",
+    response_model=PdfToImagesResponse,
+    tags=["tools-convert"],
+    summary="Convert PDF pages to JPG or PNG images",
+    description=(
+        "`dpi` controls resolution (150 / 220 / 300 are the common presets in the UI). "
+        "`pages` is `all` or a range string like `1-3,5,7-9` (1-based). "
+        "`fmt` is `jpg` or `png`. Single-page output is the raw image; multi-page is bundled as a ZIP."
+    ),
+)
 async def pdf_to_jpg(
     file: UploadFile = File(...),
     dpi: int = Form(200),
@@ -277,7 +363,13 @@ async def pdf_to_jpg(
 # ---------- PDF Lock / Unlock ---------- #
 
 
-@router.post("/pdf/lock")
+@router.post(
+    "/pdf/lock",
+    response_model=PdfLockResponse,
+    tags=["tools-security"],
+    summary="Encrypt a PDF with a password (AES-256)",
+    description="Uses pypdf 5.x for AES-256 encryption. The user/owner password is the same; existing encryption is overwritten.",
+)
 async def pdf_lock(file: UploadFile = File(...), password: str = Form(...)):
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
@@ -303,7 +395,13 @@ async def pdf_lock(file: UploadFile = File(...), password: str = Form(...)):
     }
 
 
-@router.post("/pdf/unlock")
+@router.post(
+    "/pdf/unlock",
+    response_model=PdfLockResponse,
+    tags=["tools-security"],
+    summary="Remove password protection from a PDF",
+    description="Requires the user password. Returns 400 if the password is wrong.",
+)
 async def pdf_unlock(file: UploadFile = File(...), password: str = Form(...)):
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
@@ -345,7 +443,19 @@ _TARGET_SIZES_BYTES = {
 }
 
 
-@router.post("/compress/target-size")
+@router.post(
+    "/compress/target-size",
+    response_model=CompressTargetResponse,
+    tags=["tools-compress"],
+    summary="Compress a PDF to fit a specific file-size cap",
+    description=(
+        "Iteratively rasterizes pages at progressively lower DPI + JPEG quality until the output "
+        "fits within the target. `target` is one of the named presets: "
+        "`50kb`, `100kb`, `200kb`, `500kb`, `1mb`, `2mb`, `5mb`, `10mb`, `16mb`. "
+        "If the smallest ladder step is still too big, returns the smallest possible result with "
+        "`reached_target=false` so the caller can warn the user."
+    ),
+)
 async def compress_target_size(
     file: UploadFile = File(...),
     target: str = Form("100kb"),
@@ -386,12 +496,22 @@ async def compress_target_size(
 _QUICK_LEVELS = frozenset(get_args(CompressionLevel))
 
 
-@router.post("/compress/quick")
+@router.post(
+    "/compress/quick",
+    response_model=CompressQuickResponse,
+    tags=["tools-compress"],
+    summary="One-shot level-based PDF compression (file + level)",
+    description=(
+        "Use this when you don't have a size target - the 'Best quality' button in the frontend wires here. "
+        "`level=low` is the lightest compression (preserves most fidelity); `medium` and `high` trade more "
+        "image quality for smaller output. For the workspace-style flow (upload first, then compress by file_id) "
+        "use `POST /api/compress` instead."
+    ),
+)
 async def compress_quick(
     file: UploadFile = File(...),
     level: str = Form("low"),
 ):
-    """One-shot level-based compression: accept a file + level (low/medium/high) and return a compressed PDF."""
     if level not in _QUICK_LEVELS:
         raise HTTPException(400, f"level must be one of: {', '.join(sorted(_QUICK_LEVELS))}")
     if not (file.filename or "").lower().endswith(".pdf"):
@@ -418,7 +538,16 @@ async def compress_quick(
 # ---------- Image (JPG/PNG/WebP) → PDF ---------- #
 
 
-@router.post("/jpg-to-pdf")
+@router.post(
+    "/jpg-to-pdf",
+    tags=["tools-convert"],
+    summary="Convert one or more images into a single PDF",
+    description=(
+        "Accepts up to 50 JPG/PNG/WebP files in one POST. `page_size`: "
+        "`a4_portrait`, `a4_landscape`, `letter_portrait`, `letter_landscape`, or `fit_image` "
+        "(page is sized to the image). `margin_mm` is the white border around each image."
+    ),
+)
 async def jpg_to_pdf(
     files: list[UploadFile] = File(...),
     page_size: str = Form("a4_portrait"),
@@ -456,7 +585,13 @@ async def jpg_to_pdf(
 # ---------- PDF → Word (.docx) ---------- #
 
 
-@router.post("/pdf-to-word")
+@router.post(
+    "/pdf-to-word",
+    response_model=PdfToWordResponse,
+    tags=["tools-convert"],
+    summary="Convert a PDF to an editable Word (.docx) document",
+    description="Preserves text, paragraph breaks, and inline images. Complex layouts (multi-column, floating elements) may need manual cleanup.",
+)
 async def pdf_to_word(file: UploadFile = File(...)):
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
@@ -485,7 +620,13 @@ async def pdf_to_word(file: UploadFile = File(...)):
 # ---------- Word (.docx) → PDF ---------- #
 
 
-@router.post("/word-to-pdf")
+@router.post(
+    "/word-to-pdf",
+    response_model=WordToPdfResponse,
+    tags=["tools-convert"],
+    summary="Convert a Word (.docx) document to PDF",
+    description="Reads the .docx with python-docx and renders it to PDF. Best for resumes, reports, and assignments; advanced layout features may not survive exactly.",
+)
 async def word_to_pdf(file: UploadFile = File(...)):
     name = (file.filename or "").lower()
     if not name.endswith(".docx"):
@@ -518,7 +659,16 @@ async def word_to_pdf(file: UploadFile = File(...)):
 # ---------- Sign PDF ---------- #
 
 
-@router.post("/sign-pdf")
+@router.post(
+    "/sign-pdf",
+    tags=["tools-sign"],
+    summary="Place a drawn signature image onto a PDF page",
+    description=(
+        "Stamps a PNG signature at the given position on the chosen page. Coordinates are in PDF points "
+        "(72 per inch); origin is bottom-left of the page. The signature image is typically a transparent PNG "
+        "produced by a frontend canvas."
+    ),
+)
 async def sign_pdf(
     file: UploadFile = File(...),
     signature: UploadFile = File(...),
@@ -569,7 +719,20 @@ _SUFFIX_TO_MIME = {
 }
 
 
-@router.get("/download/{output_id}")
+@router.get(
+    "/download/{output_id}",
+    tags=["tools-system"],
+    summary="Download any tool result by output_id",
+    description=(
+        "Content-type and extension are auto-detected from disk (pdf / xlsx / docx / zip / jpg / png). "
+        "`name` is the suggested attachment filename and is sanitized server-side. "
+        "Returns 404 if the output expired (`FILE_TTL_SECONDS`)."
+    ),
+    responses={
+        200: {"content": {"application/pdf": {}, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}, "application/zip": {}, "image/jpeg": {}, "image/png": {}}},
+        404: {"description": "Output not found or expired"},
+    },
+)
 async def tools_download(output_id: str, name: str = "file"):
     from app.core.config import settings
 
@@ -674,7 +837,23 @@ def _xlsx_preview(path: Path, max_rows: int) -> dict:
         wb.close()
 
 
-@router.get("/preview/{output_id}")
+@router.get(
+    "/preview/{output_id}",
+    tags=["tools-system"],
+    summary="Content-aware preview for any tool result",
+    description=(
+        "Returns a representation suitable for inline preview in the browser:\n"
+        "- **PDF** -> PNG render of page `?page=N` at width `?w=900`. Page count exposed via the `X-Page-Count` response header.\n"
+        "- **JPG / PNG** -> resized PNG\n"
+        "- **ZIP** -> PNG of the first image inside the archive\n"
+        "- **XLSX** -> JSON with columns + first 10 rows + total row count\n\n"
+        "5-minute cache header. Locked PDFs are skipped (the frontend gates these client-side)."
+    ),
+    responses={
+        200: {"content": {"image/png": {}, "application/json": {}}},
+        404: {"description": "Output not found or expired"},
+    },
+)
 async def preview(output_id: str, page: int = 0, w: int = 900):
     path = _resolve_output(output_id)
     suffix = path.suffix.lower()
