@@ -2,13 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Info } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { API_BASE } from "@/services/api";
 import { usePDFStore } from "@/store/pdfStore";
+
+const HEALTH_URL = `${API_BASE}/health`;
+
+const STATUS_MESSAGE = {
+  ok: "Everything's working. Your files are processed on the server and auto-deleted within an hour.",
+  down: "Can't reach the processing server right now. Tools won't work until it's back.",
+  checking: "Checking the server, this only takes a moment.",
+} as const;
+
+const STATUS_LABEL = {
+  ok: "Connected",
+  down: "Offline",
+  checking: "Checking",
+} as const;
 
 export function SettingsView() {
   const recent = usePDFStore((s) => s.recent);
@@ -18,7 +31,7 @@ export function SettingsView() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`${API_BASE}/health`)
+    fetch(HEALTH_URL)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error())))
       .then(() => !cancelled && setApiHealth("ok"))
       .catch(() => !cancelled && setApiHealth("down"));
@@ -53,40 +66,32 @@ export function SettingsView() {
 
       <Card>
         <CardHeader>
-          <CardTitle>API connection</CardTitle>
+          <CardTitle>Service status</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-3">
-            <span
-              data-testid="api-status"
-              className={
-                apiHealth === "ok"
-                  ? "inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success"
-                  : apiHealth === "down"
-                    ? "inline-flex items-center gap-2 rounded-full bg-destructive/10 px-3 py-1 text-xs font-medium text-destructive"
-                    : "inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs"
-              }
-            >
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  apiHealth === "ok"
-                    ? "bg-success"
-                    : apiHealth === "down"
-                      ? "bg-destructive"
-                      : "bg-muted-foreground"
-                }`}
-              />
-              {apiHealth === "ok"
-                ? "Connected"
+          <span
+            data-testid="api-status"
+            className={
+              apiHealth === "ok"
+                ? "inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success"
                 : apiHealth === "down"
-                  ? "Offline"
-                  : "Checking…"}
-            </span>
-            <code className="rounded-md bg-muted px-2 py-1 text-xs">{API_BASE}</code>
-          </div>
-          <p className="mt-3 text-xs text-muted-foreground inline-flex items-center gap-2">
-            <Info className="h-3.5 w-3.5" /> Set <code>NEXT_PUBLIC_API_BASE_URL</code> to
-            point at a remote backend.
+                  ? "inline-flex items-center gap-2 rounded-full bg-destructive/10 px-3 py-1 text-xs font-medium text-destructive"
+                  : "inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs"
+            }
+          >
+            <span
+              className={`h-2 w-2 rounded-full ${
+                apiHealth === "ok"
+                  ? "bg-success"
+                  : apiHealth === "down"
+                    ? "bg-destructive"
+                    : "bg-muted-foreground"
+              }`}
+            />
+            {STATUS_LABEL[apiHealth]}
+          </span>
+          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+            {STATUS_MESSAGE[apiHealth]}
           </p>
         </CardContent>
       </Card>
