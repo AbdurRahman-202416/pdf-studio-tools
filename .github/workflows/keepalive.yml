@@ -1,0 +1,36 @@
+name: Keepalive
+
+# Pings the backend health endpoint every ~10 minutes so Render's free tier
+# never spins down (idle timeout is ~15 min). Acts as a redundant pinger
+# alongside UptimeRobot so users never hit a cold start.
+#
+# Setup: add a repo secret named BACKEND_HEALTH_URL with the full URL,
+# e.g. https://your-backend.onrender.com/api/health
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: keepalive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ping backend health
+        env:
+          BACKEND_HEALTH_URL: ${{ secrets.BACKEND_HEALTH_URL }}
+        run: |
+          if [ -z "$BACKEND_HEALTH_URL" ]; then
+            echo "BACKEND_HEALTH_URL secret not set — skipping."
+            exit 0
+          fi
+          # --max-time 60 covers cold-start latency on Render free tier.
+          # Swallow failures (|| true) so transient backend hiccups don't
+          # trigger GitHub's auto-disable-after-N-failures on scheduled jobs.
+          curl -fsS --max-time 60 -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" \
+            "$BACKEND_HEALTH_URL" || echo "Ping failed (non-fatal)."

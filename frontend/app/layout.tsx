@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import { Plausible } from "@/components/analytics/Plausible";
 import { InstallPwaPrompt } from "@/components/share/InstallPwaPrompt";
 import { siteConfig } from "@/components/seo/SiteConfig";
+import { KeepAlive } from "@/components/system/KeepAlive";
 
 const notoSans = Noto_Sans({
   variable: "--font-noto-sans",
@@ -101,6 +102,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full">
         <Plausible />
+        <KeepAlive />
         <ThemeProvider>
           <AppShell>{children}</AppShell>
           <InstallPwaPrompt />
