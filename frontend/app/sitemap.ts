@@ -3,16 +3,16 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/components/seo/SiteConfig";
 import { toolRegistry } from "@/lib/seo/tool-registry";
 import { listSlugs as listBlogSlugs } from "@/lib/blog";
+import { listCompetitorSlugs } from "@/content/competitors";
 
 const STATIC_ROUTES = ["", "tools", "workspace", "settings", "blog", "roadmap", "about"];
-const COMPETITORS = ["smallpdf", "ilovepdf", "adobe-acrobat"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   // Clean canonical routes - these are the URLs we want indexed.
   const tools = toolRegistry.map((t) => t.slug);
   const blog = listBlogSlugs().map((s) => `blog/${s}`);
-  const vs = COMPETITORS.map((c) => `vs/${c}`);
+  const vs = listCompetitorSlugs().map((c) => `vs/${c}`);
   const toolSlugs = new Set(toolRegistry.map((t) => t.slug));
 
   return [...STATIC_ROUTES, ...tools, ...blog, ...vs].map((p) => {

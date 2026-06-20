@@ -25,8 +25,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tools" },
   openGraph: {
     title: "All PDF tools · PDF Studio",
-    description:
-      "Fourteen free PDF utilities - compress, merge, convert, OCR, lock, unlock, sign, and more. No signup, no watermark.",
+    description: `${toolRegistry.length} free PDF utilities - compress, merge, convert, OCR, lock, unlock, sign, and more. No signup, no watermark.`,
   },
 };
 
@@ -52,7 +51,7 @@ export default function ToolsIndexPage() {
           <br className="hidden sm:block" /> your workflow
         </h1>
         <p className="mt-4 text-muted-foreground leading-relaxed">
-          Fourteen focused utilities: compress, merge, convert, OCR in 100+ languages, lock/unlock, sign, and more.
+          {toolRegistry.length} focused utilities: compress, merge, convert, OCR in 100+ languages, lock/unlock, sign, and more.
           No signup, no watermark, files auto-delete in an hour.
         </p>
       </header>

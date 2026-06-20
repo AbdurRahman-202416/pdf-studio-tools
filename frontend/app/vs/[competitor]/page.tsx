@@ -63,6 +63,27 @@ export default async function ComparisonPage({
           headline: `PDF Studio vs ${c.name}`,
           description: c.shortPitch,
           author: { "@type": "Organization", name: siteConfig.name },
+          publisher: {
+            "@type": "Organization",
+            name: siteConfig.name,
+            url: siteConfig.url,
+          },
+          mainEntityOfPage: `${siteConfig.url}/vs/${competitor}`,
+        }}
+      />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: `PDF Studio vs ${c.name}`,
+              item: `${siteConfig.url}/vs/${competitor}`,
+            },
+          ],
         }}
       />
       <header>

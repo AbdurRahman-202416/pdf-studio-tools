@@ -65,6 +65,57 @@ export const competitors: Competitor[] = [
     takeaway:
       "Adobe is the right answer for heavy enterprise PDF work. For everyday merges, compressions, OCR, and document conversions, PDF Studio is faster and free.",
   },
+  {
+    slug: "pdf24",
+    name: "PDF24",
+    shortPitch:
+      "PDF24 is a generous free German PDF suite with a huge tool list and a Windows desktop app, but the web UI is dated and ad-supported.",
+    rows: [
+      { feature: "Price", pdfStudio: "Free, no ads", competitor: "Free, ad-supported" },
+      { feature: "Signup required", pdfStudio: "No", competitor: "No" },
+      { feature: "Interface", pdfStudio: "Modern, mobile-first", competitor: "Functional but dated" },
+      { feature: "Target-size compression", pdfStudio: "Yes - 100KB/200KB/500KB/1MB presets", competitor: "Quality slider only" },
+      { feature: "OCR support", pdfStudio: "Yes, 100+ languages", competitor: "Yes, fewer languages" },
+      { feature: "ID card to A4 PDF", pdfStudio: "Yes, print-ready A4", competitor: "No dedicated tool" },
+      { feature: "Files auto-delete", pdfStudio: "Yes, after 1 hour", competitor: "Yes" },
+    ],
+    takeaway:
+      "PDF24 is a solid free workhorse, especially on Windows. PDF Studio matches it on price while adding a cleaner mobile experience, exact target-size compression, and broader OCR.",
+  },
+  {
+    slug: "sejda",
+    name: "Sejda",
+    shortPitch:
+      "Sejda is a polished web PDF editor with real text editing, but the free tier caps you at 3 tasks per hour and limits file size and page count.",
+    rows: [
+      { feature: "Free tasks", pdfStudio: "Unlimited", competitor: "3 per hour" },
+      { feature: "Max pages (free)", pdfStudio: "No page cap", competitor: "200 pages / 50 MB" },
+      { feature: "Signup required", pdfStudio: "No", competitor: "No (but limited)" },
+      { feature: "Watermark on output", pdfStudio: "No", competitor: "No" },
+      { feature: "Target-size compression", pdfStudio: "Yes - exact KB targets", competitor: "Preset levels only" },
+      { feature: "OCR support", pdfStudio: "Yes, 100+ languages", competitor: "Yes (paid plans)" },
+      { feature: "Price", pdfStudio: "Free", competitor: "$7.50/mo for unlimited" },
+    ],
+    takeaway:
+      "Sejda is great for occasional in-browser editing. If you hit the 3-tasks-per-hour wall or need exact file-size targets, PDF Studio removes those limits for free.",
+  },
+  {
+    slug: "nitro",
+    name: "Nitro PDF",
+    shortPitch:
+      "Nitro is an enterprise-grade Acrobat alternative with strong editing and e-sign features, but it's a paid desktop product aimed at businesses.",
+    rows: [
+      { feature: "Price", pdfStudio: "Free", competitor: "From ~$179/yr per user" },
+      { feature: "Install required", pdfStudio: "None, web only", competitor: "Desktop install (Windows)" },
+      { feature: "Signup required", pdfStudio: "No", competitor: "Account + license" },
+      { feature: "Quick everyday tasks", pdfStudio: "Instant in-browser", competitor: "Full app launch" },
+      { feature: "OCR support", pdfStudio: "Yes, 100+ languages", competitor: "Yes (paid)" },
+      { feature: "Target-size compression", pdfStudio: "Yes - exact KB targets", competitor: "Optimize profiles" },
+      { feature: "Mobile-friendly web", pdfStudio: "Yes, responsive", competitor: "Desktop-focused" },
+    ],
+    takeaway:
+      "Nitro suits businesses that need a licensed desktop suite with admin controls. For fast, free compressing, merging, OCR, and conversions, PDF Studio gets the job done in the browser.",
+  },
 ];
 
 export function findCompetitor(slug: string): Competitor | undefined {
