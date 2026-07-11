@@ -38,7 +38,11 @@ def cleanup_expired() -> int:
     cutoff = time.time() - settings.FILE_TTL_SECONDS
     removed = 0
     for directory in (settings.UPLOAD_DIR, settings.OUTPUT_DIR):
-        for f in directory.glob("*.pdf"):
+        # Sweep every produced artifact (pdf/xlsx/docx/zip/jpg/png/…), not just
+        # PDFs — otherwise non-PDF outputs never expire and disk grows unbounded.
+        for f in directory.iterdir():
+            if not f.is_file():
+                continue
             try:
                 if f.stat().st_mtime < cutoff:
                     f.unlink(missing_ok=True)

@@ -7,6 +7,7 @@ from typing import Literal
 import fitz
 from PIL import Image
 
+from app.utils.guards import safe_zoom
 from app.utils.storage import new_file_id, output_path
 
 LayoutMode = Literal["a4_portrait", "a4_horizontal", "compact"]
@@ -35,8 +36,9 @@ def _load_first_page_as_image(pdf_bytes: bytes, dpi: int = 220) -> Image.Image:
     with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
         if doc.page_count == 0:
             raise IDCardError("PDF has no pages")
-        zoom = dpi / 72
-        pix = doc.load_page(0).get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
+        page = doc.load_page(0)
+        zoom = safe_zoom(page.rect.width, page.rect.height, dpi)
+        pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
         return Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
 
 

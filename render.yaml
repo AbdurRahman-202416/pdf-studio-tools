@@ -16,5 +16,9 @@ services:
         value: 8000
       - key: MAX_UPLOAD_MB
         value: 100
+      - key: RATE_LIMIT_ENABLED
+        value: true
       - key: CORS_ORIGINS_RAW
+        sync: false
+      - key: SENTRY_DSN
         sync: false

@@ -57,11 +57,6 @@ export function ToolPageShell({ slug, subtitle, children }: ToolPageShellProps) 
             url: canonical,
             description: tool.metaDescription,
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: "4.8",
-              ratingCount: "1284",
-            },
           },
           {
             "@context": "https://schema.org",

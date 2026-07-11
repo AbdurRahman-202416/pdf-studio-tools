@@ -16,6 +16,7 @@ from pathlib import Path
 import fitz  # PyMuPDF
 from PIL import Image
 
+from app.utils.guards import safe_zoom
 from app.utils.storage import new_file_id, output_path
 
 
@@ -42,7 +43,7 @@ _LADDER: list[tuple[int, int]] = [
 def _rasterize(file_path: Path, dpi: int, quality: int, out: Path) -> int:
     with fitz.open(file_path) as src, fitz.open() as dst:
         for page in src:
-            zoom = dpi / 72
+            zoom = safe_zoom(page.rect.width, page.rect.height, dpi)
             pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
             img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
             buf = io.BytesIO()

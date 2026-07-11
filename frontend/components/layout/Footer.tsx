@@ -7,7 +7,7 @@ export function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer className="border-t border-border bg-card/40 mt-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 grid gap-6 sm:grid-cols-3 text-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-8 grid gap-6 sm:grid-cols-4 text-sm">
         <div>
           <div className="flex items-center gap-2">
             <LogoMark size={28} className="rounded-lg" />
@@ -28,20 +28,30 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/tools/pdf-to-jpg-high-quality" className="hover:text-foreground">
+              <Link href="/pdf-to-jpg" className="hover:text-foreground">
                 PDF to JPG
               </Link>
             </li>
             <li>
-              <Link href="/tools/password-protect-pdf-online" className="hover:text-foreground">
+              <Link href="/lock-pdf" className="hover:text-foreground">
                 Lock / Unlock PDF
               </Link>
             </li>
             <li>
-              <Link href="/tools/pdf-ocr-online-free" className="hover:text-foreground">
+              <Link href="/pdf-ocr" className="hover:text-foreground">
                 PDF OCR
               </Link>
             </li>
+            <li>
+              <Link href="/tools" className="hover:text-foreground">
+                All tools →
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p className="font-semibold mb-2">Company</p>
+          <ul className="space-y-1 text-muted-foreground">
             <li>
               <Link href="/blog" className="hover:text-foreground">
                 Blog
@@ -53,8 +63,18 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/tools" className="hover:text-foreground">
-                All tools →
+              <Link href="/about" className="hover:text-foreground">
+                About
+              </Link>
+            </li>
+            <li>
+              <Link href="/privacy" className="hover:text-foreground">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link href="/terms" className="hover:text-foreground">
+                Terms of Service
               </Link>
             </li>
           </ul>

@@ -24,6 +24,22 @@ class Settings(BaseSettings):
     FILE_TTL_SECONDS: int = 60 * 60
     CLEANUP_INTERVAL_SECONDS: int = 15 * 60
 
+    # Resource-exhaustion guards (PDF / decompression bombs).
+    # A single crafted file can otherwise allocate multi-GB pixmaps or expand
+    # a few KB of zip into gigabytes of XML. These cap the blast radius.
+    MAX_PDF_PAGES: int = 500          # reject documents with more pages than this
+    MAX_RENDER_PIXELS: int = 40_000_000  # ~40 MP ceiling per rasterized page
+    MAX_ZIP_RATIO: int = 200         # max uncompressed/compressed ratio for docx/xlsx
+    MAX_ZIP_UNCOMPRESSED_MB: int = 400   # absolute cap on decompressed office-XML size
+
+    @property
+    def max_upload_bytes(self) -> int:
+        return self.MAX_UPLOAD_MB * 1024 * 1024
+
+    @property
+    def max_zip_uncompressed_bytes(self) -> int:
+        return self.MAX_ZIP_UNCOMPRESSED_MB * 1024 * 1024
+
     # Per-IP sliding-window rate limit. Disabled in dev for tests; turn on
     # via env in production: RATE_LIMIT_ENABLED=true.
     RATE_LIMIT_ENABLED: bool = False

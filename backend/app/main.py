@@ -9,7 +9,20 @@ from app.core.cleanup import cleanup_lifespan
 from app.core.config import settings
 from app.core.logging import AccessLogMiddleware, setup_logging
 from app.middleware.errors import register_error_handlers
-from app.middleware.security import RateLimitMiddleware, SecurityHeadersMiddleware
+from app.middleware.security import (
+    BodySizeLimitMiddleware,
+    RateLimitMiddleware,
+    SecurityHeadersMiddleware,
+)
+
+
+def _scrub_sensitive(event, _hint):
+    """Sentry before_send: never ship password form fields or raw request bodies."""
+    with_request = event.get("request")
+    if isinstance(with_request, dict):
+        with_request.pop("data", None)
+        with_request.pop("cookies", None)
+    return event
 
 
 def create_app() -> FastAPI:
@@ -22,6 +35,8 @@ def create_app() -> FastAPI:
                 dsn=settings.SENTRY_DSN,
                 environment=settings.ENVIRONMENT,
                 traces_sample_rate=0.1,
+                send_default_pii=False,
+                before_send=_scrub_sensitive,
             )
         except ImportError:  # pragma: no cover — sentry is optional
             pass
@@ -103,6 +118,7 @@ def create_app() -> FastAPI:
     )
     app.add_middleware(AccessLogMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_upload_bytes)
     if settings.RATE_LIMIT_ENABLED:
         app.add_middleware(
             RateLimitMiddleware,

@@ -38,6 +38,7 @@ from app.services import (
     photo_service,
 )
 from app.services import excel_to_pdf_service, image_to_pdf_service, pdf_compress_target, pdf_to_word_service, sign_pdf_service, word_to_pdf_service
+from app.utils.guards import GuardError, assert_zip_safe, is_image
 from app.utils.storage import find_output, find_upload, new_file_id, upload_path
 
 router = APIRouter(prefix="/tools")
@@ -70,6 +71,12 @@ async def id_card_combine(
     back_bytes = await back.read()
     if len(front_bytes) == 0 or len(back_bytes) == 0:
         raise HTTPException(400, "Both front and back files are required")
+
+    def _img_or_pdf(b: bytes) -> bool:
+        return is_image(b) or b[:4] == b"%PDF"
+
+    if not _img_or_pdf(front_bytes) or not _img_or_pdf(back_bytes):
+        raise HTTPException(400, "Front and back must be an image (JPG, PNG, WEBP, BMP, TIFF) or PDF.")
 
     try:
         output_id, out = await asyncio.to_thread(
@@ -237,6 +244,10 @@ async def excel_to_pdf(file: UploadFile = File(...)):
     content = await file.read()
     if content[:2] != b"PK":
         raise HTTPException(400, "Invalid Excel file")
+    try:
+        assert_zip_safe(content)
+    except GuardError as exc:
+        raise HTTPException(400, str(exc))
 
     file_id = new_file_id()
     dest = upload_path(file_id).with_suffix(".xlsx")
@@ -291,6 +302,8 @@ async def photo_to_pdf(
     image_bytes = await file.read()
     if not image_bytes:
         raise HTTPException(400, "Empty image")
+    if not is_image(image_bytes):
+        raise HTTPException(400, "File is not a valid image (JPG, PNG, WEBP, BMP, TIFF).")
 
     custom = None
     if size == "custom":
@@ -746,6 +759,10 @@ async def word_to_pdf(file: UploadFile = File(...)):
     # docx is a zip — must start with PK
     if content[:2] != b"PK":
         raise HTTPException(400, "Invalid .docx file")
+    try:
+        assert_zip_safe(content)
+    except GuardError as exc:
+        raise HTTPException(400, str(exc))
     file_id = new_file_id()
     dest = upload_path(file_id).with_suffix(".docx")
     dest.write_bytes(content)

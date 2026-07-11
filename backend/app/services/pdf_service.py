@@ -13,6 +13,7 @@ from app.models.schemas import (
     PageInfo,
     PDFMetadata,
 )
+from app.utils.guards import safe_zoom
 from app.utils.storage import find_upload, new_file_id, output_path
 
 
@@ -98,7 +99,7 @@ def compress_pdf(file_path: Path, level: CompressionLevel) -> tuple[str, Path]:
     try:
         with fitz.open(file_path) as src, fitz.open() as dst:
             for page in src:
-                zoom = dpi / 72
+                zoom = safe_zoom(page.rect.width, page.rect.height, dpi)
                 pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
                 img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
                 buf = io.BytesIO()

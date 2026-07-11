@@ -15,9 +15,46 @@ from fastapi import FastAPI, Request, Response, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from app.core.config import settings
+
 # Per-IP request log: deque of timestamps for sliding-window math.
 _HITS: dict[str, deque[float]] = {}
 _LOCK = asyncio.Lock()
+
+
+class BodySizeLimitMiddleware(BaseHTTPMiddleware):
+    """Reject over-sized uploads by their declared Content-Length *before* the
+    body is read into memory. This is the cheap global guard that stops a few
+    parallel multi-GB POSTs to any tool endpoint from OOM-killing the box.
+
+    Note: a hostile client can omit Content-Length and stream chunked; the
+    per-endpoint capped read is the backstop for that. Standard browsers and
+    HTTP clients always send Content-Length on multipart uploads.
+    """
+
+    def __init__(self, app: FastAPI, *, max_bytes: int):
+        super().__init__(app)
+        self.max_bytes = max_bytes
+
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
+    ) -> Response:
+        cl = request.headers.get("content-length")
+        if cl is not None:
+            try:
+                if int(cl) > self.max_bytes:
+                    return JSONResponse(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        content={"detail": f"Upload exceeds the {settings.MAX_UPLOAD_MB} MB limit."},
+                    )
+            except ValueError:
+                return JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={"detail": "Invalid Content-Length header."},
+                )
+        return await call_next(request)
 
 
 _DOCS_PATHS = ("/docs", "/redoc", "/openapi.json")
@@ -110,8 +147,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if request.url.path.endswith("/health") or request.method == "OPTIONS":
             return await call_next(request)
 
+        # Use the RIGHTMOST X-Forwarded-For entry (the address our own proxy
+        # observed and appended) rather than the leftmost, which is
+        # client-supplied and trivially spoofable to evade the limit.
+        xff = request.headers.get("X-Forwarded-For", "")
         ip = (
-            request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+            xff.split(",")[-1].strip()
             or (request.client.host if request.client else "anon")
         )
         limit = self._limit_for(request.url.path)

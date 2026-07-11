@@ -7,6 +7,8 @@ from pathlib import Path
 import fitz
 from PIL import Image, ImageFilter, ImageOps
 
+from app.utils.guards import safe_zoom
+
 # Any Tesseract language code accepted (e.g. "eng", "spa", "ben+eng", "hin+eng").
 # Validation happens against the actually-installed packs in list_languages().
 
@@ -113,7 +115,7 @@ def extract_text(
                         method = "text"
 
                 if method != "text":
-                    zoom = dpi / 72
+                    zoom = safe_zoom(page.rect.width, page.rect.height, dpi)
                     pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
                     img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
                     img = _preprocess_for_ocr(img)

@@ -9,6 +9,7 @@ import fitz  # PyMuPDF
 from PIL import Image
 
 from app.core.config import settings
+from app.utils.guards import assert_page_count, safe_zoom
 from app.utils.storage import new_file_id
 
 
@@ -62,13 +63,14 @@ def pdf_to_images(
     output_id = new_file_id()
     try:
         with fitz.open(file_path) as doc:
+            assert_page_count(doc.page_count)
             indexes = _parse_range(pages_spec, doc.page_count)
-            zoom = dpi / 72
-            mat = fitz.Matrix(zoom, zoom)
 
             if len(indexes) == 1:
                 i = indexes[0]
-                pix = doc.load_page(i).get_pixmap(matrix=mat, alpha=False)
+                page = doc.load_page(i)
+                zoom = safe_zoom(page.rect.width, page.rect.height, dpi)
+                pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
                 img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
                 out = settings.OUTPUT_DIR / f"{output_id}.{fmt}"
                 if fmt == "jpg":
@@ -80,7 +82,9 @@ def pdf_to_images(
             out = settings.OUTPUT_DIR / f"{output_id}.zip"
             with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED) as zf:
                 for n, i in enumerate(indexes, start=1):
-                    pix = doc.load_page(i).get_pixmap(matrix=mat, alpha=False)
+                    page = doc.load_page(i)
+                    zoom = safe_zoom(page.rect.width, page.rect.height, dpi)
+                    pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
                     img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
                     buf = io.BytesIO()
                     if fmt == "jpg":
