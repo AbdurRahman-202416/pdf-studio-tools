@@ -146,6 +146,20 @@ class PdfLockResponse(ToolDownloadable):
     pass
 
 
+class PdfSplitResponse(ToolDownloadable):
+    pages: int = Field(..., description="Number of pages in the output (extract) or number of single-page PDFs (each).")
+    ext: Literal["pdf", "zip"]
+
+
+class PdfRotateResponse(ToolDownloadable):
+    rotated: int = Field(..., description="Number of pages that were rotated.")
+
+
+class PdfDeletePagesResponse(ToolDownloadable):
+    removed: int
+    remaining: int
+
+
 class PdfToWordResponse(ToolDownloadable):
     pages: int
     characters: int

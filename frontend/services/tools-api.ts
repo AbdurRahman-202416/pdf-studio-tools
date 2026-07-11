@@ -330,4 +330,55 @@ export async function signPdf(args: SignPdfArgs): Promise<ToolDownloadable> {
   return res.json();
 }
 
+// ---------- Split / Rotate / Delete pages ---------- //
 
+export interface PdfSplitResult extends ToolDownloadable {
+  pages: number;
+  ext: "pdf" | "zip";
+}
+
+export async function splitPdf(
+  file: File,
+  pages: string,
+  mode: "extract" | "each" = "extract",
+): Promise<PdfSplitResult> {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("pages", pages);
+  fd.append("mode", mode);
+  const res = await fetch(`${API_BASE}/tools/pdf/split`, { method: "POST", body: fd });
+  if (!res.ok) throw new ApiError(await parseError(res), res.status);
+  return res.json();
+}
+
+export interface PdfRotateResult extends ToolDownloadable {
+  rotated: number;
+}
+
+export async function rotatePdf(
+  file: File,
+  angle: 90 | 180 | 270,
+  pages: string = "all",
+): Promise<PdfRotateResult> {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("angle", String(angle));
+  fd.append("pages", pages);
+  const res = await fetch(`${API_BASE}/tools/pdf/rotate`, { method: "POST", body: fd });
+  if (!res.ok) throw new ApiError(await parseError(res), res.status);
+  return res.json();
+}
+
+export interface PdfDeletePagesResult extends ToolDownloadable {
+  removed: number;
+  remaining: number;
+}
+
+export async function deletePdfPages(file: File, pages: string): Promise<PdfDeletePagesResult> {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("pages", pages);
+  const res = await fetch(`${API_BASE}/tools/pdf/delete-pages`, { method: "POST", body: fd });
+  if (!res.ok) throw new ApiError(await parseError(res), res.status);
+  return res.json();
+}

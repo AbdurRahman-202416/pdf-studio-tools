@@ -17,7 +17,10 @@ from app.models.schemas import (
     IdCardCombineResponse,
     OcrResponse,
     OcrStatusResponse,
+    PdfDeletePagesResponse,
     PdfLockResponse,
+    PdfRotateResponse,
+    PdfSplitResponse,
     PdfTableExcelResponse,
     PdfToImagesResponse,
     PdfToWordResponse,
@@ -29,6 +32,7 @@ from app.services import (
     ocr_service,
     pdf_image_service,
     pdf_lock_service,
+    pdf_pages_service,
     pdf_service,
     pdf_table_service,
     photo_service,
@@ -357,6 +361,111 @@ async def pdf_to_jpg(
         "size_bytes": out.stat().st_size,
         "count": count,
         "ext": out.suffix.lstrip("."),
+    }
+
+
+# ---------- Split / Rotate / Delete pages ---------- #
+
+
+async def _read_pdf_upload(file: UploadFile) -> Path:
+    """Shared validation for direct-upload PDF tools: extension + magic bytes, then persist."""
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(415, "Only PDF files are accepted")
+    content = await file.read()
+    if content[:4] != b"%PDF":
+        raise HTTPException(400, "Invalid PDF")
+    dest = upload_path(new_file_id())
+    dest.write_bytes(content)
+    return dest
+
+
+@router.post(
+    "/pdf/split",
+    response_model=PdfSplitResponse,
+    tags=["tools-organize"],
+    summary="Split a PDF - extract pages into one PDF, or one PDF per page (ZIP)",
+    description=(
+        "`pages` is `all` or a 1-based range string like `1-3,5`. "
+        "`mode=extract` (default) returns the selected pages as a single PDF; "
+        "`mode=each` returns a ZIP with one single-page PDF per selected page."
+    ),
+)
+async def pdf_split(
+    file: UploadFile = File(...),
+    pages: str = Form("all"),
+    mode: str = Form("extract"),
+):
+    if mode not in pdf_pages_service.SPLIT_MODES:
+        raise HTTPException(400, "mode must be 'extract' or 'each'")
+    dest = await _read_pdf_upload(file)
+    try:
+        output_id, out, count = await asyncio.to_thread(
+            pdf_pages_service.split_pdf, dest, pages, mode,
+        )
+    except pdf_pages_service.PDFPagesError as exc:
+        raise HTTPException(400, str(exc))
+    return {
+        "output_id": output_id,
+        "filename": out.name,
+        "size_bytes": out.stat().st_size,
+        "pages": count,
+        "ext": out.suffix.lstrip("."),
+    }
+
+
+@router.post(
+    "/pdf/rotate",
+    response_model=PdfRotateResponse,
+    tags=["tools-organize"],
+    summary="Rotate PDF pages by 90 / 180 / 270 degrees",
+    description="`angle` is added to each selected page's existing rotation. `pages` is `all` or `1-3,5`.",
+)
+async def pdf_rotate(
+    file: UploadFile = File(...),
+    angle: int = Form(90),
+    pages: str = Form("all"),
+):
+    if angle not in pdf_pages_service.VALID_ANGLES:
+        raise HTTPException(400, "angle must be 90, 180 or 270")
+    dest = await _read_pdf_upload(file)
+    try:
+        output_id, out, rotated = await asyncio.to_thread(
+            pdf_pages_service.rotate_pdf, dest, int(angle), pages,
+        )
+    except pdf_pages_service.PDFPagesError as exc:
+        raise HTTPException(400, str(exc))
+    return {
+        "output_id": output_id,
+        "filename": "rotated.pdf",
+        "size_bytes": out.stat().st_size,
+        "rotated": rotated,
+    }
+
+
+@router.post(
+    "/pdf/delete-pages",
+    response_model=PdfDeletePagesResponse,
+    tags=["tools-organize"],
+    summary="Delete pages from a PDF",
+    description="`pages` is a required 1-based range string like `2` or `2,4-6`. At least one page must remain.",
+)
+async def pdf_delete_pages(
+    file: UploadFile = File(...),
+    pages: str = Form(...),
+):
+    dest = await _read_pdf_upload(file)
+    try:
+        output_id, out, removed, remaining = await asyncio.to_thread(
+            pdf_pages_service.delete_pages, dest, pages,
+        )
+    except pdf_pages_service.PDFPagesError as exc:
+        raise HTTPException(400, str(exc))
+    return {
+        "output_id": output_id,
+        "filename": "pages-removed.pdf",
+        "size_bytes": out.stat().st_size,
+        "removed": removed,
+        "remaining": remaining,
     }
 
 

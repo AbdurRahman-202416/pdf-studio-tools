@@ -1,12 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { DeletePdfPagesView } from "@/features/tools/views/DeletePdfPagesView";
 import { PdfLockView } from "@/features/tools/views/PdfLockView";
 import { PdfToJpgView } from "@/features/tools/views/PdfToJpgView";
+import { RotatePdfView } from "@/features/tools/views/RotatePdfView";
+import { SplitPdfView } from "@/features/tools/views/SplitPdfView";
 
 const TOOL_MAP: Record<string, React.ComponentType> = {
   "pdf-to-jpg": PdfToJpgView,
   "pdf-lock": PdfLockView,
+  "split-pdf": SplitPdfView,
+  "rotate-pdf": RotatePdfView,
+  "delete-pdf-pages": DeletePdfPagesView,
 };
 
 export function generateStaticParams() {

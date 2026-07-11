@@ -678,6 +678,108 @@ export const toolRegistry: ToolEntry[] = [
     region: "global",
     customComponent: "SignPdfWorkspace",
   },
+  {
+    slug: "split-pdf",
+    displayName: "Split PDF",
+    primaryKeyword: "split pdf online free",
+    cardCopy: "Extract pages or break a PDF into separate files.",
+    metaDescription:
+      "Split PDF online free - extract specific pages into a new PDF, or save every page as its own file. No signup, no watermark, no page limit.",
+    relatedKeywords: [
+      "split pdf pages",
+      "extract pages from pdf",
+      "separate pdf pages",
+      "pdf splitter online",
+      "split pdf into multiple files",
+      "cut pdf pages",
+    ],
+    category: "organize",
+    iconName: "Scissors",
+    backendEndpoint: "/tools/pdf/split",
+    faqs: [
+      { q: "Can I extract just a few pages into one PDF?", a: "Yes - type a range like 1-3,7 and choose 'Extract pages'. The selected pages become one new PDF in the order you typed them." },
+      { q: "Can I split every page into its own file?", a: "Yes - choose 'One PDF per page' and you'll get a ZIP with a single-page PDF for each selected page." },
+      { q: "Is there a page or file limit?", a: "No page limit and no daily limit. Files up to 100 MB are supported and auto-delete after 1 hour." },
+      { q: "Does splitting reduce quality?", a: "No - pages are copied losslessly. Text, images, and fonts are untouched." },
+    ],
+    howTo: [
+      { name: "Upload your PDF", text: "Drop the PDF you want to split - up to 100 MB." },
+      { name: "Pick pages and mode", text: "Type a range like 1-3,5 and choose one combined PDF or one file per page." },
+      { name: "Download", text: "Get a single PDF, or a ZIP of single-page PDFs. Files auto-delete after 1 hour." },
+    ],
+    relatedSlugs: ["delete-pdf-pages", "merge-pdf", "rotate-pdf"],
+    seoCopy:
+      "Split PDF online free - extract the pages you need into a new PDF, or break the whole document into single-page files. Lossless, private (files auto-delete after 1 hour), and completely free with no signup, watermark, or page limit.",
+    region: "global",
+  },
+  {
+    slug: "rotate-pdf",
+    displayName: "Rotate PDF",
+    primaryKeyword: "rotate pdf online free",
+    cardCopy: "Fix sideways or upside-down pages permanently.",
+    metaDescription:
+      "Rotate PDF pages 90° or 180° online free and save the result permanently. Rotate all pages or just a few - no signup, no watermark.",
+    relatedKeywords: [
+      "rotate pdf and save",
+      "rotate pdf pages permanently",
+      "fix upside down pdf",
+      "rotate scanned pdf",
+      "turn pdf sideways",
+      "rotate all pages in pdf",
+    ],
+    category: "organize",
+    iconName: "RotateCw",
+    backendEndpoint: "/tools/pdf/rotate",
+    faqs: [
+      { q: "Does the rotation stick, or is it just a preview?", a: "It's written into the PDF itself, so the pages stay rotated in every viewer - Adobe, browsers, phones, and print." },
+      { q: "Can I rotate only some pages?", a: "Yes - enter a range like 2,5-7 to rotate just those pages. Everything else is untouched." },
+      { q: "My scan is upside down - which option do I use?", a: "Pick 180°. For pages scanned sideways, use 90° right or 90° left depending on the direction." },
+      { q: "Does rotating reduce quality?", a: "No - rotation only updates page orientation metadata. Text and images are not re-encoded." },
+    ],
+    howTo: [
+      { name: "Upload your PDF", text: "Drop the PDF with sideways or upside-down pages." },
+      { name: "Choose the angle", text: "90° right, 180°, or 90° left - for all pages or a range like 2,5-7." },
+      { name: "Download", text: "The rotation is saved into the file permanently." },
+    ],
+    relatedSlugs: ["split-pdf", "delete-pdf-pages", "compress-pdf"],
+    seoCopy:
+      "Rotate PDF online free and save it permanently - fix upside-down scans and sideways pages in seconds. Rotate every page or just the ones you pick. No signup, no watermark, files auto-delete after 1 hour.",
+    region: "global",
+  },
+  {
+    slug: "delete-pdf-pages",
+    displayName: "Delete PDF Pages",
+    primaryKeyword: "delete pages from pdf",
+    cardCopy: "Remove blank, wrong, or duplicate pages from a PDF.",
+    metaDescription:
+      "Delete pages from PDF online free - remove blank scans, wrong pages, or duplicates and download the cleaned file. No signup, no watermark.",
+    relatedKeywords: [
+      "remove pages from pdf",
+      "delete pdf pages online",
+      "remove blank pages from pdf",
+      "pdf page remover",
+      "delete one page from pdf",
+      "remove pages from pdf free",
+    ],
+    category: "organize",
+    iconName: "Trash2",
+    backendEndpoint: "/tools/pdf/delete-pages",
+    faqs: [
+      { q: "How do I delete just one page?", a: "Type its page number (e.g. 3) and hit Delete pages. For several, use commas and ranges like 2,4-6." },
+      { q: "Will the remaining pages be re-numbered?", a: "The remaining pages keep their content and order; only the removed pages disappear. Printed page numbers inside the document are part of the content and don't change." },
+      { q: "Can I delete every page?", a: "No - at least one page must remain, otherwise the output wouldn't be a valid PDF." },
+      { q: "Is my file kept on your servers?", a: "Only temporarily - uploads and outputs auto-delete after 1 hour, and nothing is ever shared." },
+    ],
+    howTo: [
+      { name: "Upload your PDF", text: "Drop the PDF you want to clean up." },
+      { name: "Enter pages to delete", text: "Single pages or ranges, e.g. 2,4-6. At least one page must remain." },
+      { name: "Download the cleaned PDF", text: "The selected pages are gone; everything else is untouched." },
+    ],
+    relatedSlugs: ["split-pdf", "rotate-pdf", "merge-pdf"],
+    seoCopy:
+      "Delete pages from a PDF online free - drop blank scans, wrong pages, and duplicates without re-creating the document. Lossless for the pages you keep, private (auto-delete after 1 hour), and free with no signup or watermark.",
+    region: "global",
+  },
 ];
 
 /** O(1) lookup by slug - used by tool pages, sitemap, OG generator. */
@@ -701,6 +803,7 @@ export function resolveCleanSlug(slug: string): string | undefined {
 export const TOOL_CATEGORIES: ToolCategory[] = [
   "optimize",
   "merge",
+  "organize",
   "convert",
   "security",
   "ocr",
