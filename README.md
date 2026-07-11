@@ -1,7 +1,7 @@
 # PDF Studio
 
 **The all-in-one PDF toolkit. Free, fast, watermark-free.**
-Compress, merge, convert, sign, lock, and OCR — **18 tools**, no signup, no daily limit, files auto-delete in 1 hour. Works with English, Bangla, Arabic, CJK, and 100+ languages.
+Compress, merge, split, rotate, convert, sign, lock, and OCR — **21 tools**, no signup, no daily limit, files auto-delete in 1 hour. Works with English, Bangla, Arabic, CJK, and 100+ languages.
 
 🌐 Frontend `:3000` · API `:8000` · OpenAPI docs at `/docs`
 
@@ -50,8 +50,13 @@ Each tool lives at a clean, keyword-led slug (e.g. `/compress-pdf`). Legacy `/to
 | PDF → Word | `/pdf-to-word` | Convert a PDF to editable `.docx` |
 | Word → PDF | `/word-to-pdf` | Convert `.docx` to PDF, formatting preserved |
 | Sign PDF | `/sign-pdf` | Draw a signature and place it on any page |
+| Split PDF | `/split-pdf` | Extract pages into one PDF, or one file per page |
+| Rotate PDF | `/rotate-pdf` | Rotate pages 90/180/270°, saved permanently |
+| Delete PDF Pages | `/delete-pdf-pages` | Remove unwanted pages from a PDF |
 
 **Workspace** (`/workspace`) is a multi-file canvas for merge / compress / split / rotate with per-page selection and drag-reorder across documents.
+
+**Legal:** `/privacy` (Privacy Policy) and `/terms` (Terms of Service) — files are processed server-side and auto-deleted within one hour; no data is sold.
 
 ---
 
@@ -155,6 +160,9 @@ Everything is mounted under `/api`. Workspace endpoints live in `app/api/routes.
 | POST | `/api/tools/pdf-to-word` | PDF → editable `.docx` |
 | POST | `/api/tools/word-to-pdf` | `.docx` → PDF |
 | POST | `/api/tools/sign-pdf` | Place a drawn signature onto a page |
+| POST | `/api/tools/pdf/split` | Extract pages into one PDF, or one PDF per page (ZIP) |
+| POST | `/api/tools/pdf/rotate` | Rotate pages by 90 / 180 / 270° |
+| POST | `/api/tools/pdf/delete-pages` | Remove pages from a PDF |
 | GET | `/api/tools/download/{output_id}` | Download any tool output (pdf/xlsx/zip/jpg/png) |
 | GET | `/api/tools/preview/{output_id}` | Preview a result: PNG for PDF/JPG/PNG/ZIP, JSON for XLSX. Supports `?page=N&w=900`; returns `X-Page-Count` for PDFs |
 
@@ -175,15 +183,20 @@ pytest
 
 Playwright starts the servers automatically (`playwright.config.ts > webServer`); its web server activates `backend/.venv`, so the venv must exist first.
 
+**CI:** `.github/workflows/ci.yml` runs backend `pytest` and a frontend lint + production build on every push and PR to `main` — a pre-deploy gate so a broken commit can't auto-deploy to Render/Vercel.
+
 ---
 
 ## Security
 
-- Strict MIME **and** `%PDF` magic-byte validation on every upload
-- Streamed `/api/upload` aborts and unlinks once it crosses `MAX_UPLOAD_MB` (default 100 MB)
+- Strict MIME **and** `%PDF` magic-byte validation on every upload; image tools verify image magic bytes; docx/xlsx checked for zip-bomb expansion before parsing
+- **Body-size limit middleware** rejects oversized uploads (HTTP 413) by `Content-Length` before buffering; streamed `/api/upload` also aborts and unlinks once it crosses `MAX_UPLOAD_MB` (default 100 MB)
+- **PDF / decompression-bomb guards** (`app/utils/guards.py`): every rasterization clamps to `MAX_RENDER_PIXELS` (~40 MP), a page-count ceiling (`MAX_PDF_PAGES`), and a process-wide Pillow `MAX_IMAGE_PIXELS` cap
 - `output_id` is UUID-validated before any filesystem lookup; download filenames are sanitized (no `/` or `\`)
-- Temporary storage with TTL-based background cleanup (default 15-min cadence, 1-hour file TTL) inside the FastAPI lifespan — no external cron
+- Temporary storage with TTL-based background cleanup (default 15-min cadence, 1-hour file TTL) inside the FastAPI lifespan — sweeps **all** artifact types, no external cron
+- Per-IP sliding-window **rate limiting** (`RATE_LIMIT_ENABLED=true` in production); client IP read from the trusted (rightmost) `X-Forwarded-For` entry
 - CORS allowlist via `CORS_ORIGINS_RAW`; the backend **refuses to start in production with an empty allowlist** (intentional fail-closed guard)
+- Optional Sentry error reporting (`SENTRY_DSN`) with request bodies / passwords scrubbed before send
 - PDF lock uses AES-256 (pypdf 5.x)
 - Heavy CPU work (PyMuPDF / Pillow / Tesseract / pdfplumber) runs via `asyncio.to_thread` so it never blocks the event loop
 
