@@ -1,101 +1,35 @@
+import type { Domain } from "@/lib/tools/types";
+
 /**
- * Per-tool icon palette. Curated (not random rainbow) - each slug gets a
- * distinct hue that hints at the tool's purpose. The colorful chips give
- * the otherwise-restrained "Document Atelier" surface a tactile, 3D feel.
+ * Domain palette for icon chips.
  *
- * `from` / `to` define a 135° linear gradient. `shadow` is a tailwind
- * shadow color token used for the colored drop-shadow.
+ * Previously this was a hand-picked hue per slug - a rainbow that carried no
+ * meaning and needed a new entry for every tool added. Now colour comes from
+ * the tool's domain, so it encodes the catalogue's structure, stays correct as
+ * the catalogue grows, and needs no maintenance.
+ *
+ * Endpoints are the same OKLCH family as the --primary accents in globals.css,
+ * at fixed chroma, so the chips are siblings of the page accent rather than a
+ * separate palette.
  */
-export interface ToolStyle {
+export interface DomainStyle {
   from: string;
   to: string;
   shadow: string;
 }
 
-const DEFAULT_STYLE: ToolStyle = {
-  from: "#a16207",
-  to: "#7c2d12",
-  shadow: "rgba(161, 98, 7, 0.35)",
+const STYLES: Record<Domain, DomainStyle> = {
+  pdf: { from: "#D95544", to: "#7F2117", shadow: "rgba(217,85,68, 0.38)" },
+  text: { from: "#C56E00", to: "#723500", shadow: "rgba(197,110,0, 0.38)" },
+  calc: { from: "#8E8D00", to: "#4D4C00", shadow: "rgba(142,141,0, 0.38)" },
+  convert: { from: "#03A14A", to: "#005A1C", shadow: "rgba(3,161,74, 0.38)" },
+  data: { from: "#00A49D", to: "#005B57", shadow: "rgba(0,164,157, 0.38)" },
+  security: { from: "#0095D7", to: "#00517F", shadow: "rgba(0,149,215, 0.38)" },
+  code: { from: "#5F7CEB", to: "#2E3F8D", shadow: "rgba(95,124,235, 0.38)" },
+  image: { from: "#A564D1", to: "#5D2E7B", shadow: "rgba(165,100,209, 0.38)" },
+  color: { from: "#CD5394", to: "#772151", shadow: "rgba(205,83,148, 0.38)" },
 };
 
-const STYLES: Record<string, ToolStyle> = {
-  "compress-pdf": {
-    from: "#6366f1",
-    to: "#312e81",
-    shadow: "rgba(99, 102, 241, 0.45)",
-  },
-  "compress-pdf-to-100kb": {
-    from: "#f97316",
-    to: "#7c2d12",
-    shadow: "rgba(249, 115, 22, 0.45)",
-  },
-  "merge-pdf": {
-    from: "#10b981",
-    to: "#065f46",
-    shadow: "rgba(16, 185, 129, 0.45)",
-  },
-  "pdf-to-jpg": {
-    from: "#fb7185",
-    to: "#9f1239",
-    shadow: "rgba(251, 113, 133, 0.45)",
-  },
-  "jpg-to-pdf": {
-    from: "#fbbf24",
-    to: "#a16207",
-    shadow: "rgba(251, 191, 36, 0.45)",
-  },
-  "lock-pdf": {
-    from: "#475569",
-    to: "#1e293b",
-    shadow: "rgba(71, 85, 105, 0.45)",
-  },
-  "unlock-pdf": {
-    from: "#f59e0b",
-    to: "#92400e",
-    shadow: "rgba(245, 158, 11, 0.45)",
-  },
-  "pdf-ocr": {
-    from: "#a855f7",
-    to: "#581c87",
-    shadow: "rgba(168, 85, 247, 0.45)",
-  },
-  "nid-combine": {
-    from: "#06b6d4",
-    to: "#155e75",
-    shadow: "rgba(6, 182, 212, 0.45)",
-  },
-  "passport-photo-pdf": {
-    from: "#ec4899",
-    to: "#9d174d",
-    shadow: "rgba(236, 72, 153, 0.45)",
-  },
-  "pdf-to-excel": {
-    from: "#22c55e",
-    to: "#14532d",
-    shadow: "rgba(34, 197, 94, 0.45)",
-  },
-  "excel-to-pdf": {
-    from: "#10b981",
-    to: "#064e3b",
-    shadow: "rgba(16, 185, 129, 0.45)",
-  },
-  "pdf-to-word": {
-    from: "#3b82f6",
-    to: "#1e3a8a",
-    shadow: "rgba(59, 130, 246, 0.45)",
-  },
-  "word-to-pdf": {
-    from: "#2563eb",
-    to: "#1e40af",
-    shadow: "rgba(37, 99, 235, 0.45)",
-  },
-  "sign-pdf": {
-    from: "#d97706",
-    to: "#78350f",
-    shadow: "rgba(217, 119, 6, 0.45)",
-  },
-};
-
-export function toolStyle(slug: string): ToolStyle {
-  return STYLES[slug] ?? DEFAULT_STYLE;
+export function domainStyle(domain: Domain): DomainStyle {
+  return STYLES[domain] ?? STYLES.pdf;
 }

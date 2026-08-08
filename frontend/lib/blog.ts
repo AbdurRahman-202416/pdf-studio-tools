@@ -3,6 +3,8 @@ import path from "node:path";
 
 import matter from "gray-matter";
 
+import { brand } from "@/brand.config";
+
 export interface BlogFrontmatter {
   title: string;
   description: string;
@@ -30,9 +32,24 @@ export function listPosts(): BlogPostMeta[] {
       const slug = file.replace(/\.mdx$/, "");
       const raw = fs.readFileSync(path.join(POSTS_DIR, file), "utf8");
       const { data } = matter(raw);
-      return { slug, ...(data as BlogFrontmatter) };
+      const meta = data as BlogFrontmatter;
+      return {
+        slug,
+        ...meta,
+        title: applyBrand(meta.title ?? ""),
+        description: applyBrand(meta.description ?? ""),
+      };
     })
     .sort((a, b) => (a.date < b.date ? 1 : -1));
+}
+
+/**
+ * Blog prose refers to the product as {{brand}} rather than by name, so a
+ * rename in brand.config.ts flows through published posts too. Applied to the
+ * body and to frontmatter title/description.
+ */
+function applyBrand(text: string): string {
+  return text.replaceAll("{{brand}}", brand.name);
 }
 
 export function getPost(slug: string): BlogPost | null {
@@ -40,7 +57,14 @@ export function getPost(slug: string): BlogPost | null {
   if (!fs.existsSync(file)) return null;
   const raw = fs.readFileSync(file, "utf8");
   const { data, content } = matter(raw);
-  return { slug, body: content, ...(data as BlogFrontmatter) };
+  const meta = data as BlogFrontmatter;
+  return {
+    slug,
+    body: applyBrand(content),
+    ...meta,
+    title: applyBrand(meta.title ?? ""),
+    description: applyBrand(meta.description ?? ""),
+  };
 }
 
 export function listSlugs(): string[] {
