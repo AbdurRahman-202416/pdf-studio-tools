@@ -3,7 +3,11 @@ import type { ToolContent } from "@/lib/tools/types";
 
 export const content: ToolContent = {
   slug: "compress-pdf",
-  primaryKeyword: "compress pdf for email, whatsapp, govt portal",
+  // Was "compress pdf for email, whatsapp, govt portal" - a comma-stuffed
+  // phrase that made a poor <title> and overlapped both the target-size tools
+  // and the government-portal guide. The flagship compressor targets the head
+  // transactional query; the outcome buttons remain the UX, not the keyword.
+  primaryKeyword: "compress pdf online free",
   metaDescription: "Compress PDF to fit Gmail (10 MB), WhatsApp (16 MB), or a government portal (1 MB). Pick where you're sending it, we shrink it to size. Free.",
   relatedKeywords: [
       "compress pdf for email",

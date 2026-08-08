@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { siteConfig } from "@/components/seo/SiteConfig";
 import { getTool } from "@/lib/tools";
 import { getToolContent } from "@/lib/tools/content";
+import { toSeoTitle } from "@/lib/tools/seo-title";
 
 /**
  * Per-tool Metadata, built from the slim registry plus the server-only content
@@ -21,7 +22,10 @@ export async function toolMetadata(slug: string): Promise<Metadata> {
   )}&subtitle=${encodeURIComponent(content.primaryKeyword)}`;
 
   return {
-    title: content.primaryKeyword,
+    // The <title> is the target keyword, properly cased. primaryKeyword is
+    // stored lowercase (it is the literal query); rendered verbatim it made
+    // every SERP title lowercase, which reads as unfinished and costs clicks.
+    title: toSeoTitle(content.primaryKeyword),
     description: content.metaDescription,
     keywords: [content.primaryKeyword, ...content.relatedKeywords],
     alternates: { canonical },

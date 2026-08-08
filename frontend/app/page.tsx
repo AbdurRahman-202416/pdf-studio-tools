@@ -42,10 +42,29 @@ export default function Home() {
           },
           {
             "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: siteConfig.name,
+            alternateName: siteConfig.shortName,
+            url: siteConfig.url,
+            description: siteConfig.description,
+            inLanguage: "en",
+            publisher: { "@id": `${siteConfig.url}/#organization` },
+          },
+          {
+            "@context": "https://schema.org",
             "@type": "Organization",
+            "@id": `${siteConfig.url}/#organization`,
             name: siteConfig.name,
             url: siteConfig.url,
             description: siteConfig.description,
+            // A real, stable square asset (the 180x180 apple-icon route), so
+            // this claim matches something that actually renders.
+            logo: {
+              "@type": "ImageObject",
+              url: `${siteConfig.url}/apple-icon`,
+              width: 180,
+              height: 180,
+            },
           },
         ]}
       />

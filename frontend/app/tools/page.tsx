@@ -40,13 +40,14 @@ export default function ToolsIndexPage() {
           No signup · no daily limit · no watermark
         </span>
         <h1 className="font-display mt-3 text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight leading-[1.05]">
-          Free PDF tools that{" "}
-          <em className="italic font-normal gradient-text">actually fit</em>
+          Every tool that{" "}
+          <em className="italic font-normal gradient-text">actually fits</em>
           <br className="hidden sm:block" /> your workflow
         </h1>
         <p className="mt-4 text-muted-foreground leading-relaxed">
-          {toolRegistry.length} focused utilities: compress, merge, convert, OCR in 100+ languages, lock/unlock, sign, and more.
-          No signup, no watermark, files auto-delete in an hour.
+          {toolRegistry.length} focused utilities across PDF, image, calculator, developer, text, colour and
+          security - compress, convert, OCR in 100+ languages, resize, sign, generate. No signup, no watermark,
+          files auto-delete in an hour.
         </p>
       </header>
 
