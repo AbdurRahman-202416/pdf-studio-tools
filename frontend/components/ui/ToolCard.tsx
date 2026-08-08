@@ -39,9 +39,13 @@ export function ToolCard({
       <article
         className={cn(
           "relative h-full overflow-hidden rounded-2xl border border-border bg-card",
-          "pl-[calc(0.75rem+3px)] transition-all duration-300",
-          "hover:-translate-y-0.5 hover:border-primary/30",
-          "hover:shadow-[0_8px_30px_-12px_rgb(var(--primary)/0.30)]",
+          "pl-[calc(0.75rem+3px)] transition-[transform,box-shadow,border-color] duration-300 ease-out",
+          // Lift + hue border + a soft domain-tinted glow layered over a real
+          // elevation shadow. Press settles it back for a tactile click.
+          "hover:-translate-y-1 hover:border-primary/50",
+          "hover:shadow-[0_18px_40px_-18px_rgb(var(--primary)/0.40),0_8px_18px_-12px_rgb(0_0_0/0.45)]",
+          "focus-visible:-translate-y-1 focus-visible:border-primary/50",
+          "active:translate-y-0 active:duration-100",
           compact ? "p-4" : "p-5",
         )}
       >
@@ -51,9 +55,8 @@ export function ToolCard({
           className="absolute inset-y-0 left-0 z-[1] w-[3px] bg-primary opacity-70 transition-opacity group-hover:opacity-100"
         />
 
-        {/* Domain-hued reflex that sweeps top-right -> bottom-left on
-            hover/click/focus. See .reflex in globals.css. */}
-        <span aria-hidden className="reflex" />
+        {/* Soft domain-hued surface bloom on hover/focus. See .card-glow. */}
+        <span aria-hidden className="card-glow" />
 
         {/* Content sits above the reflex so the glint never dims the text. */}
         <div className="relative z-[1]">

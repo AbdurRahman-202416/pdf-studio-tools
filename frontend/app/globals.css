@@ -330,50 +330,37 @@ body {
 }
 
 /*
- * Card reflex: a diagonal specular glint that sweeps a card from its
- * top-right corner to its bottom-left on hover, click, or keyboard focus.
+ * Card ambient glow.
  *
- * It glances with the card's OWN domain hue (--primary) rather than a generic
- * white shine, so the interaction belongs to the same per-card colour system
- * as the accent rail. The card clips it via its own overflow-hidden; content
- * sits on a higher layer so the pass never dims the text.
+ * A calm, professional hover: instead of a moving stripe, the card's surface
+ * catches a soft light from its top-right corner in the card's own domain hue
+ * (--primary), fading toward the opposite corner. It reads as depth and
+ * material, not decoration. The lift, hue border and coloured shadow live on
+ * the card's utility classes; this layer is just the surface bloom.
  *
- * Motion-only: users who ask for reduced motion get a still card.
+ * The card clips it via overflow-hidden; content sits on a higher layer so the
+ * bloom never touches text legibility. Opacity-only, so reduced-motion is fine.
  */
-.reflex {
+.card-glow {
   position: absolute;
-  inset: -35%;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   opacity: 0;
-  background: linear-gradient(
-    135deg,
-    transparent 42%,
-    rgb(255 255 255 / 0.14) 47%,
-    rgb(var(--primary) / 0.34) 50%,
-    rgb(255 255 255 / 0.14) 53%,
-    transparent 58%
-  );
-  /* Start off the top-right corner. No transform transition here, so releasing
-     a hover fades the glint out and resets it instantly instead of sweeping
-     back the wrong way. */
-  transform: translate3d(62%, -62%, 0);
-  transition: opacity 0.25s ease;
+  border-radius: inherit;
+  background:
+    radial-gradient(135% 120% at 100% 0%, rgb(var(--primary) / 0.16), transparent 55%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 40%);
+  transition: opacity 0.4s ease;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .group:hover .reflex,
-  .group:focus-visible .reflex {
-    opacity: 1;
-    transform: translate3d(-62%, 62%, 0);
-    transition: transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.2s ease;
-  }
-  /* A click reads as a quicker, brighter flick of the same glint. */
-  .group:active .reflex {
-    opacity: 1;
-    transform: translate3d(-62%, 62%, 0);
-    transition: transform 0.4s cubic-bezier(0.3, 0.7, 0.3, 1), opacity 0.1s ease;
-  }
+.group:hover .card-glow,
+.group:focus-visible .card-glow {
+  opacity: 1;
+}
+/* A press reads as the light briefly intensifying. */
+.group:active .card-glow {
+  opacity: 1;
+  transition: opacity 0.1s ease;
 }
 
 /* Blog prose styling */
