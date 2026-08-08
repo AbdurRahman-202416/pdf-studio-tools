@@ -1,3 +1,4 @@
+import { brand } from "@/brand.config";
 export interface ComparisonRow {
   feature: string;
   pdfStudio: string;
@@ -29,7 +30,7 @@ export const competitors: Competitor[] = [
       { feature: "Price", pdfStudio: "Free", competitor: "$9/mo Pro" },
     ],
     takeaway:
-      "If you want unlimited daily use, multi-language OCR, and no-watermark output without a paywall, PDF Studio is the better fit.",
+      `If you want unlimited daily use, multi-language OCR, and no-watermark output without a paywall, ${brand.name} is the better fit.`,
   },
   {
     slug: "ilovepdf",
@@ -46,7 +47,7 @@ export const competitors: Competitor[] = [
       { feature: "Price", pdfStudio: "Free", competitor: "$7/mo Pro" },
     ],
     takeaway:
-      "iLovePDF is a fine generalist if you want a one-stop site with mobile apps. PDF Studio is leaner, ad-free, and no signup required.",
+      `iLovePDF is a fine generalist if you want a one-stop site with mobile apps. ${brand.name} is leaner, ad-free, and no signup required.`,
   },
   {
     slug: "adobe-acrobat",
@@ -63,7 +64,7 @@ export const competitors: Competitor[] = [
       { feature: "Price", pdfStudio: "Free", competitor: "$19.99/mo Acrobat Pro" },
     ],
     takeaway:
-      "Adobe is the right answer for heavy enterprise PDF work. For everyday merges, compressions, OCR, and document conversions, PDF Studio is faster and free.",
+      `Adobe is the right answer for heavy enterprise PDF work. For everyday merges, compressions, OCR, and document conversions, ${brand.name} is faster and free.`,
   },
   {
     slug: "pdf24",
@@ -80,7 +81,7 @@ export const competitors: Competitor[] = [
       { feature: "Files auto-delete", pdfStudio: "Yes, after 1 hour", competitor: "Yes" },
     ],
     takeaway:
-      "PDF24 is a solid free workhorse, especially on Windows. PDF Studio matches it on price while adding a cleaner mobile experience, exact target-size compression, and broader OCR.",
+      `PDF24 is a solid free workhorse, especially on Windows. ${brand.name} matches it on price while adding a cleaner mobile experience, exact target-size compression, and broader OCR.`,
   },
   {
     slug: "sejda",
@@ -97,7 +98,7 @@ export const competitors: Competitor[] = [
       { feature: "Price", pdfStudio: "Free", competitor: "$7.50/mo for unlimited" },
     ],
     takeaway:
-      "Sejda is great for occasional in-browser editing. If you hit the 3-tasks-per-hour wall or need exact file-size targets, PDF Studio removes those limits for free.",
+      `Sejda is great for occasional in-browser editing. If you hit the 3-tasks-per-hour wall or need exact file-size targets, ${brand.name} removes those limits for free.`,
   },
   {
     slug: "nitro",
@@ -114,7 +115,7 @@ export const competitors: Competitor[] = [
       { feature: "Mobile-friendly web", pdfStudio: "Yes, responsive", competitor: "Desktop-focused" },
     ],
     takeaway:
-      "Nitro suits businesses that need a licensed desktop suite with admin controls. For fast, free compressing, merging, OCR, and conversions, PDF Studio gets the job done in the browser.",
+      `Nitro suits businesses that need a licensed desktop suite with admin controls. For fast, free compressing, merging, OCR, and conversions, ${brand.name} gets the job done in the browser.`,
   },
 ];
 
