@@ -75,7 +75,10 @@ export function ExcelToPdfView() {
             "application/vnd.ms-excel.sheet.macroenabled.12": [".xlsm"],
           }}
           file={file}
-          onChange={setFile}
+          onChange={(f) => {
+            setFile(f);
+            setResult(null);
+          }}
           testId="xlsx-file"
           className="max-w-xl"
         />

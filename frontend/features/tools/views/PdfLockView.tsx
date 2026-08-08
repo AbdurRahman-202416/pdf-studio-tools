@@ -65,7 +65,6 @@ export function PdfLockView({ mode = "lock" }: PdfLockViewProps) {
       }
       badge="NEW"
       icon={isLock ? Lock : LockOpen}
-      gradient="from-slate-700 via-slate-600 to-slate-500"
     >
       <div className="space-y-6">
         <Card>
@@ -77,7 +76,10 @@ export function PdfLockView({ mode = "lock" }: PdfLockViewProps) {
               label="Upload PDF"
               accept={{ "application/pdf": [".pdf"] }}
               file={file}
-              onChange={setFile}
+              onChange={(f) => {
+                setFile(f);
+                setResult(null);
+              }}
               hint="Max 100 MB. Files auto-delete after 1 hour."
               testId="pdf-lock-drop"
             />

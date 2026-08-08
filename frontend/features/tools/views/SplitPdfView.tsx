@@ -56,7 +56,6 @@ export function SplitPdfView() {
       subtitle="Extract pages from a PDF or split every page into its own file. Free, no signup, no watermark."
       badge="NEW"
       icon={Scissors}
-      gradient="from-sky-500 via-cyan-500 to-teal-500"
     >
       <div className="space-y-6">
         <Card>
@@ -68,7 +67,10 @@ export function SplitPdfView() {
               label="Upload PDF"
               accept={{ "application/pdf": [".pdf"] }}
               file={file}
-              onChange={setFile}
+              onChange={(f) => {
+                setFile(f);
+                setResult(null);
+              }}
               hint="Max 100 MB. Files stay private and auto-delete after 1 hour."
               testId="split-pdf-drop"
             />

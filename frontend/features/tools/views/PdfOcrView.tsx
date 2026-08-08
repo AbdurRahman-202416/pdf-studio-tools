@@ -108,7 +108,10 @@ export function PdfOcrView() {
           hint="Works best with scanned/photographed pages"
           accept={{ "application/pdf": [".pdf"] }}
           file={file}
-          onChange={setFile}
+          onChange={(f) => {
+            setFile(f);
+            setResult(null);
+          }}
           testId="ocr-file"
           className="max-w-xl"
         />

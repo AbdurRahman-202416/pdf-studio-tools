@@ -105,7 +105,10 @@ export function CompressToTargetView({
           hint="Max 100 MB. Files auto-delete after 1 hour."
           accept={{ "application/pdf": [".pdf"] }}
           file={file}
-          onChange={setFile}
+          onChange={(f) => {
+            setFile(f);
+            setResult(null);
+          }}
           className="max-w-xl"
         />
 

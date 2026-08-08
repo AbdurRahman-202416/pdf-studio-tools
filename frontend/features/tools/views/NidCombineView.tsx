@@ -98,7 +98,10 @@ export function NidCombineView() {
             accept={{ "image/*": [], "application/pdf": [".pdf"] }}
             file={front}
             preview={frontPreview}
-            onChange={setFront}
+            onChange={(f) => {
+              setFront(f);
+              setResult(null);
+            }}
             testId="nid-front"
           />
           <FileDrop
@@ -107,7 +110,10 @@ export function NidCombineView() {
             accept={{ "image/*": [], "application/pdf": [".pdf"] }}
             file={back}
             preview={backPreview}
-            onChange={setBack}
+            onChange={(f) => {
+              setBack(f);
+              setResult(null);
+            }}
             testId="nid-back"
           />
         </div>

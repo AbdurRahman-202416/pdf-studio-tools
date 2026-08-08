@@ -67,7 +67,6 @@ export function PdfToJpgView() {
       subtitle="Convert each PDF page into a high-quality JPG or PNG image. Free, no signup, no watermark."
       badge="NEW"
       icon={ImageIcon}
-      gradient="from-pink-500 via-rose-500 to-orange-500"
     >
       <div className="space-y-6">
         <Card>
@@ -79,7 +78,10 @@ export function PdfToJpgView() {
               label="Upload PDF"
               accept={{ "application/pdf": [".pdf"] }}
               file={file}
-              onChange={setFile}
+              onChange={(f) => {
+                setFile(f);
+                setResult(null);
+              }}
               hint="Max 100 MB. Pages stay private and auto-delete after 1 hour."
               testId="pdf-to-jpg-drop"
             />

@@ -67,7 +67,10 @@ export function WordToPdfView() {
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
           }}
           file={file}
-          onChange={setFile}
+          onChange={(f) => {
+            setFile(f);
+            setResult(null);
+          }}
           className="max-w-xl"
         />
 

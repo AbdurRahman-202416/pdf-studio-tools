@@ -10,6 +10,7 @@ import { ShareButtons } from "@/components/share/ShareButtons";
 import { ResultPreview } from "@/features/tools/components/ResultPreview";
 import { formatBytes } from "@/lib/utils";
 import { trackEvent } from "@/lib/track";
+import { brand } from "@/brand.config";
 
 interface ToolResultProps {
   filename: string;
@@ -90,7 +91,7 @@ export function ToolResult({
               <ResultPreview output_id={output_id} filename={filename} />
             )}
             <div className="pt-3 border-t border-border/60">
-              <ShareButtons text="Just used PDF Studio for a quick PDF task, works great:" />
+              <ShareButtons text={`Just used ${brand.name} for a quick PDF task, works great:`} />
             </div>
           </CardContent>
         </Card>

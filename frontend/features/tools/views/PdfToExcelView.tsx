@@ -70,7 +70,10 @@ export function PdfToExcelView() {
           hint="Most digital PDFs work great. Image-only scans may need OCR first."
           accept={{ "application/pdf": [".pdf"] }}
           file={file}
-          onChange={setFile}
+          onChange={(f) => {
+            setFile(f);
+            setResult(null);
+          }}
           testId="bank-file"
           className="max-w-xl"
         />

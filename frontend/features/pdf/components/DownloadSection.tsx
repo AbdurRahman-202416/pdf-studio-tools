@@ -12,6 +12,7 @@ import { downloadUrl } from "@/services/api";
 import { usePDFStore } from "@/store/pdfStore";
 import { cn, formatBytes } from "@/lib/utils";
 import { trackEvent } from "@/lib/track";
+import { brand } from "@/brand.config";
 
 export function DownloadSection() {
   const result = usePDFStore((s) => s.result);
@@ -103,7 +104,7 @@ export function DownloadSection() {
                 filename={result.filename}
               />
               <div className="pt-3 border-t border-border/60">
-                <ShareButtons text="I just used PDF Studio to process my PDF, works great:" />
+                <ShareButtons text={`I just used ${brand.name} to process my PDF, works great:`} />
               </div>
             </CardContent>
           </Card>

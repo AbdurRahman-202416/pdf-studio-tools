@@ -51,7 +51,6 @@ export function RotatePdfView() {
       subtitle="Turn sideways or upside-down pages the right way up - permanently. Free, no signup, no watermark."
       badge="NEW"
       icon={RotateCw}
-      gradient="from-violet-500 via-purple-500 to-fuchsia-500"
     >
       <div className="space-y-6">
         <Card>
@@ -63,7 +62,10 @@ export function RotatePdfView() {
               label="Upload PDF"
               accept={{ "application/pdf": [".pdf"] }}
               file={file}
-              onChange={setFile}
+              onChange={(f) => {
+                setFile(f);
+                setResult(null);
+              }}
               hint="Max 100 MB. Files stay private and auto-delete after 1 hour."
               testId="rotate-pdf-drop"
             />

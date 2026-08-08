@@ -83,7 +83,10 @@ export function PassportPhotoView() {
           accept={{ "image/*": [] }}
           file={file}
           preview={preview}
-          onChange={setFile}
+          onChange={(f) => {
+            setFile(f);
+            setResult(null);
+          }}
           testId="photo-file"
           className="max-w-xl"
         />

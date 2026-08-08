@@ -3,13 +3,14 @@ import { ArrowRight } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/Card";
 import { ToolIcon } from "@/components/brand/ToolIcon";
-import { toolsByRegion } from "@/lib/seo/tool-registry";
+import { tools } from "@/lib/tools";
 import { getToolIcon } from "@/lib/seo/tool-icons";
+import { brand } from "@/brand.config";
 
 const HIGHLIGHTS = [
   "ID front + back combine - NID, student, employee, license",
   "Compress to 100KB for govt portals",
-  "Bangla OCR (Tesseract 5)",
+  "Bangla OCR - Tesseract 5, one of 100+ languages",
   "Passport-size photo PDF (35×45mm)",
 ];
 
@@ -19,8 +20,8 @@ const HIGHLIGHTS = [
  * OCR positioning. Keeps surrounding theme (Document Atelier) untouched.
  */
 export function MadeForBangladesh() {
-  const tools = toolsByRegion("BD");
-  if (!tools.length) return null;
+  const regionTools = tools.filter((t) => t.regions?.includes("BD"));
+  if (!regionTools.length) return null;
 
   return (
     <section className="space-y-8">
@@ -34,7 +35,7 @@ export function MadeForBangladesh() {
         </h2>
         <p className="mt-3 text-muted-foreground leading-relaxed">
           NID, passport, BPSC, BCS, university admissions - every portal with strict file-size limits
-          or specific photo formats. PDF Studio handles them out of the box.
+          or specific photo formats. {brand.name} handles them out of the box.
         </p>
       </div>
 
@@ -53,7 +54,7 @@ export function MadeForBangladesh() {
       </ul>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        {tools.map((t) => {
+        {regionTools.map((t) => {
           const Icon = getToolIcon(t.iconName);
           return (
             <Link key={t.slug} href={`/${t.slug}`} className="block group">
@@ -62,7 +63,7 @@ export function MadeForBangladesh() {
                   <div className="flex items-start justify-between gap-3">
                     {Icon && (
                       <ToolIcon
-                        slug={t.slug}
+                        domain={t.domain}
                         icon={Icon}
                         size={52}
                         className="transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105"
@@ -72,10 +73,10 @@ export function MadeForBangladesh() {
                   </div>
                   <div>
                     <h3 className="font-display text-lg font-medium tracking-tight">
-                      {t.displayName}
+                      {t.cardTitle}
                     </h3>
                     <p className="mt-1 text-sm text-muted-foreground leading-relaxed line-clamp-2">
-                      {t.primaryKeyword}
+                      {t.cardBlurb}
                     </p>
                   </div>
                 </CardContent>

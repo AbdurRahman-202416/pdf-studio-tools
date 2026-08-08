@@ -47,7 +47,6 @@ export function DeletePdfPagesView() {
       subtitle="Remove unwanted pages from a PDF - blank scans, wrong pages, extra copies. Free, no signup, no watermark."
       badge="NEW"
       icon={Trash2}
-      gradient="from-rose-500 via-red-500 to-orange-500"
     >
       <div className="space-y-6">
         <Card>
@@ -59,7 +58,10 @@ export function DeletePdfPagesView() {
               label="Upload PDF"
               accept={{ "application/pdf": [".pdf"] }}
               file={file}
-              onChange={setFile}
+              onChange={(f) => {
+                setFile(f);
+                setResult(null);
+              }}
               hint="Max 100 MB. Files stay private and auto-delete after 1 hour."
               testId="delete-pages-drop"
             />

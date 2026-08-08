@@ -72,7 +72,10 @@ export function PdfToWordView() {
           hint="Works best on text-based PDFs. Output opens in Word, Google Docs, or LibreOffice."
           accept={{ "application/pdf": [".pdf"] }}
           file={file}
-          onChange={setFile}
+          onChange={(f) => {
+            setFile(f);
+            setResult(null);
+          }}
           className="max-w-xl"
         />
 

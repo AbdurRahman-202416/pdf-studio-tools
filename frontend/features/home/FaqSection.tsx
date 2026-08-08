@@ -1,8 +1,9 @@
 import { JsonLd } from "@/components/seo/JsonLd";
+import { brand } from "@/brand.config";
 
 const FAQ = [
   {
-    q: "Is PDF Studio really free?",
+    q: `Is ${brand.name} really free?`,
     a: "Yes - every tool is free, with no daily limit, no signup required, and no watermark on the output. We're funded by optional donations and don't show ads.",
   },
   {
@@ -19,7 +20,7 @@ const FAQ = [
   },
   {
     q: "Do I need to install anything?",
-    a: "No. PDF Studio runs entirely in your browser; the heavy lifting happens on our server. Nothing to download or install. You can also add it to your home screen as a PWA for one-tap access.",
+    a: `No. ${brand.name} runs entirely in your browser; the heavy lifting happens on our server. Nothing to download or install. You can also add it to your home screen as a PWA for one-tap access.`,
   },
   {
     q: "Can I compress PDFs to exactly 100KB for government portals?",

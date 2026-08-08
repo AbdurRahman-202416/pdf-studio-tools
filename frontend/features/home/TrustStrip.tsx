@@ -1,11 +1,29 @@
-import { Globe2, Lock, ShieldCheck, Timer } from "lucide-react";
+import { Globe2, Lock, MonitorSmartphone, ShieldCheck, Timer } from "lucide-react";
+
+import { tools } from "@/lib/tools";
+
+/**
+ * Credibility strip, aimed at a first-time US/UK visitor.
+ *
+ * The strongest claim goes first and it is a real one: most of the catalogue
+ * never uploads anything. The count is read from the registry rather than
+ * written down, so it cannot drift.
+ *
+ * This used to lead with "Works with Bangla & 100+ languages". Multilingual
+ * support is a genuine strength, but leading a global homepage with one
+ * specific language reads as regional - so the general claim stays here and
+ * the regional framing lives behind RegionalModule.
+ */
+const clientCount = tools.filter((t) => t.runtime === "client").length;
 
 const items = [
+  { Icon: MonitorSmartphone, label: `${clientCount} tools run in your browser` },
   { Icon: Timer, label: "Files auto-delete in 1 hour" },
   { Icon: ShieldCheck, label: "No signup required, ever" },
-  { Icon: Globe2, label: "Works with Bangla & 100+ languages" },
   { Icon: Lock, label: "Free forever, no watermark" },
 ] as const;
+
+void Globe2;
 
 export function TrustStrip() {
   return (
