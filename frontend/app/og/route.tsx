@@ -1,11 +1,12 @@
 import { ImageResponse } from "next/og";
+import { brand } from "@/brand.config";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const title = (searchParams.get("title") || "PDF Studio").slice(0, 80);
+  const title = (searchParams.get("title") || `${brand.name}`).slice(0, 80);
   const subtitle = (
     searchParams.get("subtitle") ||
     "Free PDF tools, merge, compress, OCR, convert"
@@ -50,7 +51,7 @@ export async function GET(req: Request) {
           >
             📄
           </div>
-          PDF Studio
+          {brand.name}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div
@@ -68,7 +69,7 @@ export async function GET(req: Request) {
           </div>
         </div>
         <div style={{ fontSize: 22, opacity: 0.85, display: "flex" }}>
-          pdfstudio.app · Free for everyone, everywhere
+          {brand.domain} · Free for everyone, everywhere
         </div>
       </div>
     ),

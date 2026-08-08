@@ -8,7 +8,7 @@ const EFFECTIVE_DATE = "July 11, 2026";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "How PDF Studio handles your files and data: files are processed on our server and auto-deleted within one hour, no account is required, and we never sell your data.",
+    `How ${brand.name} handles your files and data: files are processed on our server and auto-deleted within one hour, no account is required, and we never sell your data.`,
   alternates: { canonical: "/privacy" },
   openGraph: {
     title: `Privacy Policy · ${siteConfig.name}`,
@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     url: `${siteConfig.url}/privacy`,
   },
 };
+import { brand } from "@/brand.config";
 
 export default function PrivacyPage() {
   return (

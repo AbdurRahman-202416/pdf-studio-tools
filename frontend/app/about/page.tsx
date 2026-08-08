@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { siteConfig } from "@/components/seo/SiteConfig";
+import { brand } from "@/brand.config";
 
 const developer = {
   name: "Abdur Rahman",
@@ -21,7 +22,7 @@ const developer = {
 
 export const metadata: Metadata = {
   title: "About the Developer",
-  description: `${developer.name}, Front-End Engineer based in Dhaka. The developer behind PDF Studio.`,
+  description: `${developer.name}, Front-End Engineer based in Dhaka. The developer behind ${brand.name}.`,
   alternates: { canonical: "/about" },
   openGraph: {
     title: `About ${developer.name}`,
@@ -45,7 +46,7 @@ export default function AboutPage() {
         className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Back to PDF Studio
+        Back to {brand.name}
       </Link>
 
       {/* Hero */}
@@ -77,7 +78,7 @@ export default function AboutPage() {
 
       {/* Short intro */}
       <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">
-        We built PDF Studio because the best free PDF tools all have catches - watermarks, daily limits, signup walls. We removed every one.
+        We built {brand.name} because the best free PDF tools all have catches - watermarks, daily limits, signup walls. We removed every one.
       </p>
 
       {/* Contact tiles, labels only (URLs hidden, links still work) */}
@@ -117,7 +118,7 @@ export default function AboutPage() {
         <p className="text-sm text-muted-foreground">
           Have feedback or want to collaborate on{" "}
           <Link href="/" className="text-primary hover:underline">
-            PDF Studio
+            {brand.name}
           </Link>
           ?
         </p>

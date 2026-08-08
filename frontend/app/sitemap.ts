@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/components/seo/SiteConfig";
-import { toolRegistry } from "@/lib/seo/tool-registry";
+import { tools as toolRegistry } from "@/lib/tools";
+import { DOMAIN_HUBS } from "@/lib/tools/domains";
 import { listPosts, listSlugs as listBlogSlugs } from "@/lib/blog";
 import { listCompetitorSlugs } from "@/content/competitors";
 
@@ -11,7 +12,9 @@ const STATIC_ROUTES = [
   "workspace",
   "blog",
   "roadmap",
+  "settings",
   "about",
+  "contact",
   "privacy",
   "terms",
 ];
@@ -26,6 +29,8 @@ const SITE_LAST_UPDATED = new Date("2026-07-11");
 export default function sitemap(): MetadataRoute.Sitemap {
   // Clean canonical routes - these are the URLs we want indexed.
   const tools = toolRegistry.map((t) => t.slug);
+  // Hubs are only emitted when they actually contain tools - see the hub route.
+  const hubs = DOMAIN_HUBS.filter((h) => toolRegistry.some((t) => t.domain === h.domain)).map((h) => h.segment);
   const blog = listBlogSlugs().map((s) => `blog/${s}`);
   const vs = listCompetitorSlugs().map((c) => `vs/${c}`);
   const toolSlugs = new Set(toolRegistry.map((t) => t.slug));
@@ -35,7 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     listPosts().map((p) => [`blog/${p.slug}`, new Date(p.date)]),
   );
 
-  return [...STATIC_ROUTES, ...tools, ...blog, ...vs].map((p) => {
+  return [...STATIC_ROUTES, ...hubs, ...tools, ...blog, ...vs].map((p) => {
     const url = p ? `${siteConfig.url}/${p}` : siteConfig.url;
     const isTool = toolSlugs.has(p);
     const isBlog = p.startsWith("blog/");

@@ -1,8 +1,9 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/Button";
+import { brand } from "@/brand.config";
 
-export const metadata = { title: "Not found · PDF Studio" };
+export const metadata = { title: `Not found · ${brand.name}` };
 
 export default function NotFound() {
   return (

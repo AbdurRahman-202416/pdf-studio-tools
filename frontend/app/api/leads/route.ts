@@ -8,8 +8,9 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as {
     email?: string;
     source?: string;
+    message?: string;
   };
-  const { email, source } = body;
+  const { email, source, message } = body;
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Invalid email" }, { status: 400 });
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         email,
         source: source ?? "footer",
+        message: message?.slice(0, 4000),
         t: Date.now(),
       }),
     });

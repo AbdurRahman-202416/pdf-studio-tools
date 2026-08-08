@@ -3,50 +3,176 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * "Document Atelier" palette - warm cream + ink + amber.
- * Inspired by editorial print: paper-white background, ink-black type,
- * one warm amber accent. No rainbow gradients.
+ * Colour is taxonomy, not decoration.
+ *
+ * Neutrals stay quiet and cool; the only saturated colour on a page is its
+ * domain accent, so users learn the catalogue's structure by hue. Accents are
+ * generated in OKLCH at fixed chroma - they read as one family, not a crayon
+ * box - then tuned per hue until each clears WCAG AA on both surfaces.
  */
 :root {
-  --background: 250 248 242;            /* warm cream */
-  --foreground: 23 21 19;               /* deep ink */
-  --muted: 240 235 224;                 /* aged paper */
-  --muted-foreground: 102 96 88;        /* warm graphite */
-  --card: 255 253 248;                  /* slightly brighter card */
-  --card-foreground: 23 21 19;
-  --border: 224 217 203;                /* warm border */
-  --input: 224 217 203;
-  --ring: 160 70 10;                    /* amber ring (WCAG AA tuned) */
-  --primary: 160 70 10;                 /* aged-whisky amber, 5.7:1 vs cream */
-  --primary-foreground: 255 253 248;
-  --secondary: 240 235 224;
-  --secondary-foreground: 23 21 19;
-  --accent: 250 232 205;                /* soft amber tint */
-  --accent-foreground: 124 56 5;
-  --destructive: 180 41 27;             /* warm vermillion */
-  --destructive-foreground: 255 253 248;
-  --success: 24 109 73;                 /* deep emerald */
+  /* Cool, faintly blue-cast neutrals. The page surface sits BELOW cards, so
+     cards read as objects on a work surface rather than boxes on a page. */
+  --background: 244 245 247;            /* surface */
+  --foreground: 20 22 28;               /* 16.6:1 on surface */
+  --muted: 234 236 240;
+  --muted-foreground: 92 98 114;        /* 5.6:1 on surface */
+  --card: 255 255 255;                  /* surface-raised */
+  --card-foreground: 20 22 28;
+  --border: 225 228 234;
+  --input: 225 228 234;
+
+  /* --primary IS the domain accent. Defaults to the pdf hue; a [data-domain]
+     wrapper overrides it further down. */
+  --ring: 192 70 55;
+  --primary: 192 70 55;
+  --primary-foreground: 255 255 255;
+  --secondary: 234 236 240;
+  --secondary-foreground: 20 22 28;
+  --accent: 255 232 227;
+  --accent-foreground: 20 22 28;
+
+  /* Feedback hues sit near the pdf/convert domain hues, so they are always
+     paired with an icon and a filled container - never a bare accent. */
+  --destructive: 206 52 89;
+  --destructive-foreground: 255 255 255;
+  --success: 0 128 79;
 }
 
 .dark {
-  --background: 13 12 11;               /* deep ink */
-  --foreground: 237 232 225;            /* warm bone */
-  --muted: 28 26 23;
-  --muted-foreground: 165 157 145;
-  --card: 22 20 18;
-  --card-foreground: 237 232 225;
-  --border: 46 41 35;
-  --input: 46 41 35;
-  --ring: 235 152 56;                   /* brighter amber for dark */
-  --primary: 235 152 56;
-  --primary-foreground: 18 14 9;
-  --secondary: 28 26 23;
-  --secondary-foreground: 237 232 225;
-  --accent: 58 38 14;
-  --accent-foreground: 250 207 142;
-  --destructive: 220 76 50;
-  --destructive-foreground: 255 253 248;
-  --success: 64 168 122;
+  --background: 12 14 19;
+  --foreground: 232 234 239;            /* 16.0:1 on surface */
+  --muted: 27 31 39;
+  --muted-foreground: 148 155 172;      /* 6.9:1 on surface */
+  --card: 20 23 30;
+  --card-foreground: 232 234 239;
+  --border: 36 40 51;
+  --input: 36 40 51;
+
+  --ring: 209 93 77;
+  --primary: 209 93 77;
+  --primary-foreground: 10 12 16;
+  --secondary: 27 31 39;
+  --secondary-foreground: 232 234 239;
+  --accent: 47 26 22;
+  --accent-foreground: 232 234 239;
+
+  --destructive: 216 81 106;
+  --destructive-foreground: 12 14 19;
+  --success: 25 158 110;
+}
+
+/* ---- domain accents: 9 domains, evenly spaced at 40deg in OKLCH ---- */
+/* Light: tuned per hue so each clears 4.5:1 on BOTH the surface and cards. */
+[data-domain="pdf"] {
+  --primary: 192 70 55;            /* 4.61:1 surface, 5.03:1 card */
+  --ring: 192 70 55;
+  --accent: 255 232 227;
+  --primary-foreground: 255 255 255;
+}
+[data-domain="text"] {
+  --primary: 170 91 0;            /* 4.58:1 surface, 4.99:1 card */
+  --ring: 170 91 0;
+  --accent: 252 236 217;
+  --primary-foreground: 255 255 255;
+}
+[data-domain="calc"] {
+  --primary: 118 116 0;            /* 4.51:1 surface, 4.92:1 card */
+  --ring: 118 116 0;
+  --accent: 239 241 218;
+  --primary-foreground: 255 255 255;
+}
+[data-domain="convert"] {
+  --primary: 0 129 48;            /* 4.60:1 surface, 5.02:1 card */
+  --ring: 0 129 48;
+  --accent: 225 245 228;
+  --primary-foreground: 255 255 255;
+}
+[data-domain="data"] {
+  --primary: 0 125 119;            /* 4.58:1 surface, 5.00:1 card */
+  --ring: 0 125 119;
+  --accent: 217 245 243;
+  --primary-foreground: 255 255 255;
+}
+[data-domain="security"] {
+  --primary: 0 117 178;            /* 4.60:1 surface, 5.02:1 card */
+  --ring: 0 117 178;
+  --accent: 219 243 255;
+  --primary-foreground: 255 255 255;
+}
+[data-domain="code"] {
+  --primary: 78 104 206;            /* 4.59:1 surface, 5.01:1 card */
+  --ring: 78 104 206;
+  --accent: 230 238 255;
+  --primary-foreground: 255 255 255;
+}
+[data-domain="image"] {
+  --primary: 145 84 185;            /* 4.61:1 surface, 5.03:1 card */
+  --ring: 145 84 185;
+  --accent: 245 233 254;
+  --primary-foreground: 255 255 255;
+}
+[data-domain="color"] {
+  --primary: 181 68 129;            /* 4.69:1 surface, 5.11:1 card */
+  --ring: 181 68 129;
+  --accent: 255 231 241;
+  --primary-foreground: 255 255 255;
+}
+
+/* Dark: constant L works here; all clear 4.5:1 on the raised card. */
+.dark [data-domain="pdf"] {
+  --primary: 209 93 77;            /* 4.60:1 card, 4.95:1 surface */
+  --ring: 209 93 77;
+  --accent: 58 30 25;
+  --primary-foreground: 10 12 16;
+}
+.dark [data-domain="text"] {
+  --primary: 190 114 0;            /* 4.78:1 card, 5.14:1 surface */
+  --ring: 190 114 0;
+  --accent: 52 34 11;
+  --primary-foreground: 10 12 16;
+}
+.dark [data-domain="calc"] {
+  --primary: 141 141 0;            /* 5.07:1 card, 5.46:1 surface */
+  --ring: 141 141 0;
+  --accent: 40 40 12;
+  --primary-foreground: 10 12 16;
+}
+.dark [data-domain="convert"] {
+  --primary: 46 158 82;            /* 5.23:1 card, 5.63:1 surface */
+  --ring: 46 158 82;
+  --accent: 21 45 26;
+  --primary-foreground: 10 12 16;
+}
+.dark [data-domain="data"] {
+  --primary: 0 161 154;            /* 5.61:1 card, 6.03:1 surface */
+  --ring: 0 161 154;
+  --accent: 2 45 43;
+  --primary-foreground: 10 12 16;
+}
+.dark [data-domain="security"] {
+  --primary: 0 148 206;            /* 5.23:1 card, 5.63:1 surface */
+  --ring: 0 148 206;
+  --accent: 10 42 56;
+  --primary-foreground: 10 12 16;
+}
+.dark [data-domain="code"] {
+  --primary: 100 126 224;            /* 4.78:1 card, 5.15:1 surface */
+  --ring: 100 126 224;
+  --accent: 30 37 61;
+  --primary-foreground: 10 12 16;
+}
+.dark [data-domain="image"] {
+  --primary: 162 105 201;            /* 4.61:1 card, 4.96:1 surface */
+  --ring: 162 105 201;
+  --accent: 45 32 55;
+  --primary-foreground: 10 12 16;
+}
+.dark [data-domain="color"] {
+  --primary: 198 91 147;            /* 4.54:1 card, 4.89:1 surface */
+  --ring: 198 91 147;
+  --accent: 55 29 41;
+  --primary-foreground: 10 12 16;
 }
 
 @theme inline {
@@ -68,7 +194,8 @@
   --color-destructive: rgb(var(--destructive));
   --color-destructive-foreground: rgb(var(--destructive-foreground));
   --color-success: rgb(var(--success));
-  --font-sans: var(--font-noto-sans);
+  --font-sans: var(--font-public-sans);
+  --font-display: var(--font-bricolage);
   --font-mono: var(--font-jetbrains-mono);
 
   /*
@@ -105,24 +232,45 @@
 html, body { height: 100%; }
 html { font-size: clamp(16px, 0.95rem + 0.25vw, 18px); }
 body {
-  font-family: var(--font-noto-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: var(--font-public-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   background: rgb(var(--background));
   color: rgb(var(--foreground));
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Display headings - sans, kept as a class so existing usages stay in sync. */
+/* Display face. Weight 500-600 on purpose - 700+ reads cheap. */
 .font-display {
-  font-family: var(--font-noto-sans), ui-sans-serif, system-ui, sans-serif;
-  font-weight: 700;
+  font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 550;
   letter-spacing: -0.02em;
+}
+
+/* Every number that represents data - byte counts, dimensions, hashes,
+   timings - is set in mono. Data should look like data. */
+.tabular {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
 *:focus-visible {
   outline: 2px solid rgb(var(--ring));
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+/*
+ * The command palette's search field is auto-focused the moment the dialog
+ * opens, so the global focus ring adds no information - and because the rule
+ * above is UNLAYERED it outranks Tailwind's layered `outline-none` utility no
+ * matter the specificity, so it has to be turned off here.
+ *
+ * It also drew 2px outside the input, which the dialog's overflow-hidden then
+ * clipped against the rounded top edge.
+ */
+[data-palette-input]:focus-visible {
+  outline: none;
 }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -182,7 +330,7 @@ body {
 }
 
 /* Blog prose styling */
-.prose h2 { font-family: var(--font-noto-sans), ui-sans-serif, system-ui, sans-serif; font-size: 1.65rem; font-weight: 700; margin-top: 1.6em; margin-bottom: 0.5em; letter-spacing: -0.02em; }
+.prose h2 { font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif; font-size: 1.65rem; font-weight: 600; margin-top: 1.6em; margin-bottom: 0.5em; letter-spacing: -0.02em; }
 .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.25em; margin-bottom: 0.5em; }
 .prose p { margin-bottom: 1em; line-height: 1.7; }
 .prose ul { list-style: disc; padding-left: 1.5em; margin-bottom: 1em; }

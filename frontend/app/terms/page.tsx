@@ -2,17 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { siteConfig } from "@/components/seo/SiteConfig";
+import { brand } from "@/brand.config";
 
 const EFFECTIVE_DATE = "July 11, 2026";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
   description:
-    "The terms for using PDF Studio's free online PDF tools: acceptable use, no warranty, and your responsibility for the files you process.",
+    `The terms for using ${brand.name}'s free online PDF tools: acceptable use, no warranty, and your responsibility for the files you process.`,
   alternates: { canonical: "/terms" },
   openGraph: {
     title: `Terms of Service · ${siteConfig.name}`,
-    description: "The terms for using PDF Studio's free online PDF tools.",
+    description: `The terms for using ${brand.name}'s free online PDF tools.`,
     url: `${siteConfig.url}/terms`,
   },
 };

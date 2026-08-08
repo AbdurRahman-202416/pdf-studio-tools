@@ -5,10 +5,11 @@ import { siteConfig } from "@/components/seo/SiteConfig";
 /**
  * Robots policy.
  *
- * Allow all public surfaces, disallow the API + widget embeds (they
- * exist for cross-origin embed only, not indexable content), and point
- * crawlers at the sitemap. Major engines get a slightly faster crawl
- * delay because our content is mostly tool pages with stable copy.
+ * Allow all public surfaces, disallow the API, and point crawlers at the
+ * sitemap. Widget embeds are deliberately NOT disallowed here: they carry a
+ * noindex meta tag, and a crawler blocked by robots.txt would never see it.
+ * Major engines get a slightly faster crawl delay because our content is
+ * mostly tool pages with stable copy.
  */
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -16,12 +17,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/widget/"],
+        disallow: ["/api/"],
       },
       {
         userAgent: ["Googlebot", "Bingbot"],
         allow: "/",
-        disallow: ["/api/", "/widget/"],
+        disallow: ["/api/"],
       },
     ],
     sitemap: `${siteConfig.url}/sitemap.xml`,

@@ -3,15 +3,16 @@ import type { Metadata } from "next";
 import { Card, CardContent } from "@/components/ui/Card";
 import { roadmap, type Status } from "@/content/roadmap";
 import { cn } from "@/lib/utils";
+import { brand } from "@/brand.config";
 
 export const metadata: Metadata = {
   title: "Roadmap – What's shipped, in progress, and coming",
   description:
-    "Transparent product roadmap for PDF Studio. See which PDF tools are live, which are being built, and which are under consideration.",
+    `Transparent product roadmap for ${brand.name}. See which PDF tools are live, which are being built, and which are under consideration.`,
   alternates: { canonical: "/roadmap" },
   openGraph: {
-    title: "Roadmap · PDF Studio",
-    description: "Public roadmap for PDF Studio.",
+    title: `Roadmap · ${brand.name}`,
+    description: `Public roadmap for ${brand.name}.`,
     url: "/roadmap",
     images: [
       {

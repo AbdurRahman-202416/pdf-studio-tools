@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { WorkspaceShell } from "@/features/pdf/components/WorkspaceShell";
+import { brand } from "@/brand.config";
 
 export const metadata: Metadata = {
   title: "Workspace",
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
     "Drag and drop PDFs to merge, compress, reorder pages, rotate, and split, all in one fast, free workspace.",
   alternates: { canonical: "/workspace" },
   openGraph: {
-    title: "Workspace · PDF Studio",
+    title: `Workspace · ${brand.name}`,
     description:
       "Drag and drop PDFs to merge, compress, reorder, rotate, and split.",
   },

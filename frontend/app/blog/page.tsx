@@ -3,16 +3,22 @@ import Link from "next/link";
 
 import { Card, CardContent } from "@/components/ui/Card";
 import { listPosts } from "@/lib/blog";
+import { brand } from "@/brand.config";
+
+const ogImage = `${brand.url}/og?title=${encodeURIComponent(
+  `${brand.name} Blog`,
+)}&subtitle=${encodeURIComponent("Guides on PDFs, OCR, and document workflows")}`;
 
 export const metadata: Metadata = {
   title: "Blog – Guides on PDF tools, OCR, and document workflows",
   description:
-    "Tutorials and guides on PDF merging, compression, OCR, document conversion, and other PDF Studio tools. Free, no signup.",
+    `Tutorials and guides on PDF merging, compression, OCR, document conversion, and other ${brand.name} tools. Free, no signup.`,
   alternates: { canonical: "/blog" },
   openGraph: {
-    title: "PDF Studio Blog",
+    title: `${brand.name} Blog`,
     description: "Tutorials and guides on PDFs, OCR, and document workflows.",
-    url: "/blog",
+    url: `${brand.url}/blog`,
+    images: [{ url: ogImage, width: 1200, height: 630 }],
   },
 };
 

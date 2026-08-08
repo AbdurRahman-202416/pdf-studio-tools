@@ -1,29 +1,31 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import type React from "react";
 
-import { getToolIcon } from "@/lib/seo/tool-icons";
 
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
-import { ToolIcon } from "@/components/brand/ToolIcon";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/components/seo/SiteConfig";
 import { TrustStrip } from "@/features/home/TrustStrip";
 import { FaqSection } from "@/features/home/FaqSection";
 import { FeaturesAccordion } from "@/features/home/FeaturesAccordion";
 import { MadeForBangladesh } from "@/features/home/MadeForBangladesh";
-import { toolRegistry } from "@/lib/seo/tool-registry";
+import { DomainSections } from "@/features/home/DomainSections";
+import { CategoryGrid } from "@/features/home/CategoryGrid";
+import { CommandPaletteHeroTrigger } from "@/components/layout/CommandPalette";
+import { ToolSlider } from "@/components/ui/ToolSlider";
+import { RegionalModule } from "@/components/layout/RegionalModule";
+import { featuredTools, tools as toolRegistry } from "@/lib/tools";
+import { DOMAIN_HUBS } from "@/lib/tools/domains";
 
-const specializedTools = toolRegistry.map((t) => ({
-  slug: t.slug,
-  href: `/${t.slug}`,
-  title: t.displayName,
-  description: t.cardCopy,
-  iconName: t.iconName,
-}));
+const toolCount = toolRegistry.length;
+const categoryCount = DOMAIN_HUBS.filter((h) =>
+  toolRegistry.some((t) => t.domain === h.domain),
+).length;
 
 export default function Home() {
+  const featured = featuredTools();
+
   return (
     <div className="space-y-20">
       <JsonLd
@@ -54,23 +56,32 @@ export default function Home() {
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
             <Sparkles className="h-3 w-3 text-primary" /> Free · no signup · no watermark
           </span>
+
+          {/*
+            The H1 used to say "Free PDF tools" while the page title said
+            "every file tool" - a direct contradiction, and false to a
+            catalogue that is only 37% PDF. Counts come from the registry so
+            they cannot drift out of date.
+          */}
           <h1 className="font-display mt-7 text-5xl sm:text-6xl lg:text-7xl font-medium leading-[0.95] tracking-tight">
-            Free PDF tools
+            Every file &amp; everyday
             <br className="hidden sm:block" />{" "}
-            <em className="italic font-normal gradient-text">that&nbsp;just&nbsp;work</em>
-            <span className="block mt-2 text-base sm:text-lg lg:text-xl font-normal text-muted-foreground tracking-normal">
-              compress, merge, convert, OCR, sign - no signup, no watermark.
-            </span>
+            <em className="italic font-normal gradient-text">tool&nbsp;you&nbsp;need</em>
           </h1>
-          <p className="mt-6 text-base sm:text-md text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            {toolRegistry.length} focused utilities for the things you actually need to do with PDFs.
-            Free forever. No daily limits. Files auto-delete in one hour.
-            Works perfectly with English, Bangla, and 100+ other languages.
+
+          <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            {`${toolCount} free tools across ${categoryCount} categories \u2014 PDF, images, calculators, developer utilities, text, QR & barcodes, colour, data and security. No signup, no daily limits, no watermarks.`}
           </p>
-          <div className="mt-8 flex items-center justify-center gap-3 flex-wrap">
+
+          {/* Search-first: the fastest route to any of 81 tools. */}
+          <div className="mt-8 max-w-xl mx-auto">
+            <CommandPaletteHeroTrigger />
+          </div>
+
+          <div className="mt-4 flex items-center justify-center gap-3 flex-wrap">
             <Link href="/tools" data-testid="cta-tools">
               <Button size="lg">
-                Explore tools <ArrowRight className="h-4 w-4" />
+                Browse all {toolCount} tools <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/workspace" data-testid="cta-workspace">
@@ -84,25 +95,44 @@ export default function Home() {
         <div className="mt-10 max-w-3xl mx-auto">
           <TrustStrip />
         </div>
+      </section>
 
-        <div className="mt-8 grid sm:grid-cols-3 gap-3 max-w-3xl mx-auto text-sm">
-          {[
-            "Drag & drop, reorder, download",
-            "Works with Bangla & 100+ languages",
-            "Files auto-delete in 1 hour",
-          ].map((line) => (
-            <div
-              key={line}
-              className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2"
-            >
-              <CheckCircle2 className="h-4 w-4 text-success" />
-              <span>{line}</span>
-            </div>
-          ))}
+      {/* Breadth, proven in one viewport rather than after nine scrolled sections. */}
+      <section aria-labelledby="categories-heading" className="space-y-6">
+        <div className="text-center max-w-2xl mx-auto">
+          <span className="inline-block text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            Browse by category
+          </span>
+          <h2
+            id="categories-heading"
+            className="font-display mt-3 text-3xl sm:text-4xl font-medium tracking-tight"
+          >
+            {categoryCount} categories, {toolCount} tools
+          </h2>
         </div>
+        <CategoryGrid />
       </section>
 
       <FeaturesAccordion />
+
+      <section aria-labelledby="popular-heading" className="space-y-6">
+        <div className="text-center max-w-2xl mx-auto">
+          <span className="inline-block text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            Most used
+          </span>
+          <h2
+            id="popular-heading"
+            className="font-display mt-3 text-4xl sm:text-5xl font-medium tracking-tight"
+          >
+            Popular tools
+          </h2>
+          <p className="mt-3 text-muted-foreground leading-relaxed">
+            A cross-section of the catalogue - the ones people reach for most.
+          </p>
+        </div>
+        {/* The only client island on this page; everything below is static HTML. */}
+        <ToolSlider tools={featured} label="Popular tools" />
+      </section>
 
       <section id="tools" className="space-y-10">
         <div className="text-center max-w-2xl mx-auto">
@@ -110,49 +140,21 @@ export default function Home() {
             The collection
           </span>
           <h2 className="font-display mt-3 text-4xl sm:text-5xl font-medium tracking-tight">
-            Every PDF tool you actually need
+            {toolRegistry.length} tools, grouped by what they do
           </h2>
           <p className="mt-3 text-muted-foreground leading-relaxed">
-            Compress, merge, convert PDF to JPG / PNG / Word / Excel, OCR, lock, unlock, sign - all free.
+            PDFs, images, calculators, developer utilities and more. Most run entirely in your
+            browser.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {specializedTools.map((tool) => {
-            const Icon = getToolIcon(tool.iconName);
-            return (
-              <Link key={tool.href} href={tool.href} className="block group">
-                <Card className="relative h-full overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_-12px_rgb(var(--primary)/0.25)]">
-                  <span className="absolute inset-x-6 top-0 h-px rule-ink" aria-hidden />
-                  <span className="absolute inset-x-6 top-0 h-px rule-amber opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden />
-                  <CardContent className="pt-7 space-y-5">
-                    <div className="flex items-start justify-between gap-3">
-                      {Icon && (
-                        <ToolIcon
-                          slug={tool.slug}
-                          icon={Icon}
-                          size={60}
-                          className="transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105"
-                        />
-                      )}
-                      <ArrowRight className="mt-3 h-4 w-4 text-muted-foreground -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary transition" />
-                    </div>
-                    <div>
-                      <h3 className="font-display text-xl font-medium tracking-tight">
-                        {tool.title}
-                      </h3>
-                      <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
-                        {tool.description}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
+        <DomainSections />
       </section>
 
-      <MadeForBangladesh />
+      {/* Regional tools stay in the catalogue; the regional framing is shown
+          only where it means something. See components/layout/RegionalModule. */}
+      <RegionalModule regions={["BD", "IN"]}>
+        <MadeForBangladesh />
+      </RegionalModule>
 
       <FaqSection />
 

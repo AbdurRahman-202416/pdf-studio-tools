@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Noto_Sans } from "next/font/google";
+import { Bricolage_Grotesque, JetBrains_Mono, Public_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -10,11 +10,26 @@ import { Plausible } from "@/components/analytics/Plausible";
 import { InstallPwaPrompt } from "@/components/share/InstallPwaPrompt";
 import { siteConfig } from "@/components/seo/SiteConfig";
 import { KeepAlive } from "@/components/system/KeepAlive";
+import { AdSenseScript } from "@/components/ads/AdSenseScript";
 
-const notoSans = Noto_Sans({
-  variable: "--font-noto-sans",
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "600", "700"],
+/**
+ * Three faces, three jobs.
+ *
+ * Display is a variable grotesque with actual character - deliberately not
+ * Inter or Geist, which are the default on every AI-built site. Body is a
+ * clean neutral that stays out of the way. Mono carries every number that
+ * represents data, so data looks like data.
+ */
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+});
+const publicSans = Public_Sans({
+  variable: "--font-public-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 const jetbrainsMono = JetBrains_Mono({
@@ -75,7 +90,19 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = { themeColor: siteConfig.themeColor };
+/**
+ * Theme colour follows the page surface in each scheme.
+ *
+ * It used to be a single value taken from the PDF domain hue, which meant the
+ * mobile address bar rendered PDF-red on a mortgage calculator. Matching the
+ * surface makes the browser chrome blend instead.
+ */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: siteConfig.themeColorLight },
+    { media: "(prefers-color-scheme: dark)", color: siteConfig.themeColorDark },
+  ],
+};
 
 export default function RootLayout({
   children,
@@ -84,7 +111,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${notoSans.variable} ${jetbrainsMono.variable}`}
+      className={`${publicSans.variable} ${bricolage.variable} ${jetbrainsMono.variable}`}
     >
       <head>
         <script
@@ -103,6 +130,7 @@ export default function RootLayout({
       <body className="min-h-full">
         <Plausible />
         <KeepAlive />
+        <AdSenseScript />
         <ThemeProvider>
           <AppShell>{children}</AppShell>
           <InstallPwaPrompt />
