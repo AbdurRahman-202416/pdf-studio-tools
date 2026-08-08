@@ -11,16 +11,17 @@ test.describe("Tools hub", () => {
   test("tools index lists all tools and links to ID card combiner", async ({ page }) => {
     await page.goto("/tools");
     await expect(page.getByRole("heading", { name: /actually fit your workflow/i })).toBeVisible();
-    await expect(page.getByTestId("tool-id-card-to-pdf")).toBeVisible();
-    await expect(page.getByTestId("tool-pdf-ocr-online-free")).toBeVisible();
-    await expect(page.getByTestId("tool-pdf-to-excel-converter")).toBeVisible();
-    await expect(page.getByTestId("tool-passport-photo-to-pdf")).toBeVisible();
-    await page.getByTestId("tool-id-card-to-pdf").click();
-    await expect(page).toHaveURL(/\/tools\/id-card-to-pdf$/);
+    await expect(page.getByTestId("tool-nid-combine")).toBeVisible();
+    await expect(page.getByTestId("tool-pdf-ocr")).toBeVisible();
+    await expect(page.getByTestId("tool-pdf-to-excel")).toBeVisible();
+    await expect(page.getByTestId("tool-passport-photo-pdf")).toBeVisible();
+    await page.getByTestId("tool-nid-combine").click();
+    await expect(page).toHaveURL(/\/nid-combine$/);
   });
 
   test("ID card combiner uploads front + back and produces a PDF", async ({ page }) => {
-    await page.goto("/tools/id-card-to-pdf");
+    await page.goto("/nid-combine");
+    await page.waitForLoadState("networkidle");
 
     await page.getByTestId("nid-front-input").setInputFiles({
       name: "front.png",
@@ -43,14 +44,15 @@ test.describe("Tools hub", () => {
   });
 
   test("PDF OCR page shows engine status", async ({ page }) => {
-    await page.goto("/tools/pdf-ocr-online-free");
-    await expect(page.getByText(/Tesseract/)).toBeVisible({ timeout: 10_000 });
+    await page.goto("/pdf-ocr");
+    await page.waitForLoadState("networkidle");
     // Engine should be ready in CI (we installed tesseract)
-    await expect(page.getByText(/Tesseract ready/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/Tesseract ready/).first()).toBeVisible({ timeout: 10_000 });
   });
 
   test("PDF to Excel converts a generated PDF", async ({ page }) => {
-    await page.goto("/tools/pdf-to-excel-converter");
+    await page.goto("/pdf-to-excel");
+    await page.waitForLoadState("networkidle");
     const bytes = await makeSamplePDF("Bank", 1);
     await page.getByTestId("bank-file-input").setInputFiles({
       name: "statement.pdf",
@@ -66,11 +68,12 @@ test.describe("Tools hub", () => {
       errorToast.waitFor({ state: "visible", timeout: 30_000 }).catch(() => null),
     ]);
     // The page didn't crash, that's our main contract
-    await expect(page.getByRole("heading", { name: /pdf to excel/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /pdf to excel/i })).toBeVisible();
   });
 
   test("Photo to PDF generates an A4 sheet from an image", async ({ page }) => {
-    await page.goto("/tools/passport-photo-to-pdf");
+    await page.goto("/passport-photo-pdf");
+    await page.waitForLoadState("networkidle");
     await page.getByTestId("photo-file-input").setInputFiles({
       name: "selfie.png",
       mimeType: "image/png",
@@ -90,9 +93,9 @@ test.describe("Tools hub", () => {
 
   test("renamed BD tool slugs resolve (Task 7 scope)", async ({ page }) => {
     const slugs = [
-      "/tools/pdf-ocr-online-free",
-      "/tools/id-card-to-pdf",
-      "/tools/pdf-to-excel-converter",
+      "/pdf-ocr",
+      "/nid-combine",
+      "/pdf-to-excel",
     ];
     for (const slug of slugs) {
       const resp = await page.goto(slug);
@@ -102,10 +105,10 @@ test.describe("Tools hub", () => {
 
   test("renamed tool slugs resolve (Task 8 scope)", async ({ page }) => {
     const slugs = [
-      "/tools/pdf-to-jpg-high-quality",
-      "/tools/password-protect-pdf-online",
-      "/tools/unlock-pdf-with-password-online",
-      "/tools/passport-photo-to-pdf",
+      "/pdf-to-jpg",
+      "/lock-pdf",
+      "/unlock-pdf",
+      "/passport-photo-pdf",
     ];
     for (const slug of slugs) {
       const resp = await page.goto(slug);
@@ -115,13 +118,15 @@ test.describe("Tools hub", () => {
 
   test("legacy slugs 301 to new slugs", async ({ request }) => {
     const mappings = [
-      ["/tools/bangla-ocr", "/tools/pdf-ocr-online-free"],
-      ["/tools/nid-combine", "/tools/id-card-to-pdf"],
-      ["/tools/bank-to-excel", "/tools/pdf-to-excel-converter"],
-      ["/tools/pdf-to-jpg", "/tools/pdf-to-jpg-high-quality"],
-      ["/tools/pdf-lock", "/tools/password-protect-pdf-online"],
-      ["/tools/photo-to-pdf", "/tools/passport-photo-to-pdf"],
-      ["/tools/govt-forms", "/tools"],
+      ["/tools/bangla-ocr", "/pdf-ocr"],
+      ["/tools/nid-combine", "/nid-combine"],
+      ["/tools/bank-to-excel", "/pdf-to-excel"],
+      ["/tools/pdf-to-jpg", "/pdf-to-jpg"],
+      ["/tools/pdf-lock", "/lock-pdf"],
+      ["/tools/photo-to-pdf", "/passport-photo-pdf"],
+      ["/tools/govt-forms", "/compress-pdf-to-100kb"],
+      ["/tools/compress-pdf-without-losing-quality", "/compress-pdf"],
+      ["/tools/merge-large-pdf-files-online", "/merge-pdf"],
     ];
     for (const [from, to] of mappings) {
       const resp = await request.get(from, { maxRedirects: 0 });
@@ -132,26 +137,35 @@ test.describe("Tools hub", () => {
     }
   });
 
-  test("sitemap contains all 9 tool slugs", async ({ request }) => {
+  test("sitemap lists canonical tool slugs, not legacy ones", async ({ request }) => {
     const resp = await request.get("/sitemap.xml");
     const body = await resp.text();
     const required = [
-      "/tools/compress-pdf-without-losing-quality",
-      "/tools/merge-large-pdf-files-online",
-      "/tools/pdf-to-jpg-high-quality",
-      "/tools/password-protect-pdf-online",
-      "/tools/unlock-pdf-with-password-online",
-      "/tools/pdf-ocr-online-free",
-      "/tools/id-card-to-pdf",
-      "/tools/passport-photo-to-pdf",
-      "/tools/pdf-to-excel-converter",
+      "/compress-pdf",
+      "/merge-pdf",
+      "/pdf-to-jpg",
+      "/lock-pdf",
+      "/unlock-pdf",
+      "/pdf-ocr",
+      "/nid-combine",
+      "/passport-photo-pdf",
+      "/pdf-to-excel",
+      "/sign-pdf",
+      "/split-pdf",
+      "/rotate-pdf",
+      "/delete-pdf-pages",
     ];
     for (const slug of required) {
-      expect(body).toContain(slug);
+      expect(body, `sitemap should list ${slug}`).toContain(`${slug}</loc>`);
     }
-    // and no longer contains:
-    for (const old of ["bangla-ocr", "nid-combine", "bank-to-excel", "govt-forms"]) {
-      expect(body).not.toContain(`/tools/${old}`);
+    // Legacy keyword slugs are 308-redirected and must never be indexed.
+    for (const old of [
+      "/tools/compress-pdf-without-losing-quality",
+      "/tools/id-card-to-pdf",
+      "/tools/pdf-ocr-online-free",
+      "/tools/bangla-ocr",
+    ]) {
+      expect(body, `sitemap must not list legacy ${old}`).not.toContain(old);
     }
   });
 });

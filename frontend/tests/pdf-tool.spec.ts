@@ -1,14 +1,17 @@
 import { expect, test } from "@playwright/test";
 import { makeSamplePDF } from "./fixtures/make-pdf";
+import { brand } from "@/brand.config";
 
-test.describe("PDF Studio", () => {
+test.describe(`${brand.name}`, () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/workspace");
   });
 
   test("landing page links to workspace", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: /PDF toolkit/i })).toBeVisible();
+    // The hero was deliberately rebroadened from "Free PDF tools" - the site is
+    // 81 tools across 9 categories, only 37% of them PDF.
+    await expect(page.getByRole("heading", { name: /Every file .* tool you need/i })).toBeVisible();
     await page.getByTestId("cta-workspace").click();
     await expect(page).toHaveURL(/\/workspace$/);
     await expect(page.getByTestId("upload-zone")).toBeVisible();
