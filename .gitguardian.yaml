@@ -1,0 +1,25 @@
+# GitGuardian / ggshield configuration.
+#
+# The entries below are NOT real credentials. They are example values that the
+# tools themselves need to function, and they are reviewed false positives:
+#
+#   - The JWT decoder ships a sample token so users see a decode before pasting
+#     their own. It is the well-known public jwt.io demo token ("Ada Lovelace")
+#     with a literal "dummy-signature" - it signs nothing and grants nothing.
+#   - The password-strength checker uses "P@ssw0rd1" as its canonical example of
+#     a WEAK password, to explain why symbol-counting checkers are misleading.
+#
+# Nothing here is secret, so nothing needs rotating. These ignores stop future
+# scans from re-flagging the example data. Real secrets are never committed:
+# .env / .env.local are gitignored and the backend reads all config from the
+# environment at runtime.
+version: 2
+
+secret:
+  ignored-matches:
+    - name: "JWT decoder sample token (public jwt.io demo, dummy signature)"
+      match: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFkYSBMb3ZlbGFjZSIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoxOTAwMDAwMDAwfQ.dummy-signature"
+    - name: "JWT decoder placeholder token"
+      match: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMifQ.signature"
+    - name: "Weak-password teaching example in password-strength-checker"
+      match: "P@ssw0rd1"
