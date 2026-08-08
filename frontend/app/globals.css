@@ -329,6 +329,53 @@ body {
     transparent 100%);
 }
 
+/*
+ * Card reflex: a diagonal specular glint that sweeps a card from its
+ * top-right corner to its bottom-left on hover, click, or keyboard focus.
+ *
+ * It glances with the card's OWN domain hue (--primary) rather than a generic
+ * white shine, so the interaction belongs to the same per-card colour system
+ * as the accent rail. The card clips it via its own overflow-hidden; content
+ * sits on a higher layer so the pass never dims the text.
+ *
+ * Motion-only: users who ask for reduced motion get a still card.
+ */
+.reflex {
+  position: absolute;
+  inset: -35%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 42%,
+    rgb(255 255 255 / 0.14) 47%,
+    rgb(var(--primary) / 0.34) 50%,
+    rgb(255 255 255 / 0.14) 53%,
+    transparent 58%
+  );
+  /* Start off the top-right corner. No transform transition here, so releasing
+     a hover fades the glint out and resets it instantly instead of sweeping
+     back the wrong way. */
+  transform: translate3d(62%, -62%, 0);
+  transition: opacity 0.25s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .group:hover .reflex,
+  .group:focus-visible .reflex {
+    opacity: 1;
+    transform: translate3d(-62%, 62%, 0);
+    transition: transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.2s ease;
+  }
+  /* A click reads as a quicker, brighter flick of the same glint. */
+  .group:active .reflex {
+    opacity: 1;
+    transform: translate3d(-62%, 62%, 0);
+    transition: transform 0.4s cubic-bezier(0.3, 0.7, 0.3, 1), opacity 0.1s ease;
+  }
+}
+
 /* Blog prose styling */
 .prose h2 { font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif; font-size: 1.65rem; font-weight: 600; margin-top: 1.6em; margin-bottom: 0.5em; letter-spacing: -0.02em; }
 .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.25em; margin-bottom: 0.5em; }

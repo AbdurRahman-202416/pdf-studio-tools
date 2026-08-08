@@ -13,7 +13,9 @@ interface ThemeState {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      theme: "system",
+      // Dark by default. A returning visitor's saved choice (persisted under
+      // "pdf-tool-theme") still wins; this is only the first-visit default.
+      theme: "dark",
       setTheme: (t) => set({ theme: t }),
     }),
     { name: "pdf-tool-theme" },

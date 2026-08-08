@@ -48,9 +48,15 @@ export function ToolCard({
         {/* Domain accent rail. */}
         <span
           aria-hidden
-          className="absolute inset-y-0 left-0 w-[3px] bg-primary opacity-70 transition-opacity group-hover:opacity-100"
+          className="absolute inset-y-0 left-0 z-[1] w-[3px] bg-primary opacity-70 transition-opacity group-hover:opacity-100"
         />
 
+        {/* Domain-hued reflex that sweeps top-right -> bottom-left on
+            hover/click/focus. See .reflex in globals.css. */}
+        <span aria-hidden className="reflex" />
+
+        {/* Content sits above the reflex so the glint never dims the text. */}
+        <div className="relative z-[1]">
         <div className="flex items-start justify-between gap-3">
           {Icon && (
             <ToolIcon
@@ -83,6 +89,7 @@ export function ToolCard({
             <Zap aria-hidden className="h-2.5 w-2.5" /> Never uploaded
           </span>
         )}
+        </div>
       </article>
     </Link>
   );

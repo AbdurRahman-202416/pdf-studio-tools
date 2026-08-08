@@ -119,10 +119,11 @@ export default function RootLayout({
             __html: `
               try {
                 var s = JSON.parse(localStorage.getItem('pdf-tool-theme') || '{}');
-                var t = (s && s.state && s.state.theme) || 'system';
+                // Dark is the first-visit default; a saved preference overrides it.
+                var t = (s && s.state && s.state.theme) || 'dark';
                 var dark = t === 'dark' || (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                if (dark) document.documentElement.classList.add('dark');
-              } catch (e) {}
+                document.documentElement.classList.toggle('dark', dark);
+              } catch (e) { document.documentElement.classList.add('dark'); }
             `,
           }}
         />
