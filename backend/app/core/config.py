@@ -8,6 +8,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    # Brand name. The frontend's brand.config.ts is the source of truth; this
+    # only surfaces in the OpenAPI docs title. Override with APP_NAME so a
+    # rename does not need a code change here.
     APP_NAME: str = "PDF Studio API"
     APP_VERSION: str = "1.0.0"
     ENVIRONMENT: str = "development"  # development | production
@@ -29,6 +32,10 @@ class Settings(BaseSettings):
     # a few KB of zip into gigabytes of XML. These cap the blast radius.
     MAX_PDF_PAGES: int = 500          # reject documents with more pages than this
     MAX_RENDER_PIXELS: int = 40_000_000  # ~40 MP ceiling per rasterized page
+    # Size of the shared thread pool all blocking tool work runs in. Each
+    # rasterizing request can peak at ~240 MB, so this is effectively the
+    # instance's memory budget divided by that.
+    HEAVY_CONCURRENCY: int = 4
     MAX_ZIP_RATIO: int = 200         # max uncompressed/compressed ratio for docx/xlsx
     MAX_ZIP_UNCOMPRESSED_MB: int = 400   # absolute cap on decompressed office-XML size
 

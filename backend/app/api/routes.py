@@ -118,6 +118,8 @@ async def get_metadata(file_id: str):
     responses={200: {"content": {"image/png": {}}}},
 )
 async def get_thumbnail(file_id: str, page_index: int, w: int = 220):
+    # Unclamped, ?w=15000 rendered a ~1 GB pixmap from a plain GET.
+    w = max(40, min(1600, w))
     find_upload(file_id)
     png = await asyncio.to_thread(pdf_service.render_thumbnail, file_id, page_index, w)
     return Response(content=png, media_type="image/png", headers={"Cache-Control": "public, max-age=300"})

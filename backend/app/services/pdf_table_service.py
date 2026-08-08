@@ -122,6 +122,10 @@ def _write_table_block(
 
     for i, row in enumerate(body):
         for col_idx, value in enumerate(row, start=1):
+            # openpyxl types a leading "=" as a live formula - PDF-extracted
+            # text must never execute when the workbook opens.
+            if isinstance(value, str) and value.startswith("="):
+                value = "'" + value
             cell = ws.cell(row_cursor, col_idx, value)
             cell.alignment = LEFT_TOP
             cell.border = THIN_BORDER

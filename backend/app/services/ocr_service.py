@@ -63,7 +63,14 @@ def _ocr_image(img: Image.Image, lang: str) -> str:
     # PSM 3 = automatic page segmentation (best general-purpose); OEM 3 = default LSTM
     config = "--psm 3 --oem 3"
     try:
-        return pytesseract.image_to_string(img, lang=lang, config=config)
+        # pytesseract's default is timeout=0 (unlimited); a large page can pin
+        # the subprocess for many minutes with nothing to reclaim it.
+        return pytesseract.image_to_string(img, lang=lang, config=config, timeout=120)
+    except RuntimeError as exc:
+        # pytesseract raises RuntimeError("Tesseract process timeout") on expiry.
+        raise OCRError(
+            "OCR timed out on one page. Try fewer pages or a smaller scan."
+        ) from exc
     except pytesseract.TesseractError as exc:  # type: ignore
         msg = str(exc).lower()
         if "not loaded" in msg or "failed loading" in msg:

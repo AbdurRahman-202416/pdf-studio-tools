@@ -28,8 +28,10 @@ from app.models.schemas import (
     WordToPdfResponse,
 )
 from app.services import (
+    heic_service,
     id_card_service,
     ocr_service,
+    pdf_edit_service,
     pdf_image_service,
     pdf_lock_service,
     pdf_pages_service,
@@ -309,7 +311,17 @@ async def photo_to_pdf(
     if size == "custom":
         if not width_mm or not height_mm:
             raise HTTPException(400, "Custom size requires width_mm and height_mm")
+        # Bound to plausible photo sizes. Unchecked, width_mm=99999 asked
+        # Pillow for a ~1.4e12-pixel canvas - instant OOM from a 2 KB upload
+        # (the decompression-bomb guard only covers decode, not construction).
+        if not (10 <= float(width_mm) <= 300 and 10 <= float(height_mm) <= 300):
+            raise HTTPException(400, "Custom sizes must be between 10 and 300 mm.")
         custom = (float(width_mm), float(height_mm))
+
+    # Pillow's colour parser accepts names and #RRGGBB; anything else raises a
+    # bare ValueError deep inside the service, which surfaced as a 500.
+    if not re.fullmatch(r"[a-zA-Z]{3,25}|#[0-9a-fA-F]{6}", background):
+        raise HTTPException(400, "background must be a colour name or #RRGGBB.")
 
     try:
         output_id, out, info = await asyncio.to_thread(
@@ -322,6 +334,8 @@ async def photo_to_pdf(
         )
     except photo_service.PhotoError as exc:
         raise HTTPException(400, str(exc))
+    except ValueError as exc:
+        raise HTTPException(400, f"Could not build that sheet: {exc}")
 
     return {
         "output_id": output_id,
@@ -679,6 +693,8 @@ async def jpg_to_pdf(
         raise HTTPException(400, "No images provided")
     if len(files) > 50:
         raise HTTPException(400, "Max 50 images per conversion")
+    # An oversized margin inverts the drawable rect (ValueError -> 500).
+    margin_mm = max(0.0, min(50.0, margin_mm))
 
     images_bytes: list[bytes] = []
     for f in files:
@@ -702,6 +718,211 @@ async def jpg_to_pdf(
         "size_bytes": out.stat().st_size,
         **info,
     }
+
+
+
+# ---------- HEIC → JPG ---------- #
+
+
+@router.post(
+    "/heic-to-jpg",
+    tags=["tools-convert"],
+    summary="Convert an Apple HEIC/HEIF photo to JPEG",
+    description=(
+        "The one image tool that runs server-side: no browser outside Safari can "
+        "decode HEIC, and the JavaScript decoder is ~1 MB. Resolution is preserved "
+        "and EXIF is carried through. Output is deleted after the usual TTL."
+    ),
+)
+async def heic_to_jpg(file: UploadFile = File(...), quality: int = Form(92)):
+    from app.core.config import settings
+
+    data = await file.read()
+    if not data:
+        raise HTTPException(400, "The uploaded file was empty.")
+    if len(data) > settings.max_upload_bytes:
+        raise HTTPException(413, f"Upload exceeds the {settings.MAX_UPLOAD_MB} MB limit.")
+    if not heic_service.looks_like_heif(data):
+        raise HTTPException(400, "That file is not a HEIC or HEIF image.")
+
+    quality = max(40, min(100, quality))
+    try:
+        output_id, filename, size = await asyncio.to_thread(
+            heic_service.convert_to_jpeg, data, quality,
+        )
+    except heic_service.HeicError as exc:
+        raise HTTPException(400, str(exc))
+
+    return {"output_id": output_id, "filename": filename, "size_bytes": size}
+
+
+
+# ---------- PDF editing: watermark / numbers / crop / flatten / organize ---------- #
+
+
+def _read_pdf(data: bytes) -> None:
+    from app.core.config import settings
+
+    if not data:
+        raise HTTPException(400, "The uploaded file was empty.")
+    if len(data) > settings.max_upload_bytes:
+        raise HTTPException(413, f"Upload exceeds the {settings.MAX_UPLOAD_MB} MB limit.")
+    if not data.startswith(b"%PDF"):
+        raise HTTPException(400, "That file is not a PDF.")
+
+
+@router.post("/pdf/watermark", tags=["tools-edit"], summary="Stamp text across every page")
+async def pdf_watermark(
+    file: UploadFile = File(...),
+    text: str = Form(...),
+    opacity: float = Form(0.25),
+    rotation: int = Form(45),
+    font_size: int = Form(42),
+    tile: bool = Form(True),
+    pages: str = Form("all"),
+):
+    data = await file.read()
+    _read_pdf(data)
+    try:
+        output_id, size = await asyncio.to_thread(
+            pdf_edit_service.watermark, data, text,
+            opacity=opacity, rotation=rotation, font_size=font_size, tile=tile, pages=pages,
+        )
+    except pdf_edit_service.PdfEditError as exc:
+        raise HTTPException(400, str(exc))
+    return {"output_id": output_id, "filename": "watermarked.pdf", "size_bytes": size}
+
+
+@router.post("/pdf/page-numbers", tags=["tools-edit"], summary="Add page numbers")
+async def pdf_page_numbers(
+    file: UploadFile = File(...),
+    position: str = Form("bottom-center"),
+    start_at: int = Form(1),
+    fmt: str = Form("{n}"),
+    font_size: int = Form(11),
+    skip_first: bool = Form(False),
+):
+    data = await file.read()
+    _read_pdf(data)
+    try:
+        output_id, size = await asyncio.to_thread(
+            pdf_edit_service.page_numbers, data,
+            position=position, start_at=start_at, fmt=fmt,
+            font_size=font_size, skip_first=skip_first,
+        )
+    except pdf_edit_service.PdfEditError as exc:
+        raise HTTPException(400, str(exc))
+    return {"output_id": output_id, "filename": "numbered.pdf", "size_bytes": size}
+
+
+@router.post("/pdf/crop", tags=["tools-edit"], summary="Trim page margins")
+async def pdf_crop(
+    file: UploadFile = File(...),
+    top: float = Form(0),
+    right: float = Form(0),
+    bottom: float = Form(0),
+    left: float = Form(0),
+    pages: str = Form("all"),
+):
+    data = await file.read()
+    _read_pdf(data)
+    try:
+        output_id, size = await asyncio.to_thread(
+            pdf_edit_service.crop, data,
+            top=top, right=right, bottom=bottom, left=left, pages=pages,
+        )
+    except pdf_edit_service.PdfEditError as exc:
+        raise HTTPException(400, str(exc))
+    return {"output_id": output_id, "filename": "cropped.pdf", "size_bytes": size}
+
+
+@router.post("/pdf/flatten", tags=["tools-edit"], summary="Bake forms and annotations into the page")
+async def pdf_flatten(file: UploadFile = File(...)):
+    data = await file.read()
+    _read_pdf(data)
+    try:
+        output_id, size = await asyncio.to_thread(pdf_edit_service.flatten, data)
+    except pdf_edit_service.PdfEditError as exc:
+        raise HTTPException(400, str(exc))
+    return {"output_id": output_id, "filename": "flattened.pdf", "size_bytes": size}
+
+
+@router.post("/pdf/organize", tags=["tools-organize"], summary="Reorder or subset pages")
+async def pdf_organize(file: UploadFile = File(...), order: str = Form(...)):
+    data = await file.read()
+    _read_pdf(data)
+    try:
+        output_id, size = await asyncio.to_thread(pdf_edit_service.organize, data, order)
+    except pdf_edit_service.PdfEditError as exc:
+        raise HTTPException(400, str(exc))
+    return {"output_id": output_id, "filename": "organized.pdf", "size_bytes": size}
+
+
+@router.post("/pdf/redact", tags=["tools-secure"], summary="Permanently remove matching text")
+async def pdf_redact(
+    file: UploadFile = File(...),
+    terms: str = Form(...),
+    case_sensitive: bool = Form(False),
+):
+    data = await file.read()
+    _read_pdf(data)
+    # The form field itself is unbounded; refuse pathological payloads before
+    # splitting (the service additionally caps term count and length).
+    if len(terms) > 30_000:
+        raise HTTPException(400, "The redaction term list is too long.")
+    try:
+        output_id, size, hits = await asyncio.to_thread(
+            pdf_edit_service.redact, data,
+            [t for t in terms.split("\n")], case_sensitive=case_sensitive,
+        )
+    except pdf_edit_service.PdfEditError as exc:
+        raise HTTPException(400, str(exc))
+    return {"output_id": output_id, "filename": "redacted.pdf", "size_bytes": size, "removed": hits}
+
+
+@router.post("/pdf/repair", tags=["tools-edit"], summary="Rebuild a damaged PDF")
+async def pdf_repair(file: UploadFile = File(...)):
+    data = await file.read()
+    # Damaged PDFs keep their %PDF header in practice; without this check the
+    # recovery parser - MuPDF's most fragile mode - ran on arbitrary bytes of
+    # any size.
+    _read_pdf(data)
+    try:
+        output_id, size, note = await asyncio.to_thread(pdf_edit_service.repair, data)
+    except pdf_edit_service.PdfEditError as exc:
+        raise HTTPException(400, str(exc))
+    return {"output_id": output_id, "filename": "repaired.pdf", "size_bytes": size, "note": note}
+
+
+
+@router.post("/pdf/to-text", tags=["tools-convert"], summary="Extract the text layer from a PDF")
+async def pdf_to_text(file: UploadFile = File(...), layout: bool = Form(False)):
+    data = await file.read()
+    _read_pdf(data)
+    try:
+        text, pages, chars = await asyncio.to_thread(pdf_edit_service.extract_text, data, layout)
+    except pdf_edit_service.PdfEditError as exc:
+        raise HTTPException(400, str(exc))
+    return {
+        "text": text,
+        "pages": pages,
+        "characters": chars,
+        # An empty result almost always means a scan, so say so rather than
+        # returning a blank box with no explanation.
+        "note": None if chars else "No text layer found - this looks like a scan. Run PDF OCR instead.",
+    }
+
+
+@router.post("/pdf/compare", tags=["tools-edit"], summary="Compare the text of two PDFs")
+async def pdf_compare(file_a: UploadFile = File(...), file_b: UploadFile = File(...)):
+    a = await file_a.read()
+    b = await file_b.read()
+    _read_pdf(a)
+    _read_pdf(b)
+    try:
+        return await asyncio.to_thread(pdf_edit_service.compare, a, b)
+    except pdf_edit_service.PdfEditError as exc:
+        raise HTTPException(400, str(exc))
 
 
 # ---------- PDF → Word (.docx) ---------- #

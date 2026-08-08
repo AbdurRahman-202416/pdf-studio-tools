@@ -8,6 +8,7 @@ PyMuPDF, paste the image into that rect, and save a flattened copy.
 from __future__ import annotations
 
 import io
+import math
 from pathlib import Path
 
 import fitz
@@ -53,6 +54,10 @@ def sign_pdf(
                 raise SignPdfError("page_index out of range")
             page = doc.load_page(page_index)
             ph = page.rect.height
+            # NaN coordinates build Rect(nan,...) whose is_empty is False, so
+            # they sail past the outside-the-page guard below.
+            if not all(math.isfinite(v) for v in (x_pt, y_pt, width_pt, height_pt)):
+                raise SignPdfError("Signature position must be finite numbers")
             # Frontend sends (x, y) with top-left origin; PyMuPDF uses
             # top-left too for Rect, so we can place directly.
             rect = fitz.Rect(x_pt, y_pt, x_pt + width_pt, y_pt + height_pt)

@@ -47,6 +47,9 @@ def render_thumbnail(file_id: str, page_index: int, width: int = 200) -> bytes:
                 raise PDFError("Page index out of range")
             page = doc.load_page(page_index)
             zoom = max(0.2, width / max(page.rect.width, 1))
+            # Width alone doesn't bound the pixmap - a page can declare an
+            # extreme height. Re-clamp by total pixel area like safe_zoom does.
+            zoom = min(zoom, safe_zoom(page.rect.width, page.rect.height, int(zoom * 72)))
             pix = page.get_pixmap(matrix=fitz.Matrix(zoom, zoom), alpha=False)
             return pix.tobytes("png")
     except PDFError:

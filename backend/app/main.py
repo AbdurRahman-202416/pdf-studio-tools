@@ -37,6 +37,9 @@ def create_app() -> FastAPI:
                 traces_sample_rate=0.1,
                 send_default_pii=False,
                 before_send=_scrub_sensitive,
+                # Frame locals include `password` and raw document bytes on any
+                # 500 in the lock/unlock/edit paths - never ship them.
+                include_local_variables=False,
             )
         except ImportError:  # pragma: no cover — sentry is optional
             pass
@@ -107,15 +110,6 @@ def create_app() -> FastAPI:
         lifespan=cleanup_lifespan,
     )
 
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.cors_origins,
-        allow_origin_regex=settings.cors_origin_regex,
-        allow_credentials=False,
-        allow_methods=["*"],
-        allow_headers=["*"],
-        expose_headers=["Content-Disposition", "X-Page-Count"],
-    )
     app.add_middleware(AccessLogMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_upload_bytes)
@@ -125,6 +119,20 @@ def create_app() -> FastAPI:
             default_per_minute=settings.RATE_LIMIT_DEFAULT_PER_MIN,
             heavy_per_minute=settings.RATE_LIMIT_HEAVY_PER_MIN,
         )
+    # Added LAST so it is the OUTERMOST layer. Starlette wraps in reverse
+    # order; with CORS innermost, the 413/429 responses from the size and
+    # rate-limit middleware carried no Access-Control-Allow-Origin, so the
+    # browser hid them and the frontend saw an opaque network error instead
+    # of "file too large".
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_origin_regex=settings.cors_origin_regex,
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["Content-Disposition", "X-Page-Count"],
+    )
 
     register_error_handlers(app)
     app.include_router(api_router, prefix="/api")

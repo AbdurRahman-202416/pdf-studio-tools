@@ -6,6 +6,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.logging import logger
 from app.services.pdf_service import PDFError
+from app.utils.guards import GuardError
 
 
 def register_error_handlers(app) -> None:
@@ -13,6 +14,14 @@ def register_error_handlers(app) -> None:
     async def handle_pdf_error(request: Request, exc: PDFError):
         logger.warning("PDF error on %s: %s", request.url.path, exc)
         return JSONResponse(status_code=400, content={"detail": str(exc)})
+
+    # Guards raise from deep inside services; without this handler a 501-page
+    # PDF returned "500 Internal server error" from eight endpoints instead of
+    # telling the user which limit they hit.
+    @app.exception_handler(GuardError)
+    async def handle_guard_error(request: Request, exc: GuardError):
+        logger.warning("Guard limit on %s: %s", request.url.path, exc)
+        return JSONResponse(status_code=413, content={"detail": str(exc)})
 
     @app.exception_handler(FileNotFoundError)
     async def handle_not_found(request: Request, exc: FileNotFoundError):

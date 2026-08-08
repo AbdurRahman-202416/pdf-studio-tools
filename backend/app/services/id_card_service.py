@@ -25,8 +25,14 @@ class IDCardError(Exception):
 
 
 def _load_image_from_bytes(data: bytes) -> Image.Image:
-    img = Image.open(io.BytesIO(data))
-    img.load()
+    try:
+        img = Image.open(io.BytesIO(data))
+        img.load()
+    except Image.DecompressionBombError as exc:
+        # Route handlers catch IDCardError -> 400; the raw Pillow error was a 500.
+        raise IDCardError("That image is too large to process safely.") from exc
+    except Exception as exc:  # noqa: BLE001 - Pillow raises many decode types
+        raise IDCardError("Could not read that file as an image.") from exc
     if img.mode not in ("RGB", "RGBA", "L"):
         img = img.convert("RGB")
     return img

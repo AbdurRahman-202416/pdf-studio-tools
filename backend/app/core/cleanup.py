@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+from concurrent.futures import ThreadPoolExecutor
 
 from app.core.config import settings
 from app.core.logging import logger
@@ -22,6 +23,14 @@ async def _loop() -> None:
 
 @contextlib.asynccontextmanager
 async def cleanup_lifespan(_app):
+    # Cap the default executor, which is what every `asyncio.to_thread` in the
+    # routes uses. Python's default is min(32, cores+4) threads; a page render
+    # peaks at ~240 MB (pixmap + PIL copy), so a handful of concurrent heavy
+    # requests OOM-kill a 512 MB instance. Excess requests queue instead.
+    executor = ThreadPoolExecutor(
+        max_workers=settings.HEAVY_CONCURRENCY, thread_name_prefix="tool"
+    )
+    asyncio.get_running_loop().set_default_executor(executor)
     task = asyncio.create_task(_loop())
     try:
         yield
@@ -29,3 +38,4 @@ async def cleanup_lifespan(_app):
         task.cancel()
         with contextlib.suppress(asyncio.CancelledError):
             await task
+        executor.shutdown(wait=False)

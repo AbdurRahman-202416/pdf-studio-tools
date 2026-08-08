@@ -31,12 +31,25 @@ ZEBRA = colors.HexColor("#F8FAFC")
 WIDE_THRESHOLD_COLUMNS = 6
 
 
+# One reportlab Paragraph is built per cell, so unbounded sheets OOM long
+# before pagination starts. The zip guard caps the XML size, not the cell count.
+MAX_ROWS_PER_SHEET = 5000
+MAX_CELLS_PER_SHEET = 100_000
+
+
 def _sheet_rows(ws) -> list[list[str]]:
     rows: list[list[str]] = []
+    cells_seen = 0
     for r in ws.iter_rows(values_only=True):
         cells = ["" if c is None else str(c) for c in r]
         if any(c.strip() for c in cells):
             rows.append(cells)
+            cells_seen += len(cells)
+        if len(rows) > MAX_ROWS_PER_SHEET or cells_seen > MAX_CELLS_PER_SHEET:
+            raise ExcelToPDFError(
+                f"A sheet is too large to lay out (over {MAX_ROWS_PER_SHEET} rows "
+                f"or {MAX_CELLS_PER_SHEET} cells). Split it and try again."
+            )
     return rows
 
 
