@@ -5,6 +5,7 @@ import { Download, X } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { trackEvent } from "@/lib/track";
+import { brand } from "@/brand.config";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -72,7 +73,7 @@ export function InstallPwaPrompt() {
           <Download className="h-4 w-4" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold">Install PDF Studio</p>
+          <p className="text-sm font-semibold">Install {brand.name}</p>
           <p className="text-xs text-muted-foreground">One tap to launch, works offline too</p>
           <div className="mt-2 flex items-center gap-2">
             <Button size="sm" onClick={install}>

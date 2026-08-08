@@ -5,6 +5,7 @@ import { Check, Copy, Facebook, MessageCircle, Share2, Twitter } from "lucide-re
 import { toast } from "sonner";
 
 import { trackEvent } from "@/lib/track";
+import { brand } from "@/brand.config";
 
 interface ShareButtonsProps {
   text: string;
@@ -26,7 +27,7 @@ export function ShareButtons({ text, url }: ShareButtonsProps) {
 
   const nativeShare = async () => {
     try {
-      await navigator.share({ title: "PDF Studio", text, url: shareUrl });
+      await navigator.share({ title: brand.name, text, url: shareUrl });
       trackEvent("tool_shared", { channel: "native" });
     } catch {
       // user cancelled

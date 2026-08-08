@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { Logo } from "@/components/brand/Logo";
+import { CommandPalette } from "./CommandPalette";
 import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -15,22 +16,26 @@ export function Navbar() {
           <Logo size={36} />
         </div>
 
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-          <Link href="/" className="hover:text-foreground transition">
-            Home
+        <nav className="hidden md:flex items-center gap-5 text-sm font-medium text-muted-foreground">
+          <Link href="/pdf" className="hover:text-foreground transition">
+            PDF
+          </Link>
+          <Link href="/image" className="hover:text-foreground transition">
+            Image
+          </Link>
+          <Link href="/calculator" className="hover:text-foreground transition">
+            Calculators
+          </Link>
+          <Link href="/developer" className="hover:text-foreground transition">
+            Developer
           </Link>
           <Link href="/tools" className="hover:text-foreground transition">
-            Tools
-          </Link>
-          <Link href="/workspace" className="hover:text-foreground transition">
-            Workspace
-          </Link>
-          <Link href="/settings" className="hover:text-foreground transition">
-            Settings
+            All tools
           </Link>
         </nav>
 
         <div className="flex items-center gap-2">
+          <CommandPalette />
           <ThemeToggle />
         </div>
       </div>

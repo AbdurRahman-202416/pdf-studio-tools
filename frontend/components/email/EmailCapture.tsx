@@ -49,13 +49,13 @@ export function EmailCapture({ source = "footer" }: EmailCaptureProps) {
   }
 
   return (
-    <form onSubmit={submit} className="flex gap-2 max-w-sm">
+    <form onSubmit={submit} className="flex w-full max-w-sm gap-2">
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@example.com"
-        className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+        className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
         required
         aria-label="Email address"
       />

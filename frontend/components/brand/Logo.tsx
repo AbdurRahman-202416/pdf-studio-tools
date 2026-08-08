@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { brand } from "@/brand.config";
 
 interface LogoMarkProps {
   size?: number;
@@ -14,7 +15,7 @@ export function LogoMark({ size = 36, className }: LogoMarkProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label="PDF Studio"
+      aria-label={brand.name}
       className={className}
     >
       <rect width="64" height="64" rx="12" className="fill-foreground" />
@@ -44,7 +45,7 @@ export function Logo({ size = 36, className, showWordmark = true }: LogoProps) {
       className={`flex items-center gap-2 group min-w-0 ${className ?? ""}`}
       // When the wordmark is visible, let the visible text BE the accessible
       // name so Lighthouse's label-content-name-mismatch passes.
-      aria-label={showWordmark ? undefined : "PDF Studio home"}
+      aria-label={showWordmark ? undefined : `${brand.name} home`}
     >
       <LogoMark
         size={size}

@@ -14,6 +14,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { usePDFStore } from "@/store/pdfStore";
+import { brand } from "@/brand.config";
 
 const items = [
   { href: "/", label: "Home", icon: Home },
@@ -79,7 +80,7 @@ export function Sidebar() {
       </div>
 
       <div className="mt-auto px-2 pt-6 text-xs text-muted-foreground">
-        <p>PDF Studio v1.0</p>
+        <p>{brand.name} v1.0</p>
         <p className="opacity-70">Files auto-expire after 1 hour.</p>
       </div>
     </aside>
