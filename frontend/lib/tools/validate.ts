@@ -1,9 +1,11 @@
 import "server-only";
 
+import { listSlugs } from "@/lib/blog";
 import { REDIRECTS } from "@/lib/redirects";
 import { RESERVED_SLUGS, tools } from "@/lib/tools";
 import { allToolContent } from "@/lib/tools/content";
 import { DOMAIN_HUBS } from "@/lib/tools/domains";
+import { RELATED_ARTICLES } from "@/lib/tools/related-articles";
 
 /**
  * Registry invariants, enforced at build time.
@@ -75,6 +77,20 @@ export async function validateRegistry(): Promise<void> {
     for (const r of t.relatedOverride ?? []) {
       if (r === t.slug) err(`relatedOverride of "${t.slug}" includes itself`);
       if (!slugs.includes(r)) err(`relatedOverride "${r}" on "${t.slug}" does not exist`);
+    }
+  }
+
+  // --- related-guide links point at real tools and real blog posts ---
+  const toolSet = new Set(slugs);
+  const blogSlugs = new Set(listSlugs());
+  for (const [toolSlug, articles] of Object.entries(RELATED_ARTICLES)) {
+    if (!toolSet.has(toolSlug)) {
+      err(`RELATED_ARTICLES key "${toolSlug}" is not a tool slug`);
+    }
+    for (const a of articles) {
+      if (!blogSlugs.has(a.slug)) {
+        err(`related guide "${a.slug}" on "${toolSlug}" has no blog post`);
+      }
     }
   }
 

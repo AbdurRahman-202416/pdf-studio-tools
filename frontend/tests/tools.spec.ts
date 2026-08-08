@@ -10,7 +10,7 @@ const TINY_PNG = Buffer.from(
 test.describe("Tools hub", () => {
   test("tools index lists all tools and links to ID card combiner", async ({ page }) => {
     await page.goto("/tools");
-    await expect(page.getByRole("heading", { name: /actually fit your workflow/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /actually fits your workflow/i })).toBeVisible();
     await expect(page.getByTestId("tool-nid-combine")).toBeVisible();
     await expect(page.getByTestId("tool-pdf-ocr")).toBeVisible();
     await expect(page.getByTestId("tool-pdf-to-excel")).toBeVisible();

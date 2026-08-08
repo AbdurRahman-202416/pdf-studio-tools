@@ -1,9 +1,12 @@
 
+import Link from "next/link";
+
 import { AdSlot } from "@/components/ads/AdSlot";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/components/seo/SiteConfig";
 import { relatedTools, tools as allTools } from "@/lib/tools";
 import { getHubForDomain } from "@/lib/tools/domains";
+import { relatedArticles } from "@/lib/tools/related-articles";
 import { ToolCard } from "@/components/ui/ToolCard";
 import { ToolView } from "@/lib/tools/views";
 import type { ToolContent, ToolMeta } from "@/lib/tools/types";
@@ -24,6 +27,7 @@ const toolCount = allTools.length;
 export function ToolPage({ meta, content }: ToolPageProps) {
   const canonical = `${siteConfig.url}/${meta.slug}`;
   const related = relatedTools(meta.slug, 6);
+  const guides = relatedArticles(meta.slug);
   const hub = getHubForDomain(meta.domain);
 
   return (
@@ -102,6 +106,7 @@ export function ToolPage({ meta, content }: ToolPageProps) {
         <AdSlot placement="tool" />
         <FaqSection meta={meta} content={content} />
         <SeoCopyBlock content={content} />
+        <RelatedGuides guides={guides} />
         <RelatedTools tools={related} />
       </div>
     </>
@@ -178,6 +183,34 @@ function SeoCopyBlock({ content }: { content: ToolContent }) {
           </span>
         ))}
       </div>
+    </section>
+  );
+}
+
+function RelatedGuides({ guides }: { guides: { slug: string; title: string }[] }) {
+  if (!guides.length) return null;
+  return (
+    <section className="space-y-4">
+      <div>
+        <span className="inline-block text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          Guides
+        </span>
+        <h2 className="font-display mt-2 text-2xl sm:text-3xl font-medium tracking-tight">
+          Learn how to get the most out of it
+        </h2>
+      </div>
+      <ul className="grid gap-3 sm:grid-cols-2">
+        {guides.map((g) => (
+          <li key={g.slug}>
+            <Link
+              href={`/blog/${g.slug}`}
+              className="block rounded-2xl border border-border bg-card p-4 text-sm font-medium transition hover:border-primary/40 hover:text-primary"
+            >
+              {g.title} →
+            </Link>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
