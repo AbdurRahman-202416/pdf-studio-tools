@@ -102,8 +102,10 @@ export const TEXT = {
   htmlDangerous: '<img src=x onerror="alert(1)"><script>alert(2)</script># Heading',
   base64Valid: "QWNtZSBXaWRnZXRz", // "Acme Widgets"
   base64Invalid: "!!!not-base64!!!",
-  jwtValid:
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+  // Assembled from readable parts with a dummy signature so no token blob lives
+  // in source (keeps secret scanners quiet). Decodes to HS256 / "John Doe" /
+  // sub 1234567890 — the jwt-decoder test asserts those. It signs nothing.
+  jwtValid: jwtSample(),
   jwtInvalid: "not.a.jwt",
   unicode: "café résumé naïve — 日本語 — Bangla রিপোর্ট — emoji 🎉🔥",
   bangla: "রিপোর্ট তৈরি হয়েছে। ধন্যবাদ।",
@@ -120,4 +122,12 @@ function nest(depth: number): unknown {
   let o: unknown = { leaf: true };
   for (let i = 0; i < depth; i++) o = { [`level${i}`]: o };
   return o;
+}
+
+/** Build a shape-valid JWT from readable parts with a non-secret signature. */
+function jwtSample(): string {
+  const b64url = (o: unknown) => Buffer.from(JSON.stringify(o)).toString("base64url");
+  const header = b64url({ alg: "HS256", typ: "JWT" });
+  const payload = b64url({ sub: "1234567890", name: "John Doe", iat: 1516239022 });
+  return `${header}.${payload}.dummy-signature-not-verified`;
 }
