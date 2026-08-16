@@ -1,5 +1,71 @@
 import { API_BASE, ApiError } from "@/services/api";
 
+/** Default per-request ceiling so a stalled backend can never spin forever. */
+export const DEFAULT_UPLOAD_TIMEOUT_MS = 120_000;
+
+export class TimeoutError extends ApiError {
+  constructor() {
+    super("The request timed out. Please check your connection and try again.", 408);
+  }
+}
+
+export class CancelledError extends ApiError {
+  constructor() {
+    super("Cancelled.", 0);
+  }
+}
+
+export interface UploadOpts {
+  /** 0–100 upload progress. */
+  onProgress?: (pct: number) => void;
+  /** Abort the request (user cancel). */
+  signal?: AbortSignal;
+  /** Override the default timeout. */
+  timeoutMs?: number;
+}
+
+/**
+ * Shared uploader for every server tool. Uses XHR (not fetch) so we get real
+ * upload progress, native abort, and a hard timeout — the three things bare
+ * `fetch` could not provide, which is why a stalled tool used to spin forever
+ * with no cancel and no progress. Returns the parsed JSON response.
+ */
+export function uploadForm<T>(path: string, fd: FormData, opts: UploadOpts = {}): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${API_BASE}${path}`);
+    xhr.responseType = "json";
+    xhr.timeout = opts.timeoutMs ?? DEFAULT_UPLOAD_TIMEOUT_MS;
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && opts.onProgress) {
+        opts.onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+    xhr.ontimeout = () => reject(new TimeoutError());
+    xhr.onerror = () => reject(new ApiError("Network error — check your connection and try again.", 0));
+    xhr.onabort = () => reject(new CancelledError());
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.response as T);
+      } else {
+        const detail = (xhr.response && (xhr.response as { detail?: string }).detail) || xhr.statusText;
+        reject(new ApiError(detail || "Request failed", xhr.status));
+      }
+    };
+
+    if (opts.signal) {
+      if (opts.signal.aborted) {
+        xhr.abort();
+        return;
+      }
+      opts.signal.addEventListener("abort", () => xhr.abort(), { once: true });
+    }
+
+    xhr.send(fd);
+  });
+}
+
 export interface ToolDownloadable {
   output_id: string;
   filename: string;
@@ -67,15 +133,13 @@ export async function idCardCombine(
   front: File,
   back: File,
   options: IdCardCombineOptions = {},
-): Promise<ToolDownloadable> {
+ net: UploadOpts = {}): Promise<ToolDownloadable> {
   const fd = new FormData();
   fd.append("front", front);
   fd.append("back", back);
   fd.append("layout", options.layout ?? "a4_portrait");
   fd.append("add_labels", String(options.add_labels ?? true));
-  const res = await fetch(`${API_BASE}/tools/id-card/combine`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<ToolDownloadable>("/tools/id-card/combine", fd, net);
 }
 
 
@@ -89,14 +153,12 @@ export async function extractOCR(
   file: File,
   lang: string = "eng+ben",
   forceOcr = false,
-): Promise<OcrResult> {
+ net: UploadOpts = {}): Promise<OcrResult> {
   const fd = new FormData();
   fd.append("file", file);
   fd.append("lang", lang);
   fd.append("force_ocr", String(forceOcr));
-  const res = await fetch(`${API_BASE}/tools/ocr/extract`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<OcrResult>("/tools/ocr/extract", fd, net);
 }
 
 export interface PdfTableResult extends ToolDownloadable {
@@ -106,12 +168,10 @@ export interface PdfTableResult extends ToolDownloadable {
   tables: number;
 }
 
-export async function pdfTableToExcel(file: File): Promise<PdfTableResult> {
+export async function pdfTableToExcel(file: File, net: UploadOpts = {}): Promise<PdfTableResult> {
   const fd = new FormData();
   fd.append("file", file);
-  const res = await fetch(`${API_BASE}/tools/pdf-table/to-excel`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<PdfTableResult>("/tools/pdf-table/to-excel", fd, net);
 }
 
 export interface ExcelToPdfResult extends ToolDownloadable {
@@ -120,12 +180,10 @@ export interface ExcelToPdfResult extends ToolDownloadable {
   orientation: "portrait" | "landscape";
 }
 
-export async function excelToPdf(file: File): Promise<ExcelToPdfResult> {
+export async function excelToPdf(file: File, net: UploadOpts = {}): Promise<ExcelToPdfResult> {
   const fd = new FormData();
   fd.append("file", file);
-  const res = await fetch(`${API_BASE}/tools/excel/to-pdf`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<ExcelToPdfResult>("/tools/excel/to-pdf", fd, net);
 }
 
 
@@ -137,7 +195,7 @@ export interface PhotoOptions {
   height_mm?: number;
 }
 
-export async function photoToPdf(file: File, opts: PhotoOptions = {}): Promise<PhotoResult> {
+export async function photoToPdf(file: File, opts: PhotoOptions = {}, net: UploadOpts = {}): Promise<PhotoResult> {
   const fd = new FormData();
   fd.append("file", file);
   fd.append("size", opts.size ?? "passport");
@@ -147,9 +205,7 @@ export async function photoToPdf(file: File, opts: PhotoOptions = {}): Promise<P
     fd.append("width_mm", String(opts.width_mm ?? 45));
     fd.append("height_mm", String(opts.height_mm ?? 35));
   }
-  const res = await fetch(`${API_BASE}/tools/photo/to-pdf`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<PhotoResult>("/tools/photo/to-pdf", fd, net);
 }
 
 
@@ -161,33 +217,27 @@ export interface PdfToImagesResult extends ToolDownloadable {
 export async function pdfToImages(
   file: File,
   opts: { dpi: number; pages: string; fmt: "jpg" | "png" },
-): Promise<PdfToImagesResult> {
+ net: UploadOpts = {}): Promise<PdfToImagesResult> {
   const fd = new FormData();
   fd.append("file", file);
   fd.append("dpi", String(opts.dpi));
   fd.append("pages", opts.pages);
   fd.append("fmt", opts.fmt);
-  const res = await fetch(`${API_BASE}/tools/pdf-to-jpg`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<PdfToImagesResult>("/tools/pdf-to-jpg", fd, net);
 }
 
-export async function lockPdf(file: File, password: string): Promise<ToolDownloadable> {
+export async function lockPdf(file: File, password: string, net: UploadOpts = {}): Promise<ToolDownloadable> {
   const fd = new FormData();
   fd.append("file", file);
   fd.append("password", password);
-  const res = await fetch(`${API_BASE}/tools/pdf/lock`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<ToolDownloadable>("/tools/pdf/lock", fd, net);
 }
 
-export async function unlockPdf(file: File, password: string): Promise<ToolDownloadable> {
+export async function unlockPdf(file: File, password: string, net: UploadOpts = {}): Promise<ToolDownloadable> {
   const fd = new FormData();
   fd.append("file", file);
   fd.append("password", password);
-  const res = await fetch(`${API_BASE}/tools/pdf/unlock`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<ToolDownloadable>("/tools/pdf/unlock", fd, net);
 }
 
 // ---------- Target-size compression (compress to 100KB) ---------- //
@@ -217,13 +267,11 @@ export interface CompressTargetResult extends ToolDownloadable {
 export async function compressPdfToTarget(
   file: File,
   target: CompressTargetKey,
-): Promise<CompressTargetResult> {
+ net: UploadOpts = {}): Promise<CompressTargetResult> {
   const fd = new FormData();
   fd.append("file", file);
   fd.append("target", target);
-  const res = await fetch(`${API_BASE}/tools/compress/target-size`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<CompressTargetResult>("/tools/compress/target-size", fd, net);
 }
 
 export type QuickCompressLevel = "low" | "medium" | "high";
@@ -236,13 +284,11 @@ export interface QuickCompressResult extends ToolDownloadable {
 export async function compressPdfQuick(
   file: File,
   level: QuickCompressLevel = "low",
-): Promise<QuickCompressResult> {
+ net: UploadOpts = {}): Promise<QuickCompressResult> {
   const fd = new FormData();
   fd.append("file", file);
   fd.append("level", level);
-  const res = await fetch(`${API_BASE}/tools/compress/quick`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<QuickCompressResult>("/tools/compress/quick", fd, net);
 }
 
 // ---------- JPG / PNG / WebP → PDF ---------- //
@@ -263,14 +309,12 @@ export async function imagesToPdf(
   files: File[],
   pageSize: ImageToPdfPageSize = "a4_portrait",
   marginMm = 10,
-): Promise<ImageToPdfResult> {
+ net: UploadOpts = {}): Promise<ImageToPdfResult> {
   const fd = new FormData();
   for (const f of files) fd.append("files", f);
   fd.append("page_size", pageSize);
   fd.append("margin_mm", String(marginMm));
-  const res = await fetch(`${API_BASE}/tools/jpg-to-pdf`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<ImageToPdfResult>("/tools/jpg-to-pdf", fd, net);
 }
 
 // ---------- PDF → Word ---------- //
@@ -281,12 +325,10 @@ export interface PdfToWordResult extends ToolDownloadable {
   images: number;
 }
 
-export async function pdfToWord(file: File): Promise<PdfToWordResult> {
+export async function pdfToWord(file: File, net: UploadOpts = {}): Promise<PdfToWordResult> {
   const fd = new FormData();
   fd.append("file", file);
-  const res = await fetch(`${API_BASE}/tools/pdf-to-word`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<PdfToWordResult>("/tools/pdf-to-word", fd, net);
 }
 
 // ---------- Word → PDF ---------- //
@@ -296,12 +338,10 @@ export interface WordToPdfResult extends ToolDownloadable {
   images: number;
 }
 
-export async function wordToPdf(file: File): Promise<WordToPdfResult> {
+export async function wordToPdf(file: File, net: UploadOpts = {}): Promise<WordToPdfResult> {
   const fd = new FormData();
   fd.append("file", file);
-  const res = await fetch(`${API_BASE}/tools/word-to-pdf`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<WordToPdfResult>("/tools/word-to-pdf", fd, net);
 }
 
 // ---------- Sign PDF ---------- //
@@ -316,7 +356,7 @@ export interface SignPdfArgs {
   heightPt: number;
 }
 
-export async function signPdf(args: SignPdfArgs): Promise<ToolDownloadable> {
+export async function signPdf(args: SignPdfArgs, net: UploadOpts = {}): Promise<ToolDownloadable> {
   const fd = new FormData();
   fd.append("file", args.file);
   fd.append("signature", args.signaturePng, "signature.png");
@@ -325,9 +365,7 @@ export async function signPdf(args: SignPdfArgs): Promise<ToolDownloadable> {
   fd.append("y_pt", String(args.yPt));
   fd.append("width_pt", String(args.widthPt));
   fd.append("height_pt", String(args.heightPt));
-  const res = await fetch(`${API_BASE}/tools/sign-pdf`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<ToolDownloadable>("/tools/sign-pdf", fd, net);
 }
 
 // ---------- Split / Rotate / Delete pages ---------- //
@@ -341,14 +379,12 @@ export async function splitPdf(
   file: File,
   pages: string,
   mode: "extract" | "each" = "extract",
-): Promise<PdfSplitResult> {
+ net: UploadOpts = {}): Promise<PdfSplitResult> {
   const fd = new FormData();
   fd.append("file", file);
   fd.append("pages", pages);
   fd.append("mode", mode);
-  const res = await fetch(`${API_BASE}/tools/pdf/split`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<PdfSplitResult>("/tools/pdf/split", fd, net);
 }
 
 export interface PdfRotateResult extends ToolDownloadable {
@@ -359,14 +395,12 @@ export async function rotatePdf(
   file: File,
   angle: 90 | 180 | 270,
   pages: string = "all",
-): Promise<PdfRotateResult> {
+ net: UploadOpts = {}): Promise<PdfRotateResult> {
   const fd = new FormData();
   fd.append("file", file);
   fd.append("angle", String(angle));
   fd.append("pages", pages);
-  const res = await fetch(`${API_BASE}/tools/pdf/rotate`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<PdfRotateResult>("/tools/pdf/rotate", fd, net);
 }
 
 export interface PdfDeletePagesResult extends ToolDownloadable {
@@ -374,11 +408,9 @@ export interface PdfDeletePagesResult extends ToolDownloadable {
   remaining: number;
 }
 
-export async function deletePdfPages(file: File, pages: string): Promise<PdfDeletePagesResult> {
+export async function deletePdfPages(file: File, pages: string, net: UploadOpts = {}): Promise<PdfDeletePagesResult> {
   const fd = new FormData();
   fd.append("file", file);
   fd.append("pages", pages);
-  const res = await fetch(`${API_BASE}/tools/pdf/delete-pages`, { method: "POST", body: fd });
-  if (!res.ok) throw new ApiError(await parseError(res), res.status);
-  return res.json();
+  return uploadForm<PdfDeletePagesResult>("/tools/pdf/delete-pages", fd, net);
 }

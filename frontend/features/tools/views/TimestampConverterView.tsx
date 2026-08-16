@@ -28,12 +28,21 @@ export function TimestampConverterView() {
   const [raw, setRaw] = useState("");
   const [unit, setUnit] = useState<"s" | "ms" | "auto">("auto");
   const [zone, setZone] = useState("UTC");
-  const [now, setNow] = useState(() => Date.now());
+  // Start at 0 so the server-rendered HTML and the first client render match
+  // (Date.now() differs between the two and triggered a hydration mismatch,
+  // React error #418). The real clock is set on mount, below.
+  const [now, setNow] = useState(0);
   const [copied, setCopied] = useState<string | null>(null);
 
   useEffect(() => {
+    // Defer the first real timestamp to the next frame (not a synchronous
+    // setState in the effect) so the rule stays clean and SSR/CSR still match.
+    const raf = requestAnimationFrame(() => setNow(Date.now()));
     const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearInterval(t);
+    };
   }, []);
 
   const localZone = useMemo(
@@ -91,11 +100,12 @@ export function TimestampConverterView() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-xs font-medium text-muted-foreground">Right now</span>
             <button
-              onClick={() => setRaw(String(Math.floor(now / 1000)))}
-              className="tabular text-sm font-medium text-primary hover:underline"
+              onClick={() => now && setRaw(String(Math.floor(now / 1000)))}
+              disabled={!now}
+              className="tabular text-sm font-medium text-primary hover:underline disabled:opacity-60"
               data-testid="use-now"
             >
-              {Math.floor(now / 1000)}
+              {now ? Math.floor(now / 1000) : "—"}
             </button>
           </div>
 

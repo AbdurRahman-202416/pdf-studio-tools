@@ -18,6 +18,7 @@ from docx import Document
 from docx.shared import Inches, Pt
 from PIL import Image
 
+from app.utils.guards import assert_pdf_page_limit
 from app.utils.storage import new_file_id
 
 
@@ -32,6 +33,7 @@ def _extract_blocks(page: fitz.Page) -> list[dict]:
 
 
 def pdf_to_docx(file_path: Path) -> tuple[str, Path, dict]:
+    assert_pdf_page_limit(file_path)
     output_id = new_file_id()
     out = file_path.parent.parent / "output" / f"{output_id}.docx"
     out.parent.mkdir(parents=True, exist_ok=True)

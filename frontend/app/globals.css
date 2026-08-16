@@ -49,8 +49,8 @@
   --border: 36 40 51;
   --input: 36 40 51;
 
-  --ring: 209 93 77;
-  --primary: 209 93 77;
+  --ring: 216 119 105;
+  --primary: 216 119 105;
   --primary-foreground: 10 12 16;
   --secondary: 27 31 39;
   --secondary-foreground: 232 234 239;
@@ -121,56 +121,56 @@
 
 /* Dark: constant L works here; all clear 4.5:1 on the raised card. */
 .dark [data-domain="pdf"] {
-  --primary: 209 93 77;            /* 4.60:1 card, 4.95:1 surface */
-  --ring: 209 93 77;
+  --primary: 216 119 105;            /* 4.60:1 card, 4.95:1 surface */
+  --ring: 216 119 105;
   --accent: 58 30 25;
   --primary-foreground: 10 12 16;
 }
 .dark [data-domain="text"] {
-  --primary: 190 114 0;            /* 4.78:1 card, 5.14:1 surface */
-  --ring: 190 114 0;
+  --primary: 200 137 41;            /* 4.78:1 card, 5.14:1 surface */
+  --ring: 200 137 41;
   --accent: 52 34 11;
   --primary-foreground: 10 12 16;
 }
 .dark [data-domain="calc"] {
-  --primary: 141 141 0;            /* 5.07:1 card, 5.46:1 surface */
-  --ring: 141 141 0;
+  --primary: 159 159 41;            /* 5.07:1 card, 5.46:1 surface */
+  --ring: 159 159 41;
   --accent: 40 40 12;
   --primary-foreground: 10 12 16;
 }
 .dark [data-domain="convert"] {
-  --primary: 46 158 82;            /* 5.23:1 card, 5.63:1 surface */
-  --ring: 46 158 82;
+  --primary: 79 174 110;            /* 5.23:1 card, 5.63:1 surface */
+  --ring: 79 174 110;
   --accent: 21 45 26;
   --primary-foreground: 10 12 16;
 }
 .dark [data-domain="data"] {
-  --primary: 0 161 154;            /* 5.61:1 card, 6.03:1 surface */
-  --ring: 0 161 154;
+  --primary: 41 176 170;            /* 5.61:1 card, 6.03:1 surface */
+  --ring: 41 176 170;
   --accent: 2 45 43;
   --primary-foreground: 10 12 16;
 }
 .dark [data-domain="security"] {
-  --primary: 0 148 206;            /* 5.23:1 card, 5.63:1 surface */
-  --ring: 0 148 206;
+  --primary: 41 165 214;            /* 5.23:1 card, 5.63:1 surface */
+  --ring: 41 165 214;
   --accent: 10 42 56;
   --primary-foreground: 10 12 16;
 }
 .dark [data-domain="code"] {
-  --primary: 100 126 224;            /* 4.78:1 card, 5.15:1 surface */
-  --ring: 100 126 224;
+  --primary: 125 147 229;            /* 4.78:1 card, 5.15:1 surface */
+  --ring: 125 147 229;
   --accent: 30 37 61;
   --primary-foreground: 10 12 16;
 }
 .dark [data-domain="image"] {
-  --primary: 162 105 201;            /* 4.61:1 card, 4.96:1 surface */
-  --ring: 162 105 201;
+  --primary: 177 129 210;            /* 4.61:1 card, 4.96:1 surface */
+  --ring: 177 129 210;
   --accent: 45 32 55;
   --primary-foreground: 10 12 16;
 }
 .dark [data-domain="color"] {
-  --primary: 198 91 147;            /* 4.54:1 card, 4.89:1 surface */
-  --ring: 198 91 147;
+  --primary: 207 117 164;            /* 4.54:1 card, 4.89:1 surface */
+  --ring: 207 117 164;
   --accent: 55 29 41;
   --primary-foreground: 10 12 16;
 }

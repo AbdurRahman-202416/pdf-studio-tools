@@ -7,7 +7,9 @@ import zipfile
 from pathlib import Path
 from typing import get_args
 
-from fastapi import APIRouter, File, Form, HTTPException, Response, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile
+
+from app.api.deps import temp_inputs
 from fastapi.responses import FileResponse, JSONResponse
 from app.models.schemas import (
     CompressQuickResponse,
@@ -162,6 +164,7 @@ async def ocr_extract(
     if not content[:4] == b"%PDF":
         raise HTTPException(400, "Invalid PDF")
     dest.write_bytes(content)
+    # OCR deliberately keeps its input (it returns file_id); TTL cleanup handles it.
 
     try:
         result = await asyncio.to_thread(
@@ -194,7 +197,8 @@ async def ocr_extract(
         "gets a styled header band, zebra rows, borders, autofit columns, and frozen panes."
     ),
 )
-async def pdf_table_to_excel(file: UploadFile = File(...)):
+async def pdf_table_to_excel(
+    _cleanup: list[Path] = Depends(temp_inputs),file: UploadFile = File(...)):
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
     content = await file.read()
@@ -204,6 +208,7 @@ async def pdf_table_to_excel(file: UploadFile = File(...)):
     file_id = new_file_id()
     dest = upload_path(file_id)
     dest.write_bytes(content)
+    _cleanup.append(dest)
 
     try:
         output_id, out, stats = await asyncio.to_thread(
@@ -239,7 +244,8 @@ async def pdf_table_to_excel(file: UploadFile = File(...)):
         "Wide sheets (more than 6 columns or >80 avg-chars/row) auto-flip the whole document to landscape."
     ),
 )
-async def excel_to_pdf(file: UploadFile = File(...)):
+async def excel_to_pdf(
+    _cleanup: list[Path] = Depends(temp_inputs),file: UploadFile = File(...)):
     name = (file.filename or "").lower()
     if not (name.endswith(".xlsx") or name.endswith(".xlsm")):
         raise HTTPException(415, "Only .xlsx or .xlsm files are accepted")
@@ -254,6 +260,7 @@ async def excel_to_pdf(file: UploadFile = File(...)):
     file_id = new_file_id()
     dest = upload_path(file_id).with_suffix(".xlsx")
     dest.write_bytes(content)
+    _cleanup.append(dest)
 
     try:
         output_id, out, stats = await asyncio.to_thread(
@@ -360,6 +367,7 @@ async def photo_to_pdf(
     ),
 )
 async def pdf_to_jpg(
+    _cleanup: list[Path] = Depends(temp_inputs),
     file: UploadFile = File(...),
     dpi: int = Form(200),
     pages: str = Form("all"),
@@ -374,6 +382,7 @@ async def pdf_to_jpg(
     file_id = new_file_id()
     dest = upload_path(file_id)
     dest.write_bytes(content)
+    _cleanup.append(dest)
 
     try:
         output_id, out, count = await asyncio.to_thread(
@@ -403,6 +412,7 @@ async def _read_pdf_upload(file: UploadFile) -> Path:
         raise HTTPException(400, "Invalid PDF")
     dest = upload_path(new_file_id())
     dest.write_bytes(content)
+    # Callers register `dest` with temp_inputs for cleanup (they hold the dep).
     return dest
 
 
@@ -418,6 +428,7 @@ async def _read_pdf_upload(file: UploadFile) -> Path:
     ),
 )
 async def pdf_split(
+    _cleanup: list[Path] = Depends(temp_inputs),
     file: UploadFile = File(...),
     pages: str = Form("all"),
     mode: str = Form("extract"),
@@ -425,6 +436,7 @@ async def pdf_split(
     if mode not in pdf_pages_service.SPLIT_MODES:
         raise HTTPException(400, "mode must be 'extract' or 'each'")
     dest = await _read_pdf_upload(file)
+    _cleanup.append(dest)
     try:
         output_id, out, count = await asyncio.to_thread(
             pdf_pages_service.split_pdf, dest, pages, mode,
@@ -448,6 +460,7 @@ async def pdf_split(
     description="`angle` is added to each selected page's existing rotation. `pages` is `all` or `1-3,5`.",
 )
 async def pdf_rotate(
+    _cleanup: list[Path] = Depends(temp_inputs),
     file: UploadFile = File(...),
     angle: int = Form(90),
     pages: str = Form("all"),
@@ -455,6 +468,7 @@ async def pdf_rotate(
     if angle not in pdf_pages_service.VALID_ANGLES:
         raise HTTPException(400, "angle must be 90, 180 or 270")
     dest = await _read_pdf_upload(file)
+    _cleanup.append(dest)
     try:
         output_id, out, rotated = await asyncio.to_thread(
             pdf_pages_service.rotate_pdf, dest, int(angle), pages,
@@ -477,10 +491,12 @@ async def pdf_rotate(
     description="`pages` is a required 1-based range string like `2` or `2,4-6`. At least one page must remain.",
 )
 async def pdf_delete_pages(
+    _cleanup: list[Path] = Depends(temp_inputs),
     file: UploadFile = File(...),
     pages: str = Form(...),
 ):
     dest = await _read_pdf_upload(file)
+    _cleanup.append(dest)
     try:
         output_id, out, removed, remaining = await asyncio.to_thread(
             pdf_pages_service.delete_pages, dest, pages,
@@ -506,7 +522,8 @@ async def pdf_delete_pages(
     summary="Encrypt a PDF with a password (AES-256)",
     description="Uses pypdf 5.x for AES-256 encryption. The user/owner password is the same; existing encryption is overwritten.",
 )
-async def pdf_lock(file: UploadFile = File(...), password: str = Form(...)):
+async def pdf_lock(
+    _cleanup: list[Path] = Depends(temp_inputs),file: UploadFile = File(...), password: str = Form(...)):
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
     content = await file.read()
@@ -516,6 +533,7 @@ async def pdf_lock(file: UploadFile = File(...), password: str = Form(...)):
     file_id = new_file_id()
     dest = upload_path(file_id)
     dest.write_bytes(content)
+    _cleanup.append(dest)
 
     try:
         output_id, out = await asyncio.to_thread(
@@ -538,7 +556,8 @@ async def pdf_lock(file: UploadFile = File(...), password: str = Form(...)):
     summary="Remove password protection from a PDF",
     description="Requires the user password. Returns 400 if the password is wrong.",
 )
-async def pdf_unlock(file: UploadFile = File(...), password: str = Form(...)):
+async def pdf_unlock(
+    _cleanup: list[Path] = Depends(temp_inputs),file: UploadFile = File(...), password: str = Form(...)):
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
     content = await file.read()
@@ -548,6 +567,7 @@ async def pdf_unlock(file: UploadFile = File(...), password: str = Form(...)):
     file_id = new_file_id()
     dest = upload_path(file_id)
     dest.write_bytes(content)
+    _cleanup.append(dest)
 
     try:
         output_id, out = await asyncio.to_thread(
@@ -593,6 +613,7 @@ _TARGET_SIZES_BYTES = {
     ),
 )
 async def compress_target_size(
+    _cleanup: list[Path] = Depends(temp_inputs),
     file: UploadFile = File(...),
     target: str = Form("100kb"),
 ):
@@ -607,6 +628,7 @@ async def compress_target_size(
     file_id = new_file_id()
     dest = upload_path(file_id)
     dest.write_bytes(content)
+    _cleanup.append(dest)
 
     target_bytes = _TARGET_SIZES_BYTES[target]
     try:
@@ -645,6 +667,7 @@ _QUICK_LEVELS = frozenset(get_args(CompressionLevel))
     ),
 )
 async def compress_quick(
+    _cleanup: list[Path] = Depends(temp_inputs),
     file: UploadFile = File(...),
     level: str = Form("low"),
 ):
@@ -659,6 +682,7 @@ async def compress_quick(
     file_id = new_file_id()
     dest = upload_path(file_id)
     dest.write_bytes(content)
+    _cleanup.append(dest)
 
     output_id, out = await asyncio.to_thread(pdf_service.compress_pdf, dest, level)
 
@@ -935,7 +959,8 @@ async def pdf_compare(file_a: UploadFile = File(...), file_b: UploadFile = File(
     summary="Convert a PDF to an editable Word (.docx) document",
     description="Preserves text, paragraph breaks, and inline images. Complex layouts (multi-column, floating elements) may need manual cleanup.",
 )
-async def pdf_to_word(file: UploadFile = File(...)):
+async def pdf_to_word(
+    _cleanup: list[Path] = Depends(temp_inputs),file: UploadFile = File(...)):
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(415, "Only PDF files are accepted")
     content = await file.read()
@@ -944,6 +969,7 @@ async def pdf_to_word(file: UploadFile = File(...)):
     file_id = new_file_id()
     dest = upload_path(file_id)
     dest.write_bytes(content)
+    _cleanup.append(dest)
 
     try:
         output_id, out, stats = await asyncio.to_thread(
@@ -970,7 +996,8 @@ async def pdf_to_word(file: UploadFile = File(...)):
     summary="Convert a Word (.docx) document to PDF",
     description="Reads the .docx with python-docx and renders it to PDF. Best for resumes, reports, and assignments; advanced layout features may not survive exactly.",
 )
-async def word_to_pdf(file: UploadFile = File(...)):
+async def word_to_pdf(
+    _cleanup: list[Path] = Depends(temp_inputs),file: UploadFile = File(...)):
     name = (file.filename or "").lower()
     if not name.endswith(".docx"):
         raise HTTPException(415, "Only .docx files are accepted")
@@ -987,6 +1014,7 @@ async def word_to_pdf(file: UploadFile = File(...)):
     file_id = new_file_id()
     dest = upload_path(file_id).with_suffix(".docx")
     dest.write_bytes(content)
+    _cleanup.append(dest)
 
     try:
         output_id, out, stats = await asyncio.to_thread(
@@ -1017,6 +1045,7 @@ async def word_to_pdf(file: UploadFile = File(...)):
     ),
 )
 async def sign_pdf(
+    _cleanup: list[Path] = Depends(temp_inputs),
     file: UploadFile = File(...),
     signature: UploadFile = File(...),
     page_index: int = Form(0),
@@ -1037,6 +1066,7 @@ async def sign_pdf(
     file_id = new_file_id()
     dest = upload_path(file_id)
     dest.write_bytes(pdf_bytes)
+    _cleanup.append(dest)
 
     try:
         output_id, out = await asyncio.to_thread(

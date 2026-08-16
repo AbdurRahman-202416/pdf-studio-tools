@@ -88,7 +88,7 @@ export function MobileNavDrawer({
             </nav>
             <div className="mt-auto text-xs text-muted-foreground">
               <p>{brand.name}</p>
-              <p className="opacity-70">Files auto-delete in 1 hour.</p>
+              <p>Files auto-delete in 1 hour.</p>
             </div>
           </motion.aside>
         </>

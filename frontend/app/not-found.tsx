@@ -3,7 +3,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { brand } from "@/brand.config";
 
-export const metadata = { title: `Not found · ${brand.name}` };
+// noindex overrides the layout's index/follow so a 404 no longer emits two
+// contradictory robots directives (Next also marks not-found as noindex).
+export const metadata = {
+  title: `Not found · ${brand.name}`,
+  robots: { index: false, follow: false },
+};
 
 export default function NotFound() {
   return (

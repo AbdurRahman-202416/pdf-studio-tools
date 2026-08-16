@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     # a few KB of zip into gigabytes of XML. These cap the blast radius.
     MAX_PDF_PAGES: int = 500          # reject documents with more pages than this
     MAX_RENDER_PIXELS: int = 40_000_000  # ~40 MP ceiling per rasterized page
+    MAX_IMAGE_DIMENSION: int = 12_000    # max px per side for uploaded images (sign/photo/etc.)
+    # Max simultaneous heavy (rasterizing/OCR/office) jobs. Excess requests get
+    # a fast 503 instead of piling onto the thread pool and starving the box.
+    MAX_HEAVY_INFLIGHT: int = 8
     # Size of the shared thread pool all blocking tool work runs in. Each
     # rasterizing request can peak at ~240 MB, so this is effectively the
     # instance's memory budget divided by that.

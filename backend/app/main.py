@@ -11,6 +11,7 @@ from app.core.logging import AccessLogMiddleware, setup_logging
 from app.middleware.errors import register_error_handlers
 from app.middleware.security import (
     BodySizeLimitMiddleware,
+    ConcurrencyLimitMiddleware,
     RateLimitMiddleware,
     SecurityHeadersMiddleware,
 )
@@ -113,6 +114,7 @@ def create_app() -> FastAPI:
     app.add_middleware(AccessLogMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_upload_bytes)
+    app.add_middleware(ConcurrencyLimitMiddleware, max_inflight=settings.MAX_HEAVY_INFLIGHT)
     if settings.RATE_LIMIT_ENABLED:
         app.add_middleware(
             RateLimitMiddleware,

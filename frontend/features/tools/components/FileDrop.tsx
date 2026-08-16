@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback } from "react";
-import { useDropzone, type Accept } from "react-dropzone";
+import { useDropzone, type Accept, type FileRejection } from "react-dropzone";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { Image as ImageIcon, UploadCloud, X } from "lucide-react";
 
 import { cn, formatBytes } from "@/lib/utils";
+import { MAX_UPLOAD_BYTES, rejectionMessage } from "@/lib/upload-limits";
 
 interface FileDropProps {
   label: string;
@@ -16,6 +18,8 @@ interface FileDropProps {
   hint?: string;
   testId?: string;
   className?: string;
+  /** Max file size in bytes. Defaults to the shared 100 MB cap. */
+  maxSize?: number;
 }
 
 export function FileDrop({
@@ -27,19 +31,40 @@ export function FileDrop({
   hint,
   testId,
   className,
+  maxSize = MAX_UPLOAD_BYTES,
 }: FileDropProps) {
   const onDrop = useCallback(
     (accepted: File[]) => {
-      if (accepted[0]) onChange(accepted[0]);
+      const f = accepted[0];
+      if (!f) return;
+      // react-dropzone doesn't flag empty files; a 0-byte upload just fails
+      // server-side with a confusing error, so reject it here with a clear one.
+      if (f.size === 0) {
+        toast.error("That file is empty.");
+        return;
+      }
+      onChange(f);
     },
     [onChange],
+  );
+
+  const onDropRejected = useCallback(
+    (rejections: FileRejection[]) => {
+      // Surface the first, most relevant reason. Without this the UI silently
+      // swallowed wrong-type / oversize drops and looked broken.
+      const code = rejections[0]?.errors[0]?.code;
+      toast.error(rejectionMessage(code, { accept, maxSize }));
+    },
+    [accept, maxSize],
   );
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     accept,
     multiple: false,
     noClick: true,
+    maxSize,
     onDrop,
+    onDropRejected,
   });
 
   return (

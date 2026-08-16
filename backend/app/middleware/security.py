@@ -57,6 +57,58 @@ class BodySizeLimitMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
 
+class ConcurrencyLimitMiddleware(BaseHTTPMiddleware):
+    """Cap simultaneous heavy processing jobs.
+
+    All PDF/image/office work runs on a small shared thread pool; without a cap,
+    a handful of slow requests (e.g. compressing a 500-page scan) queue up and
+    starve every other request with no upper bound. This rejects excess heavy
+    POSTs with a fast 503 + Retry-After instead of letting them pile on.
+
+    Only genuinely heavy endpoints count against the limit. Lightweight reads
+    (health, preview, download, status, GETs) are never gated, so the UI stays
+    responsive even when processing is saturated.
+    """
+
+    # Substrings that identify a light/free endpoint even under POST.
+    _LIGHT = ("/download", "/preview", "/ocr/status", "/health", "/files/")
+
+    def __init__(self, app: FastAPI, *, max_inflight: int):
+        super().__init__(app)
+        self.max_inflight = max_inflight
+        self._inflight = 0  # asyncio single-thread: ++/-- between awaits is atomic
+
+    def _is_heavy(self, request: Request) -> bool:
+        if request.method not in ("POST", "PUT"):
+            return False
+        path = request.url.path
+        if not path.startswith("/api/"):
+            return False
+        if any(seg in path for seg in self._LIGHT):
+            return False
+        return True
+
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
+    ) -> Response:
+        if not self._is_heavy(request):
+            return await call_next(request)
+        # No await between the check and the increment → race-free under asyncio.
+        if self._inflight >= self.max_inflight:
+            return JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                content={"detail": "The server is busy processing other files. Please retry in a moment."},
+                headers={"Retry-After": "5"},
+            )
+        self._inflight += 1
+        try:
+            return await call_next(request)
+        finally:
+            self._inflight -= 1
+
+
 _DOCS_PATHS = ("/docs", "/redoc", "/openapi.json")
 
 

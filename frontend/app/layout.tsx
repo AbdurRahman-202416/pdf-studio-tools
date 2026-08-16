@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, JetBrains_Mono, Public_Sans } from "next/font/google";
 import { Toaster } from "sonner";
-import { Analytics } from "@vercel/analytics/next";
+import { VercelAnalytics } from "@/components/analytics/VercelAnalytics";
 
 import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
@@ -81,7 +81,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  alternates: { canonical: "/" },
+  // No global canonical: every real page sets its own (see each page's
+  // generateMetadata / metadata). A blanket "/" canonical wrongly pointed the
+  // homepage-less routes (404, widgets) at the homepage.
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
     other: {
@@ -143,7 +145,7 @@ export default function RootLayout({
             toastOptions={{ duration: 3500 }}
           />
         </ThemeProvider>
-        <Analytics />
+        <VercelAnalytics />
       </body>
     </html>
   );

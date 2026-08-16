@@ -7,23 +7,61 @@ const API_BASE_URL = `http://127.0.0.1:${BACKEND_PORT}/api`;
 
 export default defineConfig({
   testDir: "./tests",
-  fullyParallel: false,
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: 1,
-  reporter: process.env.CI ? "github" : "list",
+  workers: process.env.CI ? 2 : 4,
+  reporter: process.env.CI
+    ? [["github"], ["html", { open: "never" }], ["json", { outputFile: "test-results/results.json" }]]
+    : [["list"], ["html", { open: "never" }]],
   timeout: 90_000,
   expect: { timeout: 10_000 },
   use: {
     baseURL: BASE_URL,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
-    video: "off",
+    video: "retain-on-failure",
   },
   projects: [
+    // Legacy specs (kept green): the two original files at tests/*.spec.ts.
     {
-      name: "chromium",
+      name: "legacy",
+      testMatch: /tests\/(pdf-tool|tools)\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] },
+    },
+    // Registry sweep + SEO + a11y: no uploads, no backend dependency for most.
+    {
+      name: "smoke",
+      testMatch: /tests\/e2e\/smoke\/.*\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "seo",
+      testMatch: /tests\/e2e\/seo\/.*\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "a11y",
+      testMatch: /tests\/e2e\/accessibility\/.*\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    // Pure browser tools — could run with zero backend.
+    {
+      name: "client",
+      testMatch: /tests\/e2e\/(developer|text|data|color|security|convert|calc|image)\/.*\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    // Server tools + fallback — need the FastAPI backend.
+    {
+      name: "server",
+      testMatch: /tests\/e2e\/(pdf|failure)\/.*\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    // Mobile smoke over a representative slice.
+    {
+      name: "mobile",
+      testMatch: /tests\/e2e\/(smoke|accessibility)\/.*\.spec\.ts/,
+      use: { ...devices["Pixel 7"] },
     },
   ],
   webServer: [

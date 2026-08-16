@@ -14,6 +14,7 @@ from pathlib import Path
 import fitz
 from PIL import Image
 
+from app.utils.guards import GuardError, assert_image_dimensions
 from app.utils.storage import new_file_id, output_path
 
 
@@ -35,7 +36,9 @@ def sign_pdf(
     if width_pt <= 0 or height_pt <= 0:
         raise SignPdfError("Invalid signature size")
 
-    # Validate image
+    # Validate image: format AND dimensions. Image.open is lazy, so a format-only
+    # check lets a 30000x30000 "bomb" through to MuPDF, which then decodes it.
+    # assert_image_dimensions reads the header size and rejects before any decode.
     try:
         with Image.open(io.BytesIO(signature_png)) as im:
             if im.format != "PNG":
@@ -44,6 +47,10 @@ def sign_pdf(
         raise
     except Exception as exc:  # noqa: BLE001
         raise SignPdfError(f"Could not read signature image: {exc}") from exc
+    try:
+        assert_image_dimensions(signature_png)
+    except GuardError as exc:
+        raise SignPdfError(str(exc)) from exc
 
     output_id = new_file_id()
     out = output_path(output_id)

@@ -13,7 +13,7 @@ from app.models.schemas import (
     PageInfo,
     PDFMetadata,
 )
-from app.utils.guards import safe_zoom
+from app.utils.guards import GuardError, assert_page_count, safe_zoom
 from app.utils.storage import find_upload, new_file_id, output_path
 
 
@@ -24,6 +24,7 @@ class PDFError(Exception):
 def read_metadata(file_id: str, filename: str, file_path: Path) -> PDFMetadata:
     try:
         with fitz.open(file_path) as doc:
+            assert_page_count(doc.page_count)
             pages = [
                 PageInfo(index=i, width=p.rect.width, height=p.rect.height)
                 for i, p in enumerate(doc)
@@ -65,11 +66,15 @@ def merge_pdfs(items: Iterable[tuple[Path, list[int]]], filename: str) -> tuple[
         try:
             reader = PdfReader(str(path))
             total = len(reader.pages)
+            assert_page_count(total)
             if not indexes:
                 indexes = list(range(total))
             for i in indexes:
                 if 0 <= i < total:
                     writer.add_page(reader.pages[i])
+                    assert_page_count(len(writer.pages))
+        except GuardError:
+            raise  # page-limit → 413, not a 400 "failed to read"
         except Exception as exc:  # noqa: BLE001
             raise PDFError(f"Failed to read {path.name}: {exc}") from exc
 

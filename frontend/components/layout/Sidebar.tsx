@@ -81,7 +81,7 @@ export function Sidebar() {
 
       <div className="mt-auto px-2 pt-6 text-xs text-muted-foreground">
         <p>{brand.name} v1.0</p>
-        <p className="opacity-70">Files auto-expire after 1 hour.</p>
+        <p>Files auto-expire after 1 hour.</p>
       </div>
     </aside>
   );

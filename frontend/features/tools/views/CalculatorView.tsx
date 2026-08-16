@@ -280,7 +280,7 @@ export function CalculatorView({ slug }: { slug: string }) {
                     <dt className="text-sm text-muted-foreground">
                       {r.label}
                       {r.hint && (
-                        <span className="ml-1.5 text-[11px] opacity-70">({r.hint})</span>
+                        <span className="ml-1.5 text-[11px] text-muted-foreground">({r.hint})</span>
                       )}
                     </dt>
                     <dd className="tabular shrink-0 text-sm font-medium">{r.value}</dd>

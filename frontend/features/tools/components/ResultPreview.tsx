@@ -23,6 +23,16 @@ type Preview =
 
 export function ResultPreview({ output_id, filename }: ResultPreviewProps) {
   const [page, setPage] = useState(0);
+  const [lastOutputId, setLastOutputId] = useState(output_id);
+
+  // When a new result loads, jump back to page 1. Without this the paginator
+  // kept the previous result's page index and requested a page the new (often
+  // shorter) result may not have. (React 19 set-state-in-render pattern.)
+  if (output_id !== lastOutputId) {
+    setLastOutputId(output_id);
+    setPage(0);
+  }
+
   const requestedKey = `${output_id}:${page}`;
   const [fetchedKey, setFetchedKey] = useState(requestedKey);
   const [data, setData] = useState<Preview | null>(null);

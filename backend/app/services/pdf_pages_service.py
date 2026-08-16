@@ -8,6 +8,7 @@ from pathlib import Path
 import fitz  # PyMuPDF
 
 from app.core.config import settings
+from app.utils.guards import GuardError, assert_page_count
 from app.utils.storage import new_file_id
 
 
@@ -63,6 +64,7 @@ def split_pdf(file_path: Path, pages_spec: str = "all", mode: str = "extract") -
     output_id = new_file_id()
     try:
         with fitz.open(file_path) as doc:
+            assert_page_count(doc.page_count)
             indexes = _parse_range(pages_spec, doc.page_count)
 
             if mode == "extract":
@@ -86,6 +88,8 @@ def split_pdf(file_path: Path, pages_spec: str = "all", mode: str = "extract") -
                     finally:
                         single.close()
             return output_id, out, len(indexes)
+    except GuardError:
+        raise
     except PDFPagesError:
         raise
     except Exception as exc:  # noqa: BLE001
@@ -100,6 +104,7 @@ def rotate_pdf(file_path: Path, angle: int, pages_spec: str = "all") -> tuple[st
     output_id = new_file_id()
     try:
         with fitz.open(file_path) as doc:
+            assert_page_count(doc.page_count)
             indexes = _parse_range(pages_spec, doc.page_count)
             for i in indexes:
                 page = doc.load_page(i)
@@ -107,6 +112,8 @@ def rotate_pdf(file_path: Path, angle: int, pages_spec: str = "all") -> tuple[st
             out = settings.OUTPUT_DIR / f"{output_id}.pdf"
             doc.save(out, garbage=3, deflate=True)
         return output_id, out, len(indexes)
+    except GuardError:
+        raise
     except PDFPagesError:
         raise
     except Exception as exc:  # noqa: BLE001
@@ -122,6 +129,7 @@ def delete_pages(file_path: Path, pages_spec: str) -> tuple[str, Path, int, int]
     try:
         with fitz.open(file_path) as doc:
             total = doc.page_count
+            assert_page_count(total)
             indexes = _parse_range(pages_spec, total)
             if len(indexes) >= total:
                 raise PDFPagesError("Cannot delete all pages - at least one page must remain")
@@ -130,6 +138,8 @@ def delete_pages(file_path: Path, pages_spec: str) -> tuple[str, Path, int, int]
             doc.save(out, garbage=3, deflate=True)
             remaining = doc.page_count
         return output_id, out, len(indexes), remaining
+    except GuardError:
+        raise
     except PDFPagesError:
         raise
     except Exception as exc:  # noqa: BLE001

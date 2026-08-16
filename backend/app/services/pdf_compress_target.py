@@ -16,7 +16,7 @@ from pathlib import Path
 import fitz  # PyMuPDF
 from PIL import Image
 
-from app.utils.guards import safe_zoom
+from app.utils.guards import assert_pdf_page_limit, safe_zoom
 from app.utils.storage import new_file_id, output_path
 
 
@@ -70,6 +70,9 @@ def compress_to_target(
         raise CompressTargetError("Target must be at least 50 KB")
     if target_bytes > 20 * 1024 * 1024:
         raise CompressTargetError("Target must be at most 20 MB")
+
+    # Fail fast before the rasterize ladder touches a single page.
+    assert_pdf_page_limit(file_path)
 
     output_id = new_file_id()
     out = output_path(output_id)

@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Scissors, Wand2 } from "lucide-react";
+import { Scissors, Wand2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { FileDrop } from "@/features/tools/components/FileDrop";
 import { ToolResult } from "@/features/tools/components/ToolResult";
 import { ToolShell } from "@/features/tools/components/ToolShell";
-import { splitPdf, toolDownloadUrl, type PdfSplitResult } from "@/services/tools-api";
+import { CancelledError, splitPdf, toolDownloadUrl, type PdfSplitResult } from "@/services/tools-api";
 import { ApiError } from "@/services/api";
 import { cn } from "@/lib/utils";
 
@@ -23,17 +23,27 @@ export function SplitPdfView() {
   const [mode, setMode] = useState<"extract" | "each">("extract");
   const [pages, setPages] = useState("all");
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<PdfSplitResult | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const onCancel = () => abortRef.current?.abort();
 
   const onSubmit = async () => {
     if (!file) {
       toast.error("Please select a PDF first.");
       return;
     }
+    const controller = new AbortController();
+    abortRef.current = controller;
     setBusy(true);
+    setProgress(0);
     setResult(null);
     try {
-      const r = await splitPdf(file, pages, mode);
+      const r = await splitPdf(file, pages, mode, {
+        signal: controller.signal,
+        onProgress: setProgress,
+      });
       setResult(r);
       toast.success(
         mode === "each"
@@ -41,10 +51,14 @@ export function SplitPdfView() {
           : `Extracted ${r.pages} page${r.pages === 1 ? "" : "s"}`,
       );
     } catch (err) {
-      const msg = err instanceof ApiError ? err.message : "Split failed";
-      toast.error(msg);
+      // A user-initiated cancel is not an error; stay quiet.
+      if (!(err instanceof CancelledError)) {
+        toast.error(err instanceof ApiError ? err.message : "Split failed");
+      }
     } finally {
+      // Always clear busy — no permanent spinner, no dead button.
       setBusy(false);
+      abortRef.current = null;
     }
   };
 
@@ -122,16 +136,42 @@ export function SplitPdfView() {
           </CardContent>
         </Card>
 
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={onSubmit}
-          isLoading={busy}
-          disabled={!file || busy}
-          data-testid="split-pdf-submit"
-        >
-          <Wand2 className="h-4 w-4" /> Split PDF
-        </Button>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={onSubmit}
+              isLoading={busy}
+              disabled={!file || busy}
+              data-testid="split-pdf-submit"
+            >
+              <Wand2 className="h-4 w-4" /> Split PDF
+            </Button>
+            {busy && (
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={onCancel}
+                data-testid="split-pdf-cancel"
+              >
+                <X className="h-4 w-4" /> Cancel
+              </Button>
+            )}
+          </div>
+          {busy && progress > 0 && progress < 100 && (
+            <div
+              className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+              role="progressbar"
+              aria-valuenow={progress}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              data-testid="split-pdf-progress"
+            >
+              <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
+            </div>
+          )}
+        </div>
 
         {result && downloadName && (
           <ToolResult

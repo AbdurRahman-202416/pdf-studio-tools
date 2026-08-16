@@ -46,4 +46,9 @@ export const siteConfig = {
     "ilovepdf alternative",
   ],
   plausibleDomain: process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN || "",
+  // Vercel Web Analytics only works when actually served by Vercel; enabling it
+  // elsewhere injects /_vercel/insights/script.js which 404s on every page.
+  // Auto-on for Vercel deploys; opt-in anywhere else via the explicit flag.
+  vercelAnalytics:
+    process.env.NEXT_PUBLIC_ENABLE_VERCEL_ANALYTICS === "true" || process.env.VERCEL === "1",
 } as const;

@@ -2,12 +2,14 @@
 import Link from "next/link";
 
 import { AdSlot } from "@/components/ads/AdSlot";
+import { TrackView } from "@/components/analytics/TrackView";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/components/seo/SiteConfig";
 import { relatedTools, tools as allTools } from "@/lib/tools";
 import { getHubForDomain } from "@/lib/tools/domains";
 import { relatedArticles } from "@/lib/tools/related-articles";
 import { ToolCard } from "@/components/ui/ToolCard";
+import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ToolView } from "@/lib/tools/views";
 import type { ToolContent, ToolMeta } from "@/lib/tools/types";
 
@@ -32,6 +34,7 @@ export function ToolPage({ meta, content }: ToolPageProps) {
 
   return (
     <>
+      <TrackView event="tool_view" id={meta.id} />
       <JsonLd
         data={[
           {
@@ -94,6 +97,13 @@ export function ToolPage({ meta, content }: ToolPageProps) {
           domain's hue (see the [data-domain] rules in globals.css), so a tool
           page is accented by what it operates on without any per-page styling. */}
       <div className="space-y-16" data-domain={meta.domain}>
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            ...(hub ? [{ label: hub.title, href: `/${hub.segment}` }] : []),
+            { label: meta.cardTitle },
+          ]}
+        />
         <ToolView
           slug={meta.slug}
           title={meta.cardTitle}

@@ -31,6 +31,58 @@ def assert_page_count(page_count: int) -> None:
         )
 
 
+def assert_pdf_page_limit(file_path) -> int:
+    """Open a PDF just far enough to read its page count and reject oversized
+    documents before any expensive per-page work (rasterize / OCR / table
+    extraction). Returns the page count on success.
+
+    fitz.open parses the xref + page tree only; it does not decode page content,
+    so this is a cheap fail-fast check. Use it at the entry of every heavy PDF
+    endpoint that does not already open through pdf_edit_service._open.
+    """
+    import fitz  # PyMuPDF
+
+    try:
+        with fitz.open(file_path) as doc:
+            count = doc.page_count
+    except GuardError:
+        raise
+    except Exception as exc:  # noqa: BLE001 - malformed PDF
+        raise GuardError(f"Could not read that PDF: {exc}") from exc
+    assert_page_count(count)
+    return count
+
+
+def assert_image_dimensions(data: bytes) -> tuple[int, int]:
+    """Reject images whose declared pixel dimensions exceed the safety ceiling,
+    reading only the header so a decompression bomb never gets decoded.
+
+    Pillow's `Image.open` is lazy: it parses the header (and `.size`) without
+    allocating the full bitmap. Checking `.size` here BEFORE the bytes reach a
+    decoder (PIL or MuPDF) is what actually stops a 30000x30000 "bomb" that a
+    format-only check sails past.
+    """
+    try:
+        with Image.open(io.BytesIO(data)) as im:
+            width, height = im.size
+    except GuardError:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        raise GuardError(f"Could not read that image: {exc}") from exc
+    if width <= 0 or height <= 0:
+        raise GuardError("Image has invalid dimensions.")
+    if width > settings.MAX_IMAGE_DIMENSION or height > settings.MAX_IMAGE_DIMENSION:
+        raise GuardError(
+            f"Image is {width}x{height}px; the limit is "
+            f"{settings.MAX_IMAGE_DIMENSION}px per side."
+        )
+    if width * height > settings.MAX_RENDER_PIXELS:
+        raise GuardError(
+            f"Image has {width * height} pixels; the limit is {settings.MAX_RENDER_PIXELS}."
+        )
+    return width, height
+
+
 def safe_zoom(width_pt: float, height_pt: float, dpi: int) -> float:
     """Return a zoom factor for `dpi` clamped so the rasterized page stays
     under MAX_RENDER_PIXELS. Prevents PDF-bomb pixmap allocation."""

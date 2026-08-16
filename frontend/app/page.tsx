@@ -17,6 +17,14 @@ import { ToolSlider } from "@/components/ui/ToolSlider";
 import { RegionalModule } from "@/components/layout/RegionalModule";
 import { featuredTools, tools as toolRegistry } from "@/lib/tools";
 import { DOMAIN_HUBS } from "@/lib/tools/domains";
+import type { Metadata } from "next";
+
+// The homepage inherits title/description/OG from the root layout, but the
+// canonical must be explicit here now that the layout no longer sets a blanket
+// "/" canonical for every route.
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const toolCount = toolRegistry.length;
 const categoryCount = DOMAIN_HUBS.filter((h) =>

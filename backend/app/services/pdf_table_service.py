@@ -9,6 +9,7 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 
+from app.utils.guards import assert_pdf_page_limit
 from app.utils.storage import new_file_id, output_path
 
 
@@ -173,6 +174,8 @@ def convert_pdf_table(file_path: Path, output_name: str = "extracted-tables.xlsx
       - Multi-page PDF with tables on multiple pages → 1 sheet per page named "Page N".
       - Each table gets a styled header band, zebra rows, borders, autofit columns, frozen header.
     """
+    # pdfplumber's table detection is superlinear in vector ops; cap pages first.
+    assert_pdf_page_limit(file_path)
     try:
         with pdfplumber.open(file_path) as pdf:
             pages_tables = _extract_pages(pdf)
